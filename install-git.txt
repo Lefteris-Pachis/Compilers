@@ -1,0 +1,10 @@
+git config --global user.name "Your Name Here"
+git config --global user.email "your_email@youremail.com"
+git clone https://github.com/Lefteris-Pachis/Compilers.git
+ssh-keygen -t rsa -C "pachis@csd.uoc.gr"
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+sudo pacman -S xclip
+xclip -sel clip < ~/.ssh/id_rsa.pub
+ssh -T git@github.com
+git remote set-url origin git@github.com:Lefteris-Pachis/Compilers.git
