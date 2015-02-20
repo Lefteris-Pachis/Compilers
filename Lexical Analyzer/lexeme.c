@@ -26,7 +26,7 @@ char GetNextChar(void){
 		return lookAhead;
 	}
 	else{
-		assert(ifeof(inputFile));
+		assert(!feof(inputFile));
 		return fgetc(inputFile);
 	}
 }
