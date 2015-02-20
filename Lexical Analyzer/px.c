@@ -205,8 +205,6 @@ int gettoken(void){
 				if(c == '/') return COMMENTS;
 				else state = -1;	 				//ERROR
 				break;
-
-
 			default: assert(0); /*Giwrgadakhs*/
 		}
 		ExtendLexeme(c);
