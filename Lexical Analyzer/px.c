@@ -62,6 +62,11 @@ unsigned curr = 0;
 unsigned lineNo = 0;
 
 void ResetLexeme(void){
+	int i = 0;
+	while(lexeme[i] != '\0'){
+		lexeme[i] = '\0';
+		i++;
+	}
 	curr = 0; 
 }
 
@@ -208,6 +213,108 @@ int gettoken(void){
 	}
 }
 
+char* Convert(int x){
+	switch(x){
+		case 0:
+			return "END_OF_FILE";
+		case 1:
+			return "LE";
+		case 2:
+			return "LT";
+		case 3:
+			return "GE";
+		case 4:
+			return "GT";
+		case 5:
+			return "NE";
+		case 6:
+			return "NOT";
+		case 7:
+			return "EQ";
+		case 8:
+			return "ASSIGN";
+		case 9:
+			return "ADD";
+		case 10:
+			return "SUB";
+		case 11:
+			return "MUL";
+		case 12:
+			return "DIV";
+		case 13:
+			return "MOD";
+		case 14:
+			return "ADDONE";
+		case 15:
+			return "SUBONE";
+		case 16:
+			return "IDENTIFIER";
+		case 17:
+			return "KEYWORD_IF";
+		case 18:
+			return "KEYWORD_ELSE";
+		case 19:
+			return "KEYWORD_WHILE";
+		case 20:
+			return "KEYWORD_FOR";
+		case 21:
+			return "KEYWORD_FUNCTION";
+		case 22:
+			return "KEYWORD_RETURN";
+		case 23:
+			return "KEYWORD_BREAK";
+		case 24:
+			return "KEYWORD_CONTINUE";
+		case 25:
+			return "KEYWORD_AND";
+		case 26:
+			return "KEYWORD_NOT";
+		case 27:
+			return "KEYWORD_OR";
+		case 28:
+			return "KEYWORD_LOCAL";
+		case 29:
+			return "KEYWORD_TRUE";
+		case 30:
+			return "KEYWORD_FALSE";
+		case 31:
+			return "KEYWORD_NIL";
+		case 32:
+			return "INTCONST";
+		case 33:
+			return "DOUBLE";
+		case 34:
+			return "STRING";
+		case 35:
+			return "SEMICOLON";
+		case 36:
+			return "LBRACKET";
+		case 37:
+			return "RBRACKET";
+		case 38:
+			return "LPARENTHESES";
+		case 39:
+			return "RPARENTHESES";
+		case 40:
+			return "LBRACE";
+		case 41:
+			return "RBRACE";
+		case 42:
+			return "COMMA";
+		case 43:
+			return "DOT";
+		case 44:
+			return "DDOT";
+		case 45:
+			return "COLON";
+		case 46:
+			return "DCOLON";
+		case 47:
+			return "COMMENTS";
+	}
+	return "ERROR";
+}
+
 void main(int argc, char const *argv[])
 {
 	inputFile = fopen("gg.txt","r");
@@ -220,7 +327,7 @@ void main(int argc, char const *argv[])
 			printf("ERROR\n");
 			break;
 		}
-		printf("%d\n", i );
+		printf("%d: %s | %s\n",lineNo,Convert(i),lexeme);
 		i = gettoken();
 	}
 	
