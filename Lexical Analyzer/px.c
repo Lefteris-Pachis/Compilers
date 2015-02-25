@@ -119,6 +119,18 @@ int gettoken(void){
 				if(c == '!') state = 2; else
 				if(c == '=') state = 3; else
 				if(c == '>') state = 4; else
+				if(c == 'i') state = 18; else
+				if(c == 'w') state = 20; else
+				if(c == 'f') state = 21; else
+				if(c == 'r') state = 22; else
+				if(c == 'e') state = 23; else
+				if(c == 'b') state = 24; else
+				if(c == 'c') state = 25; else
+				if(c == 'a') state = 26; else
+				if(c == 'n') state = 27; else
+				if(c == 'o') state = 28; else
+				if(c == 'l') state = 29; else
+				if(c == 't') state = 30; else
 				if(isalpha(c)) state = 5; else
 				if(isspace(c))
 					{ CheckLine(c); state = 6; continue; } else
@@ -204,6 +216,261 @@ int gettoken(void){
 			case 17:
 				if(c == '/') return COMMENTS;
 				else state = -1;	 				//ERROR
+				break;
+			case 18:
+				if(c == 'f') { state = 33; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 33:
+				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_IF; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 20:
+				if(c == 'h') { state = 34; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 34:
+				if(c == 'i') { state = 35; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 35:
+				if(c == 'l') { state = 36; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 36:
+				if(c == 'e') { state = 37; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 37:
+				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_WHILE; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 21:
+				if(c == 'o') { state = 38; ExtendLexeme(c); continue; } else
+				if(c == 'u') { state = 40; ExtendLexeme(c); continue; } else
+				if(c == 'a') { state = 47; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 38:
+				if(c == 'r') { state = 39; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 39:
+				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_FOR; }
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 40:
+				if(c == 'n') { state = 41; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 41:
+				if(c == 'c') { state = 42; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 42:
+				if(c == 't') { state = 43; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 43:
+				if(c == 'i') { state = 44; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 44:
+				if(c == 'o') { state = 45; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 45:
+				if(c == 'n') { state = 46; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 46:
+				if(isspace(c)) return KEYWORD_FUNCTION;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 47:
+				if(c == 'l') { state = 48; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 48:
+				if(c == 's') { state = 49; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 49:
+				if(c == 'e') { state = 50; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 50:
+				if(isspace(c)) return KEYWORD_FALSE;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 22:
+				if(c == 'e') { state = 51; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 51:
+				if(c == 't') { state = 52; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 52:
+				if(c == 'e') { state = 53; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 53:
+				if(c == 'r') { state = 54; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 54:
+				if(c == 'n') { state = 55; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 55:
+				if(isspace(c)) return KEYWORD_RETURN;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 23:
+				if(c == 'l') { state = 56; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 56:
+				if(c == 's') { state = 57; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 57:
+				if(c == 'e') { state = 58; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 58:
+				if(isspace(c)) return KEYWORD_ELSE;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 24:
+				if(c == 'r') { state = 59; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 59:
+				if(c == 'e') { state = 60; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 60:
+				if(c == 'a') { state = 61; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 61:
+				if(c == 'k') { state = 62; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 62:
+				if(isspace(c)) return KEYWORD_RETURN;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 25:
+				if(c == 'o') { state = 63; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 63:
+				if(c == 'n') { state = 64; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 64:
+				if(c == 't') { state = 65; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 65:
+				if(c == 'i') { state = 66; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 66:
+				if(c == 'n') { state = 67; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 67:
+				if(c == 'u') { state = 68; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 68:
+				if(c == 'e') { state = 69; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 69:
+				if(isspace(c)) return KEYWORD_CONTINUE;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 26:
+				if(c == 'n') { state = 70; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 70:
+				if(c == 'd') { state = 71; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 71:
+				if(isspace(c)) return KEYWORD_AND;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 27:
+				if(c == 'o') { state = 72; ExtendLexeme(c); continue; } else
+				if(c == 'i') { state = 74; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 72:
+				if(c == 't') { state = 73; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 73:
+				if(isspace(c)) return KEYWORD_NOT;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 74:
+				if(c == 'l') { state = 75; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 75:
+				if(isspace(c)) return KEYWORD_NIL;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 28:
+				if(c == 'r') { state = 76; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 76:
+				if(isspace(c)) return KEYWORD_OR;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 29:
+				if(c == 'o') { state = 77; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 77:
+				if(c == 'c') { state = 78; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 78:
+				if(c == 'a') { state = 79; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 79:
+				if(c == 'l') { state = 80; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 80:
+				if(isspace(c)) return KEYWORD_LOCAL;
+				else { ExtendLexeme(c); state = 5; continue; }
+				break;
+			case 30:
+				if(c == 'r') { state = 81; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 81:
+				if(c == 'u') { state = 82; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 82:
+				if(c == 'e') { state = 83; ExtendLexeme(c); continue; }
+				else { ExtendLexeme(c); state = 5; continue; }	
+				break;
+			case 83:
+				if(isspace(c)) return KEYWORD_TRUE;
+				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			default: assert(0); /*Giwrgadakhs*/
 		}
