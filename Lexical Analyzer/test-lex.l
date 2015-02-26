@@ -68,19 +68,6 @@ comment1		"//".*
 <COMMENT>"*"+"/"	BEGIN(INITIAL);
 
 
-
- /* Print delimiters. */
-[(]         {printf("(left-parenthesis %u)\n", yylineno);}
-[)]         {printf("(right-parenthesis %u)\n", yylineno);}
-[;]         {printf("(semicolon %u)\n", yylineno);}
-
-
-
- /* Print identifiers, integers and operators. */
-{INT}       {printf("(int %s %u)\n",yytext, yylineno);}
-{ID}        {printf("(id \"%s\" %u)\n", yytext, yylineno);}
-{OP}        {printf("(op \"%s\" %u)\n", yytext, yylineno);}
-{unknown} 	{printf("(unknown\"%s\" %u)\n", yytext, yylineno);}
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}
