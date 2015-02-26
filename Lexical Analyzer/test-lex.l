@@ -63,7 +63,9 @@ comment1			"//".*
 %x COMMENT
 
 %%
-
+"if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"false"|"nil" { 
+	printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); 
+}
 "/*"				BEGIN(COMMENT);
 <COMMENT>[^*]*
 <COMMENT>"*"+[^*/]*
@@ -100,21 +102,6 @@ comment1			"//".*
 {dot} 				{ printf("%d:    %d    %s    DOT\n",yylineno,id,yytext); }
 {double_dot} 		{ printf("%d:    %d    %s    DOUBLE DOT\n",yylineno,id,yytext); }
 {comment1} 			{ printf("%d:    %d    %s    COMMENT\n",yylineno,id,yytext); }
-
-{keyword_if} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_else} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_for} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_function} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_return} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_break} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_continue} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_and} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_not} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_or} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_local} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_true} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_false} 	{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
-{keyword_nil} 		{ printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); }
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}
