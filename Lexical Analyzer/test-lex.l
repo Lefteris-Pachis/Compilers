@@ -5,6 +5,7 @@
 
 %option yylineno
 %option noyywrap
+%option prefix = "alpha_yy"
 
 ID     [A-Za-z_][A-Za-z_0-9]*
 INT    -?[1-9][0-9]*
