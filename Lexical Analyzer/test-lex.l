@@ -10,6 +10,7 @@
 ID     [A-Za-z_][A-Za-z_0-9]*
 INT    -?[1-9][0-9]*
 OP     [-+*/^=]
+unknown +.+
 
 %%
 
@@ -18,14 +19,18 @@ OP     [-+*/^=]
 [)]         {printf("(right-parenthesis %u)\n", yylineno);}
 [;]         {printf("(semicolon %u)\n", yylineno);}
 
+
+
  /* Print identifiers, integers and operators. */
 {INT}       {printf("(int %s %u)\n",yytext, yylineno);}
 {ID}        {printf("(id \"%s\" %u)\n", yytext, yylineno);}
 {OP}        {printf("(op \"%s\" %u)\n", yytext, yylineno);}
-
+{unknown} 	{printf("(unknown\"%s\" %u)\n", yytext, yylineno);}
  /* Ignore comments and whitespace. */
+
 #[^\n]*     {}
-[ \t\r\n]   {}
+[\t\r\n]   {}
+
 
 <<EOF>>     {printf("(eof %u)\n", yylineno); return 0;}
 
