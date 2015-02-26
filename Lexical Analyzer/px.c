@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -53,6 +54,12 @@
 #define DCOLON					46 		/* :: */
 #define COMMENTS				47 		/* // */
 
+struct alpha_token_t{
+	int id;
+	char *buffer;
+	int category;
+	int line;
+};
 
 char lookAhead = '\0';
 int useLookAhead = 0;
@@ -222,7 +229,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 33:
-				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_IF; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_IF; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 20:
@@ -242,7 +249,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 37:
-				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_WHILE; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_WHILE; }
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 21:
@@ -256,7 +263,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 39:
-				if(isspace(c) || c == '(') { Retract(c); return KEYWORD_FOR; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_FOR; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 40:
@@ -284,7 +291,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 46:
-				if(isspace(c)) return KEYWORD_FUNCTION;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_FUNCTION; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 47:
@@ -300,7 +307,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 50:
-				if(isspace(c)) return KEYWORD_FALSE;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_FALSE; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 22:
@@ -324,7 +331,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 55:
-				if(isspace(c)) return KEYWORD_RETURN;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_RETURN; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 23:
@@ -340,7 +347,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 58:
-				if(isspace(c)) return KEYWORD_ELSE;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_ELSE; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 24:
@@ -360,7 +367,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 62:
-				if(isspace(c)) return KEYWORD_RETURN;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_RETURN; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 25:
@@ -392,7 +399,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 69:
-				if(isspace(c)) return KEYWORD_CONTINUE;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_CONTINUE; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 26:
@@ -404,7 +411,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 71:
-				if(isspace(c)) return KEYWORD_AND;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_AND; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 27:
@@ -417,7 +424,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 73:
-				if(isspace(c)) return KEYWORD_NOT;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_NOT; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 74:
@@ -425,7 +432,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 75:
-				if(isspace(c)) return KEYWORD_NIL;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_NIL; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 28:
@@ -433,7 +440,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 76:
-				if(isspace(c)) return KEYWORD_OR;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_OR; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 29:
@@ -453,7 +460,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 80:
-				if(isspace(c)) return KEYWORD_LOCAL;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_LOCAL; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 30:
@@ -469,7 +476,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 83:
-				if(isspace(c)) return KEYWORD_TRUE;
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_TRUE; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			default: assert(0); /*Giwrgadakhs*/
@@ -584,7 +591,10 @@ void main(int argc, char const *argv[])
 {
 	inputFile = fopen("gg.txt","r");
 	char ch;
+	int id = 1;
+	struct alpha_token_t *ggwp;
 	int i = gettoken();
+	
 
 	while(i != 0)
 	{
@@ -592,7 +602,12 @@ void main(int argc, char const *argv[])
 			printf("ERROR\n");
 			break;
 		}
-		printf("%d: %s | %s\n",lineNo,Convert(i),lexeme);
+		ggwp = (struct alpha_token_t *)malloc(sizeof(struct alpha_token_t));
+		ggwp->id = id;
+		id++;
+		ggwp->buffer = lexeme;
+		ggwp->line = lineNo;
+		printf("%d: #%d 	\"%s\" %s\n",ggwp->line,ggwp->id,ggwp->buffer,Convert(i));
 		i = gettoken();
 	}
 	
