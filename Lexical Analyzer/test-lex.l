@@ -66,10 +66,19 @@ comment1			"//".*
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"false"|"nil" { 
 	printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); 
 }
-"/*"				BEGIN(COMMENT);
-<COMMENT>[^*]*
-<COMMENT>"*"+[^*/]*
-<COMMENT>"*"+"/"	BEGIN(INITIAL);
+"/*"	{
+			int c;
+			while ((c = input()) != EOF ) {
+				if(c == '*') {
+					if((c = input()) == '/'){
+						printf("%d:    %d    %s    COMMENT\n",yylineno,id,yytext);
+						break;
+					}else
+						unput(c);
+				}
+			}
+		}
+
 
 {id} 				{ printf("%d:    %d    %s    IDENTIFIER\n",yylineno,id,yytext); }
 {integer} 			{ printf("%d:    %d    %s    INTEGER\n",yylineno,id,yytext); }
