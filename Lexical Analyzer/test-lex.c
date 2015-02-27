@@ -597,16 +597,24 @@ void print_list(struct token_t *head){
 	printf("The Linked List : \n");
  	struct token_t *tmp = head;
  	while(tmp!=NULL){
-   		printf("%d:    %d    %s    %s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    		}
   	printf("NULL");
 }
 
+void print_token(int id){
+	struct token_t *tmp = head;
+	while(tmp!=NULL){
+		if(tmp->id == id)
+   			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		tmp=tmp->next;
+   	}
+}
 
 
 
-#line 610 "test-lex.c"
+#line 618 "test-lex.c"
 
 #define INITIAL 0
 #define COMMENT 1
@@ -816,12 +824,12 @@ YY_DECL
 		}
 
 	{
-#line 96 "test-lex.l"
+#line 104 "test-lex.l"
 
 
 
 
-#line 825 "test-lex.c"
+#line 833 "test-lex.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -890,21 +898,20 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 100 "test-lex.l"
-{ 
-	printf("%d:    %d    %s    KEYWORD\n",alpha_yylineno,id,alpha_yytext); 
-	head = list_w_tokens(alpha_yylineno,id,alpha_yytext,"KEYWORD");
+#line 108 "test-lex.l"
+{
+	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"KEYWORD");
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 104 "test-lex.l"
+#line 111 "test-lex.l"
 {
 			int c;
 			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
-						printf("%d:    %d    %s    COMMENT\n",alpha_yylineno,id++,alpha_yytext);
+						head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMENT");
 						break;
 					}else
 						unput(c);
@@ -914,188 +921,188 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 118 "test-lex.l"
-{printf("%d:    %d    %s    IDENTIFIER\n",alpha_yylineno,id,alpha_yytext); 
-		 head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"IDENTIFIER");		
-}
+#line 125 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"IDENTIFIER"); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 122 "test-lex.l"
-{printf("%d:    %d    %s    INTEGER     \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"INTEGER"); }
+#line 127 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"INTEGER"); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 123 "test-lex.l"
-{printf("%d:    %d    %s    DOUBLE      \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE"); }
+#line 128 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE"); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 124 "test-lex.l"
-{printf("%d:    %d    %s    CHARACTER   \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"CHARACTER"); }
+#line 129 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"CHARACTER"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 125 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 130 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 126 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 131 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 127 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 132 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 128 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 133 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 129 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 134 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 130 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 135 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 131 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 136 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 132 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 137 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 133 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 138 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 134 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 139 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 135 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 140 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 136 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 141 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 137 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 142 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 138 "test-lex.l"
-{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
+#line 143 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 139 "test-lex.l"
-{printf("%d:    %d    %s    BRACER      \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACER"); }
+#line 144 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACER"); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 140 "test-lex.l"
-{printf("%d:    %d    %s    BRACER      \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACER"); }
+#line 145 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACER"); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 141 "test-lex.l"
-{printf("%d:    %d    %s    BRACKET     \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACKET"); }
+#line 146 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACKET"); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 142 "test-lex.l"
-{printf("%d:    %d    %s    BRACKET     \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACKET"); }
+#line 147 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"BRACKET"); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 143 "test-lex.l"
-{printf("%d:    %d    %s    PARENTHESES \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PARENTHESES"); }
+#line 148 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PARENTHESES"); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 144 "test-lex.l"
-{printf("%d:    %d    %s    PARENTHESES \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PARENTHESES"); }
+#line 149 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PARENTHESES"); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 145 "test-lex.l"
-{printf("%d:    %d    %s    SEMICOLON   \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"SEMICOLON"); }
+#line 150 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"SEMICOLON"); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 146 "test-lex.l"
-{printf("%d:    %d    %s    COMMA       \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMA"); }
+#line 151 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMA"); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 147 "test-lex.l"
-{printf("%d:    %d    %s    COLON       \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COLON"); }
+#line 152 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COLON"); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 148 "test-lex.l"
-{printf("%d:    %d    %s    DOUBLE COLON\n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE COLON"); }
+#line 153 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE COLON"); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 149 "test-lex.l"
-{printf("%d:    %d    %s    DOT         \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOT"); }
+#line 154 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOT"); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 150 "test-lex.l"
-{printf("%d:    %d    %s    DOUBLE DOT  \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE DOT"); }
+#line 155 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE DOT"); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 151 "test-lex.l"
-{printf("%d:    %d    %s    COMMENT     \n",alpha_yylineno,id,alpha_yytext); head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMENT"); }
+#line 156 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMENT"); }
 	YY_BREAK
 /* Ignore comments and whitespace. */
 case 34:
 YY_RULE_SETUP
-#line 154 "test-lex.l"
+#line 159 "test-lex.l"
 {}
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 155 "test-lex.l"
+#line 160 "test-lex.l"
 {}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
-#line 158 "test-lex.l"
+#line 163 "test-lex.l"
 {	printf("(eof %u)\n", alpha_yylineno); 
-			print_list(head);
-
+			//print_list(head);
+			int i = 0;
+			for(i = 1; i <= id; i++)
+				print_token(i);
 			return 0;
 }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 164 "test-lex.l"
+#line 171 "test-lex.l"
 ECHO;
 	YY_BREAK
-#line 1099 "test-lex.c"
+#line 1106 "test-lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2100,7 +2107,7 @@ void alpha_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 164 "test-lex.l"
+#line 171 "test-lex.l"
 
 
 
