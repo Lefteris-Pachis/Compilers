@@ -171,7 +171,15 @@ comment1			"//".*
 %%
 
 int main(int argc, char* argv[]) {
-  yylex() ;
-    return EXIT_SUCCESS ;
+	if(argc > 1) {
+		if(!(yyin = fopen(argv[1],"r"))) {
+			fprintf(stderr, "Cannot read file: %s\n", argv[1]);
+			return 1;
+		}
+	}
+	else
+		yyin = stdin;
+  	yylex();
+    return 0;
 }
 
