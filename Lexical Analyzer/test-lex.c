@@ -595,7 +595,7 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 
 void print_list(struct token_t *head){
 
-	printf("The Linked List : n");
+	printf("The Linked List : \n");
  	struct token_t *tmp = head;
  	while(tmp!=NULL){
    		printf("%d:    %d    %s    %s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
@@ -916,181 +916,187 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 114 "test-lex.l"
-{ printf("%d:    %d    %s    IDENTIFIER\n",alpha_yylineno,id,alpha_yytext); }
+{printf("%d:    %d    %s    IDENTIFIER\n",alpha_yylineno,id,alpha_yytext); 
+		 head=list_w_tokens(alpha_yylineno,id,alpha_yytext,"IDENTIFIER");		
+}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 115 "test-lex.l"
-{ printf("%d:    %d    %s    INTEGER\n",alpha_yylineno,id,alpha_yytext); }
+#line 118 "test-lex.l"
+{printf("%d:    %d    %s    INTEGER     \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 116 "test-lex.l"
-{ printf("%d:    %d    %s    DOUBLE\n",alpha_yylineno,id,alpha_yytext); }
+#line 119 "test-lex.l"
+{printf("%d:    %d    %s    DOUBLE      \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 117 "test-lex.l"
-{ printf("%d:    %d    %s    CHARACTER\n",alpha_yylineno,id,alpha_yytext); }
+#line 120 "test-lex.l"
+{printf("%d:    %d    %s    CHARACTER   \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 118 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 121 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 119 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 122 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 120 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 123 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 121 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 124 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 122 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 125 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 123 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 126 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 124 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 127 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 125 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 128 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 126 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 129 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 127 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 130 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 128 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 131 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 129 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 132 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 130 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 133 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 131 "test-lex.l"
-{ printf("%d:    %d    %s    OPERATOR\n",alpha_yylineno,id,alpha_yytext); }
+#line 134 "test-lex.l"
+{printf("%d:    %d    %s    OPERATOR    \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 132 "test-lex.l"
-{ printf("%d:    %d    %s    BRACER\n",alpha_yylineno,id,alpha_yytext); }
+#line 135 "test-lex.l"
+{printf("%d:    %d    %s    BRACER      \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 133 "test-lex.l"
-{ printf("%d:    %d    %s    BRACER\n",alpha_yylineno,id,alpha_yytext); }
+#line 136 "test-lex.l"
+{printf("%d:    %d    %s    BRACER      \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 134 "test-lex.l"
-{ printf("%d:    %d    %s    BRACKET\n",alpha_yylineno,id,alpha_yytext); }
+#line 137 "test-lex.l"
+{printf("%d:    %d    %s    BRACKET     \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 135 "test-lex.l"
-{ printf("%d:    %d    %s    BRACKET\n",alpha_yylineno,id,alpha_yytext); }
+#line 138 "test-lex.l"
+{printf("%d:    %d    %s    BRACKET     \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 136 "test-lex.l"
-{ printf("%d:    %d    %s    PARENTHESES\n",alpha_yylineno,id,alpha_yytext); }
+#line 139 "test-lex.l"
+{printf("%d:    %d    %s    PARENTHESES \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 137 "test-lex.l"
-{ printf("%d:    %d    %s    PARENTHESES\n",alpha_yylineno,id,alpha_yytext); }
+#line 140 "test-lex.l"
+{printf("%d:    %d    %s    PARENTHESES \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 138 "test-lex.l"
-{ printf("%d:    %d    %s    SEMICOLON\n",alpha_yylineno,id,alpha_yytext); }
+#line 141 "test-lex.l"
+{printf("%d:    %d    %s    SEMICOLON   \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 139 "test-lex.l"
-{ printf("%d:    %d    %s    COMMA\n",alpha_yylineno,id,alpha_yytext); }
+#line 142 "test-lex.l"
+{printf("%d:    %d    %s    COMMA       \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 140 "test-lex.l"
-{ printf("%d:    %d    %s    COLON\n",alpha_yylineno,id,alpha_yytext); }
+#line 143 "test-lex.l"
+{printf("%d:    %d    %s    COLON       \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 141 "test-lex.l"
-{ printf("%d:    %d    %s    DOUBLE COLON\n",alpha_yylineno,id,alpha_yytext); }
+#line 144 "test-lex.l"
+{printf("%d:    %d    %s    DOUBLE COLON\n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 142 "test-lex.l"
-{ printf("%d:    %d    %s    DOT\n",alpha_yylineno,id,alpha_yytext); }
+#line 145 "test-lex.l"
+{printf("%d:    %d    %s    DOT         \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 143 "test-lex.l"
-{ printf("%d:    %d    %s    DOUBLE DOT\n",alpha_yylineno,id,alpha_yytext); }
+#line 146 "test-lex.l"
+{printf("%d:    %d    %s    DOUBLE DOT  \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 144 "test-lex.l"
-{ printf("%d:    %d    %s    COMMENT\n",alpha_yylineno,id,alpha_yytext); }
+#line 147 "test-lex.l"
+{printf("%d:    %d    %s    COMMENT     \n",alpha_yylineno,id,alpha_yytext); }
 	YY_BREAK
 /* Ignore comments and whitespace. */
 case 34:
 YY_RULE_SETUP
-#line 147 "test-lex.l"
+#line 150 "test-lex.l"
 {}
 	YY_BREAK
 case 35:
 /* rule 35 can match eol */
 YY_RULE_SETUP
-#line 148 "test-lex.l"
+#line 151 "test-lex.l"
 {}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
-#line 151 "test-lex.l"
-{printf("(eof %u)\n", alpha_yylineno); return 0;}
+#line 154 "test-lex.l"
+{	printf("(eof %u)\n", alpha_yylineno); 
+			print_list(head);
+
+			return 0;
+}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 153 "test-lex.l"
+#line 160 "test-lex.l"
 ECHO;
 	YY_BREAK
-#line 1094 "test-lex.c"
+#line 1100 "test-lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2098,7 +2104,7 @@ void alpha_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 153 "test-lex.l"
+#line 160 "test-lex.l"
 
 
 
