@@ -94,6 +94,13 @@ comment1			"//".*
 %x COMMENT
 
 %%
+
+
+"/*"			BEGIN(COMMENT);
+<COMMENT>[^*]*
+<COMMENT>"*"+[^*/]*
+<COMMENT>"*"+"/"	BEGIN(INITIAL);
+
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"false"|"nil" { 
 	printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); 
 }
