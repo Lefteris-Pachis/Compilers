@@ -18,7 +18,6 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	list->category=strdup(category);
 	list->next=head;
 	head=list;
-	id++;
 	return head;
 };
 
@@ -27,7 +26,7 @@ void print_list(struct token_t *head){
 	printf("The Linked List : \n");
  	struct token_t *tmp = head;
  	while(tmp!=NULL){
-   		printf("%d:    %d    %s    %s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    		}
   	printf("NULL");
@@ -97,10 +96,6 @@ comment1			"//".*
 %%
 
 
-"/*"			BEGIN(COMMENT);
-<COMMENT>[^*]*
-<COMMENT>"*"+[^*/]*
-<COMMENT>"*"+"/"	BEGIN(INITIAL);
 
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"false"|"nil" { 
 	printf("%d:    %d    %s    KEYWORD\n",yylineno,id,yytext); 
@@ -111,7 +106,7 @@ comment1			"//".*
 			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
-						printf("%d:    %d    %s    COMMENT\n",yylineno,id,yytext);
+						printf("%d:    %d    %s    COMMENT\n",yylineno,id++,yytext);
 						break;
 					}else
 						unput(c);
@@ -121,39 +116,39 @@ comment1			"//".*
 
 
 {id}	{printf("%d:    %d    %s    IDENTIFIER\n",yylineno,id,yytext); 
-		 head = list_w_tokens(yylineno,id,yytext,"IDENTIFIER");		
+		 head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER");		
 }
 
-{integer} 			{printf("%d:    %d    %s    INTEGER     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"IDENTIFIER"); }
-{double} 			{printf("%d:    %d    %s    DOUBLE      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"DOUBLE"); }
-{character} 		{printf("%d:    %d    %s    CHARACTER   \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"CHARACTER"); }
-{op_add} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_sub} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_less} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_greater} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_equal} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_less_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_great_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_diff} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_log_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_plus} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_minus} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_mod} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_mul} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{op_div} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"OPERATOR"); }
-{left_bracer} 		{printf("%d:    %d    %s    BRACER      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"BRACER"); }
-{right_bracer} 		{printf("%d:    %d    %s    BRACER      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"BRACER"); }
-{left_bracket} 		{printf("%d:    %d    %s    BRACKET     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"BRACKET"); }
-{right_bracket} 	{printf("%d:    %d    %s    BRACKET     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"BRACKET"); }
-{left_parentheses} 	{printf("%d:    %d    %s    PARENTHESES \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"PARENTHESES"); }
-{right_parentheses} {printf("%d:    %d    %s    PARENTHESES \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"PARENTHESES"); }
-{semicolon} 		{printf("%d:    %d    %s    SEMICOLON   \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"SEMICOLON"); }
-{comma} 			{printf("%d:    %d    %s    COMMA       \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"COMMA"); }
-{colon} 			{printf("%d:    %d    %s    COLON       \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"COLON"); }
-{double_colon} 		{printf("%d:    %d    %s    DOUBLE COLON\n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"DOUBLE COLON"); }
-{dot} 				{printf("%d:    %d    %s    DOT         \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"DOT"); }
-{double_dot} 		{printf("%d:    %d    %s    DOUBLE DOT  \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"DOUBLE DOT"); }
-{comment1} 			{printf("%d:    %d    %s    COMMENT     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id,yytext,"COMMENT"); }
+{integer} 			{printf("%d:    %d    %s    INTEGER     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
+{double} 			{printf("%d:    %d    %s    DOUBLE      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
+{character} 		{printf("%d:    %d    %s    CHARACTER   \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
+{op_add} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_sub} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_less} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_greater} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_equal} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_less_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_great_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_diff} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_log_eq} 		{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_plus} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_minus} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_mod} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_mul} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_div} 			{printf("%d:    %d    %s    OPERATOR    \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{left_bracer} 		{printf("%d:    %d    %s    BRACER      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
+{right_bracer} 		{printf("%d:    %d    %s    BRACER      \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
+{left_bracket} 		{printf("%d:    %d    %s    BRACKET     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
+{right_bracket} 	{printf("%d:    %d    %s    BRACKET     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
+{left_parentheses} 	{printf("%d:    %d    %s    PARENTHESES \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
+{right_parentheses} {printf("%d:    %d    %s    PARENTHESES \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
+{semicolon} 		{printf("%d:    %d    %s    SEMICOLON   \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"SEMICOLON"); }
+{comma} 			{printf("%d:    %d    %s    COMMA       \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"COMMA"); }
+{colon} 			{printf("%d:    %d    %s    COLON       \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"COLON"); }
+{double_colon} 		{printf("%d:    %d    %s    DOUBLE COLON\n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"DOUBLE COLON"); }
+{dot} 				{printf("%d:    %d    %s    DOT         \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
+{double_dot} 		{printf("%d:    %d    %s    DOUBLE DOT  \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
+{comment1} 			{printf("%d:    %d    %s    COMMENT     \n",yylineno,id,yytext); head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}
