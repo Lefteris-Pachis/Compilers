@@ -2,6 +2,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 int id = 1;
+struct token_t{
+	int id;
+	char *buffer;
+	char *category;
+	int line;
+	struct token_t *next;
+}*head;
+struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
+	struct token_t *list;
+	list = (struct token_t *)malloc(sizeof(struct token_t));
+	list->line=line;
+	list->id=id;
+	list->buffer=strdup(buffer);
+	list->category=strdup(category);
+	list->next=head;
+	head=list;
+	return head;
+};
+
+void print_list(struct token_t *head){
+
+	printf("The Linked List : n");
+ 	struct token_t *tmp = head;
+ 	while(tmp!=NULL){
+   		printf("%d:    %d    %s    %s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		tmp=tmp->next;
+   		}
+  	printf("NULL");
+}
+
+
 
 %}
 
@@ -125,3 +156,4 @@ int main(int argc, char* argv[]) {
   yylex() ;
     return EXIT_SUCCESS ;
 }
+
