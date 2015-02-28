@@ -60,7 +60,6 @@ id          [A-Za-z_][A-Za-z_0-9]*
 integer		(0[xX][0-9A-Fa-f]*)|([0-9]*)
 double		[0-9]+.[0-9]+
 character	'.'
-string		\".*\"
 undefined  	(.)
 op_add		"+"
 op_sub		"-"
@@ -109,9 +108,9 @@ double_dot			".."
 comment1			"//".*	
 
 %x COMMENT
+%s STRING
 
 %%
-
 
 "\""	{
 			int c;
@@ -135,12 +134,14 @@ comment1			"//".*
 						unput(c);
 				}else if(c == '\"'){
 					*get_ptr++ = '\0';
-					printf("%d:    %d    %s    STRING\n",yylineno,id++,get);
 					break;
 				}else{
 					*get_ptr++ = c;
 				}
 			}
+
+			printf("%d:    %d    %s    STRING\n",yylineno,id++,get);
+			head = list_w_tokens(yylineno,id++,get,"STRING");
 		}
 
 
@@ -197,7 +198,6 @@ comment1			"//".*
 
 
 {id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER",0); }
-{string}			{ head = list_w_tokens(yylineno,id++,yytext,"STRING",0); }
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER",0); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE",0); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER",0); }
