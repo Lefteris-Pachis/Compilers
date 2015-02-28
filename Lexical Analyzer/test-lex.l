@@ -158,7 +158,7 @@ comment1			"//".*
 {dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
 {double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
-{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"undefined");}
+{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"UNDEFINED");}
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}

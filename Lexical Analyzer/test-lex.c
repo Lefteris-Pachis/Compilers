@@ -1097,7 +1097,7 @@ YY_RULE_SETUP
 case 35:
 YY_RULE_SETUP
 #line 161 "test-lex.l"
-{head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"undefined");}
+{head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"UNDEFINED");}
 	YY_BREAK
 /* Ignore comments and whitespace. */
 case 36:
