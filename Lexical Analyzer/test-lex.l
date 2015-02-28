@@ -53,7 +53,7 @@ integer		(0[xX][0-9A-Fa-f]*)|([0-9]*)
 double		[0-9]+.[0-9]+
 character	'.'
 string		\".*\"
-
+undefined  	(.)
 op_add		"+"
 op_sub		"-"
 op_less		"<"
@@ -105,8 +105,7 @@ comment1			"//".*
 %%
 
 
-
-"if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"false"|"nil" {
+"if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"while"|"false"|"nil" {
 	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD");
 }
 "/*"	{
@@ -120,10 +119,14 @@ comment1			"//".*
 						unput(c);
 				}
 			}
+			if(c==EOF){
+				printf("\nError.Comment not terminated in line %d\nExit\n",yylineno);
+				exit(1);
+			}
 		}
 
 
-{id}	{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
+{id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
 {string}			{ head = list_w_tokens(yylineno,id++,yytext,"STRING"); }
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
@@ -155,6 +158,7 @@ comment1			"//".*
 {dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
 {double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
+{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"undefined");}
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}
@@ -168,6 +172,7 @@ comment1			"//".*
 				print_token(i);
 			return 0;
 }
+
 
 %%
 
