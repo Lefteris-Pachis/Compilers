@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 
 #define MAX_LEXEME 				1024
 #define UNKNOWN_TOKEN 			-1
@@ -54,19 +55,41 @@
 #define DCOLON					46 		/* :: */
 #define COMMENTS				47 		/* // */
 
-struct alpha_token_t{
+struct token_t{
 	int id;
 	char *buffer;
-	int category;
+	char *category;
 	int line;
+	struct token_t *next;
+}*head;
+
+struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
+	struct token_t *list;
+	list = (struct token_t *)malloc(sizeof(struct token_t));
+	list->line=line;
+	list->id=id;
+	list->buffer=strdup(buffer);
+	list->category=strdup(category);
+	list->next=head;
+	head=list;
+	return head;
 };
+
+void print_token(int id){
+	struct token_t *tmp = head;
+	while(tmp!=NULL){
+		if(tmp->id == id)
+   			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		tmp=tmp->next;
+   	}
+}
 
 char lookAhead = '\0';
 int useLookAhead = 0;
 FILE* inputFile = (FILE*) 0;
 char lexeme[MAX_LEXEME];
 unsigned curr = 0;
-unsigned lineNo = 0;
+unsigned lineNo = 1;
 
 void ResetLexeme(void){
 	int i = 0;
@@ -118,7 +141,7 @@ int gettoken(void){
 			return UNKNOWN_TOKEN;
 		if(feof(inputFile))
 			return END_OF_FILE;
-		printf("state = %d\n",state);
+		//printf("state = %d\n",state);
 		char c = GetNextChar();
 		switch(state){
 			case 0:
@@ -589,7 +612,7 @@ char* Convert(int x){
 
 void main(int argc, char const *argv[])
 {
-	inputFile = fopen("gg.txt","r");
+	inputFile = fopen(argv[1],"r");
 	char ch;
 	int id = 1;
 	struct alpha_token_t *ggwp;
@@ -602,14 +625,10 @@ void main(int argc, char const *argv[])
 			printf("ERROR\n");
 			break;
 		}
-		ggwp = (struct alpha_token_t *)malloc(sizeof(struct alpha_token_t));
-		ggwp->id = id;
-		id++;
-		ggwp->buffer = lexeme;
-		ggwp->line = lineNo;
-		printf("%d: #%d 	\"%s\" %s\n",ggwp->line,ggwp->id,ggwp->buffer,Convert(i));
+		head = list_w_tokens(lineNo,id++,lexeme,Convert(i));
 		i = gettoken();
 	}
-	
+	int j = 0;
+	for(j = 1; j <= id; j++)
+		print_token(j);
 }
-//Giwrgadakhs
