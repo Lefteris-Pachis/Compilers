@@ -118,12 +118,26 @@ comment1			"//".*
 					}else
 						unput(c);
 				}
-			}
+				if(c=='/'){
+					if(c=input()=='*'){
+						while ((c = input()) != EOF ){
+							if((c = input()) == '/'){
+								head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT");
+								break;
+							}else
+								unput(c);
+						}
+
+
+						}
+					}
+				}
 			if(c==EOF){
 				printf("\nError.Comment not terminated in line %d\nExit\n",yylineno);
 				exit(1);
 			}
-		}
+	}
+
 
 
 {id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
