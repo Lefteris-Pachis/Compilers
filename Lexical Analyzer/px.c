@@ -198,7 +198,7 @@ int gettoken(void){
 				if(c == '=') { ExtendLexeme(c); return GE; }
 				Retract(c); return GT;
 			case 5:
-				if(isalpha(c) || isdigit(c)) state = 5;
+				if(isalpha(c) || isdigit(c) || c == '_') state = 5;
 				else { Retract(c); return IDENTIFIER; }
 				break;
 			case 6:
@@ -208,8 +208,8 @@ int gettoken(void){
 					{ Retract(c); state = 0; }
 				continue;
 			case 7:
-				if(c == '*') { state == 15; continue;  }
-				else if(c == '/') { state == 16; continue; }
+				if(c == '*') { state = 15; ExtendLexeme(c); continue;  }
+				else if(c == '/') { state = 16; ExtendLexeme(c); continue; }
 				else { Retract(c); return DIV; }
 			case 8:
 				if(c == '+') { ExtendLexeme(c); return ADDONE; }
@@ -235,16 +235,16 @@ int gettoken(void){
 				if(isdigit(c)) { state = 14; ExtendLexeme(c); continue; }
 				else { Retract(c); return DOUBLE; } 
 			case 15:
-				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 15; continue; }
-				else if(c == '*') { state = 17; continue; }
+				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 15; ExtendLexeme(c); continue; }
+				else if(c == '*') { state = 17; ExtendLexeme(c); continue; }
 				break;
 			case 16:
-				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 16; continue; }
+				if(isalpha(c) || isdigit(c) || isspace(c) && c != '\n') { state = 16; ExtendLexeme(c); continue; }
 				else if(c == '\n') { CheckLine(c); return COMMENTS; }
 				else state = -1;					//ERROR
 				break;
 			case 17:
-				if(c == '/') return COMMENTS;
+				if(c == '/') { ExtendLexeme(c); return COMMENTS; }
 				else state = -1;	 				//ERROR
 				break;
 			case 18:

@@ -2112,8 +2112,16 @@ void alpha_yyfree (void * ptr )
 
 
 int main(int argc, char* argv[]) {
-  alpha_yylex() ;
-    return EXIT_SUCCESS ;
+	if(argc > 1) {
+		if(!(alpha_yyin = fopen(argv[1],"r"))) {
+			fprintf(stderr, "Cannot read file: %s\n", argv[1]);
+			return 1;
+		}
+	}
+	else
+		alpha_yyin = stdin;
+  	alpha_yylex();
+    return 0;
 }
 
 
