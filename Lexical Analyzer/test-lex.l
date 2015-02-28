@@ -113,6 +113,37 @@ comment1			"//".*
 %%
 
 
+"\""	{
+			int c;
+			char get[100];
+			char* get_ptr;
+			get_ptr=get;
+			int len=0;
+			while ((c = input()) != EOF ) {
+				if(c  == '\\'){
+					if((c=input())=='n')
+						*get_ptr++ ='\n';
+					else
+						unput(c);					
+					if((c=input())=='t')
+						*get_ptr++ ='\t';
+					else
+						unput(c);
+					if((c=input())=='\\')
+						*get_ptr++ ='\\';
+					else
+						unput(c);
+				}else if(c == '\"'){
+					*get_ptr++ = '\0';
+					printf("%d:    %d    %s    STRING\n",yylineno,id++,get);
+					break;
+				}else{
+					*get_ptr++ = c;
+				}
+			}
+		}
+
+
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"while"|"false"|"nil" {
 	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD",0);
 }
