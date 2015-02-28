@@ -52,6 +52,7 @@ id          [A-Za-z_][A-Za-z_0-9]*
 integer		(0[xX][0-9A-Fa-f]*)|([0-9]*)
 double		[0-9]+.[0-9]+
 character	'.'
+string		\".*\"
 
 op_add		"+"
 op_sub		"-"
@@ -123,7 +124,7 @@ comment1			"//".*
 
 
 {id}	{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
-
+{string}			{ head = list_w_tokens(yylineno,id++,yytext,"STRING"); }
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }

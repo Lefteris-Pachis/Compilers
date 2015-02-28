@@ -622,7 +622,7 @@ void main(int argc, char const *argv[])
 	while(i != 0)
 	{
 		if(i == -1){
-			printf("ERROR\n");
+			//printf("ERROR\n");
 			break;
 		}
 		head = list_w_tokens(lineNo,id++,lexeme,Convert(i));
