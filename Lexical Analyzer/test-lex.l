@@ -141,7 +141,7 @@ comment1			"//".*
 			}
 
 			printf("%d:    %d    %s    STRING\n",yylineno,id++,get);
-			head = list_w_tokens(yylineno,id++,get,"STRING");
+			head = list_w_tokens(yylineno,id++,get,"STRING",0);
 		}
 
 
