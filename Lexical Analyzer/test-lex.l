@@ -224,7 +224,7 @@ comment1			"//".*
 {dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
 {double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
-{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"UNDEFINED");}
+{undefined}         { printf("undefined character %c in line %d\n",yytext,yylineno); }
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}

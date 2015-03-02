@@ -1157,7 +1157,7 @@ YY_RULE_SETUP
 case 35:
 YY_RULE_SETUP
 #line 227 "test-lex.l"
-{head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"UNDEFINED");}
+{ printf("undefined character %c in line %d\n",alpha_yytext,alpha_yylineno); }
 	YY_BREAK
 /* Ignore comments and whitespace. */
 case 36:
