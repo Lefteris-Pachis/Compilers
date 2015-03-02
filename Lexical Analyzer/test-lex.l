@@ -35,11 +35,6 @@ void print_list(struct token_t *head){
 void print_token(int id){
 	struct token_t *tmp = head;
 	while(tmp!=NULL){
-		/*if(strcmp(tmp->category,"NESTED_COMMENT_")==0){
-			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
-			tmp=tmp->next;
-			break;
-		}*/
 		if(tmp->id == id)
    			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
@@ -73,21 +68,6 @@ op_minus	"--"
 op_mod		"%"
 op_mul		"*"
 op_div		"/"
-
-keyword_if			"if"
-keyword_else		"else"
-keyword_for			"for"
-keyword_function	"function"
-keyword_return		"return"
-keyword_break		"break"
-keyword_continue	"continue"
-keyword_and			"and"
-keyword_not 		"not"
-keyword_or 			"or"
-keyword_local		"local"
-keyword_true		"true"
-keyword_false		"false"
-keyword_nil 		"nil"
 
 left_bracer			"{"
 right_bracer		"}"
