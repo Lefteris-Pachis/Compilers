@@ -7,10 +7,9 @@ struct token_t{
 	char *buffer;
 	char *category;
 	int line;
-	int comment_level;
 	struct token_t *next;
 }*head;
-struct token_t* list_w_tokens(int line,int id,char* buffer,char* category,int comment_level){
+struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	struct token_t *list;
 	list = (struct token_t *)malloc(sizeof(struct token_t));
 	list->line=line;
@@ -18,7 +17,6 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category,int co
 	list->buffer=strdup(buffer);
 	list->category=strdup(category);
 	list->next=head;
-	list->comment_level=comment_level;
 	head=list;
 	return head;
 };
@@ -38,7 +36,7 @@ void print_token(int id){
 	struct token_t *tmp = head;
 	while(tmp!=NULL){
 		/*if(strcmp(tmp->category,"NESTED_COMMENT_")==0){
-			printf("%d:    %d    %s    \t%s\tlevel: %d\n",tmp->line,tmp->id,tmp->buffer,tmp->category,tmp->comment_level);
+			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
 			tmp=tmp->next;
 			break;
 		}*/
@@ -139,96 +137,94 @@ comment1			"//".*
 					*get_ptr++ = c;
 				}
 			}
-
-			printf("%d:    %d    %s    STRING\n",yylineno,id++,get);
-			head = list_w_tokens(yylineno,id++,get,"STRING",0);
+			head = list_w_tokens(yylineno,id++,get,"STRING");
 		}
 
 
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"while"|"false"|"nil" {
-	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD",0);
+	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD");
 }
 "/*"	{
-			static 	int level;
+			int anoigei = 1, kleinei = 0;
 			int c;
-			int nested_comment(int level){
+			int nested_comment(){
 				while ((c = input()) != EOF ){
 					if(c=='*'){
 						if((c = input()) == '/'){
-							
-							head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT_",level);
-							break;
-							return level;
+							kleinei++;
+							head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT");
 						}
 						else
 							unput(c);
 					}
 					if(c=='/'){
 						if(c=input()=='*'){
-							level++;
-							nested_comment(level);
+							anoigei++;
+							nested_comment();
 						}
-					
+					}
 				}
 			}
-		}
 
-		while ((c = input()) != EOF ) {
+			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
-						head = list_w_tokens(yylineno,id++,yytext,"COMMENT",level);
+						kleinei++;
+						head = list_w_tokens(yylineno,id++,yytext,"COMMENT");
 						break;
 					}else
 						unput(c);
 				}
 				if(c=='/'){
 					if(c=input()=='*'){
-						level++;
-						nested_comment(level);
-						}
-					
+						anoigei++;
+						nested_comment();
+					}
 				}
-			if(c==EOF){
-				printf("\nError.Comment not terminated in line %d\nExit\n",yylineno);
+			}
+			if(anoigei != kleinei){
+				if(kleinei > anoigei)
+					printf("Error.Comment closes more times than needed in line %d\nExit\n",yylineno);
+				else
+					printf("\nError.Comment not terminated in line %d\nExit\n",yylineno);
 				exit(1);
 			}
 		}
-}
 
 
 
-{id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER",0); }
-{integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER",0); }
-{double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE",0); }
-{character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER",0); }
-{op_add} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_sub} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_less} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_greater} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_equal} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_less_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_great_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_diff} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_log_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_plus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_minus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_mod} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_mul} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{op_div} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR",0); }
-{left_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER",0); }
-{right_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER",0); }
-{left_bracket} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET",0); }
-{right_bracket} 	{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET",0); }
-{left_parentheses} 	{ head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES",0); }
-{right_parentheses} { head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES",0); }
-{semicolon} 		{ head = list_w_tokens(yylineno,id++,yytext,"SEMICOLON",0); }
-{comma} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMA",0); }
-{colon} 			{ head = list_w_tokens(yylineno,id++,yytext,"COLON",0); }
-{double_colon} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE COLON",0); }
-{dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT",0); }
-{double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT",0); }
-{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT",0); }
-{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"UNDEFINED",0);}
+{id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
+{integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
+{double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
+{character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
+{op_add} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_sub} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_less} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_greater} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_equal} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_less_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_great_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_diff} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_log_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_plus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_minus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_mod} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_mul} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{op_div} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
+{left_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
+{right_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
+{left_bracket} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
+{right_bracket} 	{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
+{left_parentheses} 	{ head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
+{right_parentheses} { head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
+{semicolon} 		{ head = list_w_tokens(yylineno,id++,yytext,"SEMICOLON"); }
+{comma} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMA"); }
+{colon} 			{ head = list_w_tokens(yylineno,id++,yytext,"COLON"); }
+{double_colon} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE COLON"); }
+{dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
+{double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
+{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
+{undefined}         {head = list_w_tokens(yylineno,id++,yytext,"UNDEFINED");}
  /* Ignore comments and whitespace. */
 
 #[^\n]*     {}
