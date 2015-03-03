@@ -50,8 +50,8 @@ void print_token(int id){
 %option prefix = "alpha_yy"
 
 id          [A-Za-z_][A-Za-z_0-9]*
-integer		(0[xX][0-9A-Fa-f]*)|([0-9]*)
-double		[0-9]+.[0-9]+
+integer		[0-9]+
+double		[0-9]+\.[0-9]+
 character	'.'
 undefined  	(.)
 op_add		"+"
