@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 int id = 1;
+
 struct token_t{
 	int id;
 	char *buffer;
@@ -9,10 +10,10 @@ struct token_t{
 	int line;
 	struct token_t *next;
 }*head,*tail;
+
 struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	struct token_t *list;
 	list = (struct token_t *)malloc(sizeof(struct token_t));
-
 	list->line=line;
 	list->id=id;
 	list->buffer=strdup(buffer);
@@ -23,35 +24,21 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 		tail=head;
 		return head;
 	}
-	if(head->next==NULL){
+	if(head->next==NULL)
 		head->next=list;
-	}else
+	else
 		tail->next=list;
 	tail=list;
 	return head;
 };
 
 void print_list(struct token_t *head){
-
-	printf("The Linked List : \n");
  	struct token_t *tmp = head;
  	while(tmp!=NULL){
-   		printf("%d:    #%d    \"%s\"    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
-   		tmp=tmp->next;
-   		}
-  	printf("NULL");
-}
-
-void print_token(int id){
-	struct token_t *tmp = head;
-	while(tmp!=NULL){
-		if(tmp->id == id)
-   			printf("%d:    #%d    \"%s\"    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		printf("%d: #%d    \"%s\"    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    	}
 }
-
-
 
 %}
 
@@ -78,7 +65,6 @@ op_minus	"--"
 op_mod		"%"
 op_mul		"*"
 op_div		"/"
-
 left_bracer			"{"
 right_bracer		"}"
 left_bracket		"["
@@ -91,8 +77,6 @@ colon				":"
 double_colon		"::"
 dot					"."
 double_dot			".."
-
-
 comment1			"//".*	
 
 %x COMMENT
@@ -131,9 +115,22 @@ comment1			"//".*
 		}
 
 
-"if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"while"|"false"|"nil" {
-	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD");
-}
+"if"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_IF"); }
+"else"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_ELSE"); }
+"for"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_FOR"); }
+"function"	{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_FUNCTION"); }
+"return"	{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_RETURN"); }
+"break"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_BREAK"); }
+"continue"	{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_CONTINUE"); }
+"and"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_AND"); }
+"not"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_NOT"); }
+"or"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_OR"); }
+"local"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_LOCAL"); }
+"true"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_TRUE"); }
+"while"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_WHILE"); }
+"false"		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_FALSE"); }
+"nil" 		{ head = list_w_tokens(yylineno,id++,yytext,"KEYWORD_NIL"); }
+
 "/*"	{
 			int anoigei = 1, kleinei = 0;
 			int c;
@@ -181,32 +178,30 @@ comment1			"//".*
 			}
 		}
 
-
-
 {id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
-{op_add} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_sub} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_less} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_greater} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_equal} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_less_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_great_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_diff} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_log_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_plus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_minus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_mod} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_mul} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{op_div} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); }
-{left_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
-{right_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACER"); }
-{left_bracket} 		{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
-{right_bracket} 	{ head = list_w_tokens(yylineno,id++,yytext,"BRACKET"); }
-{left_parentheses} 	{ head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
-{right_parentheses} { head = list_w_tokens(yylineno,id++,yytext,"PARENTHESES"); }
+{op_add} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_ADD"); }
+{op_sub} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_SUB"); }
+{op_less} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_LESS"); }
+{op_greater} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_GREATER"); }
+{op_equal} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_EQUAL"); }
+{op_less_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_LESS_EQUAL"); }
+{op_great_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_GREATER_EQUAL"); }
+{op_diff} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_DIFF"); }
+{op_log_eq} 		{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_LOG_EQ"); }
+{op_plus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_PLUS"); }
+{op_minus} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_MINUS"); }
+{op_mod} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_MOD"); }
+{op_mul} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_MUL"); }
+{op_div} 			{ head = list_w_tokens(yylineno,id++,yytext,"OPERATOR_DIV"); }
+{left_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"LEFT_BRACER"); }
+{right_bracer} 		{ head = list_w_tokens(yylineno,id++,yytext,"RIGHT_BRACER"); }
+{left_bracket} 		{ head = list_w_tokens(yylineno,id++,yytext,"LEFT_BRACKET"); }
+{right_bracket} 	{ head = list_w_tokens(yylineno,id++,yytext,"RIGHT_BRACKET"); }
+{left_parentheses} 	{ head = list_w_tokens(yylineno,id++,yytext,"LEFT_PARENTHESES"); }
+{right_parentheses} { head = list_w_tokens(yylineno,id++,yytext,"RIGHT_PARENTHESES"); }
 {semicolon} 		{ head = list_w_tokens(yylineno,id++,yytext,"SEMICOLON"); }
 {comma} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMA"); }
 {colon} 			{ head = list_w_tokens(yylineno,id++,yytext,"COLON"); }
@@ -214,21 +209,14 @@ comment1			"//".*
 {dot} 				{ head = list_w_tokens(yylineno,id++,yytext,"DOT"); }
 {double_dot} 		{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE DOT"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
-{undefined}         { printf("undefined character %c in line %d\n",yytext,yylineno); }
- /* Ignore comments and whitespace. */
+{undefined}         { printf("undefined character %s in line %d\n",yytext,yylineno); }
 
-#[^\n]*     {}
 [\t\r\n]   {}
-
 
 <<EOF>> {	printf("(eof %u)\n", yylineno); 
 			print_list(head);
-			int i = 0;
-			for(i = 1; i <= id; i++)
-				//print_token(i);
 			return 0;
 }
-
 
 %%
 
@@ -244,4 +232,3 @@ int main(int argc, char* argv[]) {
   	yylex();
     return 0;
 }
-
