@@ -18,13 +18,17 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	list->buffer=strdup(buffer);
 	list->category=strdup(category);
 	list->next=NULL;
+	if(head==NULL){
+		head=list;
+		tail=head;
+		return head;
+	}
 	if(head->next==NULL){
-		head=tail;
 		head->next=list;
 	}else
 		tail->next=list;
 	tail=list;
-	return tail;
+	return head;
 };
 
 void print_list(struct token_t *head){
@@ -218,10 +222,10 @@ comment1			"//".*
 
 
 <<EOF>> {	printf("(eof %u)\n", yylineno); 
-			//print_list(head);
+			print_list(head);
 			int i = 0;
 			for(i = 1; i <= id; i++)
-				print_token(i);
+				//print_token(i);
 			return 0;
 }
 
