@@ -54,6 +54,7 @@
 #define COLON					45 		/* : */
 #define DCOLON					46 		/* :: */
 #define COMMENTS				47 		/* // */
+#define NESTED_COMMENTS			48
 
 struct token_t{
 	int id;
@@ -79,7 +80,11 @@ void print_token(int id){
 	struct token_t *tmp = head;
 	while(tmp!=NULL){
 		if(tmp->id == id)
-   			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+			if(strcmp(tmp->category,"STRING") == 0){
+				
+			}
+   			else
+   				printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    	}
 }
@@ -90,6 +95,7 @@ FILE* inputFile = (FILE*) 0;
 char lexeme[MAX_LEXEME];
 unsigned curr = 0;
 unsigned lineNo = 1;
+int anoigei = 0, kleinei = 0;
 
 void ResetLexeme(void){
 	int i = 0;
@@ -143,6 +149,7 @@ int gettoken(void){
 			return END_OF_FILE;
 		//printf("state = %d\n",state);
 		char c = GetNextChar();
+		
 		switch(state){
 			case 0:
 				if(c == '<') state = 1; else
@@ -208,7 +215,7 @@ int gettoken(void){
 					{ Retract(c); state = 0; }
 				continue;
 			case 7:
-				if(c == '*') { state = 15; ExtendLexeme(c); continue;  }
+				if(c == '*') { anoigei++; state = 15; ExtendLexeme(c); continue;  }
 				else if(c == '/') { state = 16; ExtendLexeme(c); continue; }
 				else { Retract(c); return DIV; }
 			case 8:
@@ -236,16 +243,21 @@ int gettoken(void){
 				else { Retract(c); return DOUBLE; } 
 			case 15:
 				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 15; ExtendLexeme(c); continue; }
+				else if(c == '/') { state = 84; ExtendLexeme(c); continue; }
 				else if(c == '*') { state = 17; ExtendLexeme(c); continue; }
 				break;
+			case 84:
+				if(c == '*') { anoigei++; state = 15; ExtendLexeme(c); continue; }
+				else { state = 15; ExtendLexeme(c); continue; }
 			case 16:
 				if(isalpha(c) || isdigit(c) || isspace(c) && c != '\n') { state = 16; ExtendLexeme(c); continue; }
 				else if(c == '\n') { CheckLine(c); return COMMENTS; }
 				else state = -1;					//ERROR
 				break;
 			case 17:
-				if(c == '/') { ExtendLexeme(c); return COMMENTS; }
-				else state = -1;	 				//ERROR
+				if(anoigei > kleinei+1 && c == '/') { kleinei++; ExtendLexeme(c); return NESTED_COMMENTS;}
+				if(c == '/') { kleinei++; printf("anoigei = %d kleinei = %d\n",anoigei,kleinei ); ExtendLexeme(c); return COMMENTS; }
+				else state = 15;	 				//ERROR
 				break;
 			case 18:
 				if(c == 'f') { state = 33; ExtendLexeme(c); continue; }
@@ -502,6 +514,7 @@ int gettoken(void){
 				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_TRUE; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
+
 			default: assert(0); /*Giwrgadakhs*/
 		}
 		ExtendLexeme(c);
@@ -606,6 +619,8 @@ char* Convert(int x){
 			return "DCOLON";
 		case 47:
 			return "COMMENTS";
+		case 48:
+			return "NESTED_COMMENTS";
 	}
 	return "ERROR";
 }
