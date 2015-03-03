@@ -86,10 +86,9 @@ comment1			"//".*
 
 "\""	{
 			int c;
-			char get[100];
+			char get[10000];
 			char* get_ptr;
 			get_ptr=get;
-			int len=0;
 			while ((c = input()) != EOF ) {
 				if(c  == '\\'){
 					if((c=input())=='n')
@@ -102,6 +101,10 @@ comment1			"//".*
 						unput(c);
 					if((c=input())=='\\')
 						*get_ptr++ ='\\';
+					else
+						unput(c);
+					if((c=input())=='\"')
+						*get_ptr++ ='\"';
 					else
 						unput(c);
 				}else if(c == '\"'){
