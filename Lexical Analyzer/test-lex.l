@@ -8,17 +8,23 @@ struct token_t{
 	char *category;
 	int line;
 	struct token_t *next;
-}*head;
+}*head,*tail;
 struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	struct token_t *list;
 	list = (struct token_t *)malloc(sizeof(struct token_t));
+
 	list->line=line;
 	list->id=id;
 	list->buffer=strdup(buffer);
 	list->category=strdup(category);
-	list->next=head;
-	head=list;
-	return head;
+	list->next=NULL;
+	if(head->next==NULL){
+		head=tail;
+		head->next=list;
+	}else
+		tail->next=list;
+	tail=list;
+	return tail;
 };
 
 void print_list(struct token_t *head){
@@ -26,7 +32,7 @@ void print_list(struct token_t *head){
 	printf("The Linked List : \n");
  	struct token_t *tmp = head;
  	while(tmp!=NULL){
-   		printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   		printf("%d:    #%d    \"%s\"    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    		}
   	printf("NULL");
@@ -36,7 +42,7 @@ void print_token(int id){
 	struct token_t *tmp = head;
 	while(tmp!=NULL){
 		if(tmp->id == id)
-   			printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+   			printf("%d:    #%d    \"%s\"    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
    		tmp=tmp->next;
    	}
 }
