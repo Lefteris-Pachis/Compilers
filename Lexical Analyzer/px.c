@@ -7,62 +7,133 @@
 #define MAX_LEXEME 				1024
 #define UNKNOWN_TOKEN 			-1
 #define END_OF_FILE				0
-#define LE						1 		/* <= */
-#define LT						2 		/* < */
-#define GE 						3		/* >= */
-#define GT 						4 		/* > */
-#define NE						5 		/* != */
-#define NOT						6 		/* ! */
-#define EQ						7		/* == */
-#define ASSIGN					8		/* = */
-#define ADD						9		/* + */
-#define SUB						10		/* - */
-#define MUL						11		/* * */
-#define DIV 					12		/* / */
-#define MOD						13		/* % */
-#define ADDONE					14		/* ++ */
-#define SUBONE					15		/* -- */
-#define IDENTIFIER				16
-#define KEYWORD_IF		 		17 		/* if */
-#define KEYWORD_ELSE			18 		/* else */
-#define KEYWORD_WHILE			19 		/* while */
-#define KEYWORD_FOR 			20 		/* for */
-#define KEYWORD_FUNCTION		21 		/* function */
-#define KEYWORD_RETURN			22 		/* return */
-#define KEYWORD_BREAK			23 		/* break */
-#define KEYWORD_CONTINUE		24 		/* continue */
-#define KEYWORD_AND				25 		/* and */
-#define KEYWORD_NOT				26 		/* not */
-#define KEYWORD_OR				27 		/* or */
-#define KEYWORD_LOCAL			28 		/* local */
-#define KEYWORD_TRUE			29 		/* true */
-#define KEYWORD_FALSE			30 		/* false */
-#define KEYWORD_NIL				31 		/* nil */
-#define INTCONST				32
-#define DOUBLE					33
-#define STRING					34
-#define SEMICOLON				35 		/* ; */
-#define LBRACKET				36  	/* [ */
-#define RBRACKET				37 		/* ] */
-#define LPARENTHESES			38 		/* ( */
-#define RPARENTHESES			39 		/* ) */
-#define LBRACE					40 		/* { */
-#define RBRACE 					41 		/* } */
-#define COMMA					42 		/* , */
-#define DOT						43 		/* . */
-#define DDOT					44 		/* .. */
-#define COLON					45 		/* : */
-#define DCOLON					46 		/* :: */
-#define COMMENTS				47 		/* // */
-#define NESTED_COMMENTS			48
+#define OPERATOR				1 		/* <= */
+#define KEYWORD					2 		/* < */
+#define IDENTIFIER				3
+#define INTCONST				4
+#define DOUBLE					5
+#define STRING					6
+#define PUNCTUATION				7 		/* ; */
+#define SINGLE_LINE_COMMENTS	8 		/* // */
+#define NESTED_COMMENTS			9
+#define MULTI_LINE_COMMENTS		10
+
+typedef enum { IF, ELSE, WHILE, FOR, FUNCTION, RETURN, BREAK, CONTINUE, AND, NOT, OR, LOCAL, TRUE, FALSE, NIL }keyword;
+typedef enum { ASSIGN, PLUS, MINUS, MUL, DIV, MOD, EQUAL, NOT_EQUAL, ADD, SUB, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL }operator;
+typedef enum { LEFT_BRACER, RIGHT_BRACER, LEFT_BRACKET, RIGHT_BRACKET, LEFT_PARENTHESES, RIGHT_PARENTHESES, SEMICOLON, COMMA, COLON, DOUBLE_COLON, DOT, DOUBLE_DOT }punctuation;
 
 struct token_t{
 	int id;
 	char *buffer;
 	char *category;
 	int line;
+	keyword keywrd;
+	operator op;
+	punctuation p;
+	int intconst;
+	float fl;
 	struct token_t *next;
-}*head;
+}*head,*tail;
+
+keyword Convert_key_to_enum(char *x){
+	if(strcmp(x,"if") == 0) return IF;
+	else if(strcmp(x,"else") == 0) return ELSE;
+	else if(strcmp(x,"while") == 0) return WHILE;
+	else if(strcmp(x,"for") == 0) return FOR;
+	else if(strcmp(x,"function") == 0) return FUNCTION;
+	else if(strcmp(x,"return") == 0) return RETURN;
+	else if(strcmp(x,"break") == 0) return BREAK;
+	else if(strcmp(x,"continue") == 0) return CONTINUE;
+	else if(strcmp(x,"and") == 0) return AND;
+	else if(strcmp(x,"not") == 0) return NOT;
+	else if(strcmp(x,"or") == 0) return OR;
+	else if(strcmp(x,"local") == 0) return LOCAL;
+	else if(strcmp(x,"true") == 0) return TRUE;
+	else if(strcmp(x,"false") == 0) return FALSE;
+	else if(strcmp(x,"nil") == 0) return NIL;
+}
+
+operator Convert_op_to_enum(char *x){
+	if(strcmp(x,"=") == 0) return ASSIGN;
+	else if(strcmp(x,"+") == 0) return PLUS;
+	else if(strcmp(x,"-") == 0) return MINUS;
+	else if(strcmp(x,"*") == 0) return MUL;
+	else if(strcmp(x,"/") == 0) return DIV;
+	else if(strcmp(x,"%") == 0) return MOD;
+	else if(strcmp(x,"==") == 0) return EQUAL;
+	else if(strcmp(x,"!=") == 0) return NOT_EQUAL;
+	else if(strcmp(x,"++") == 0) return ADD;
+	else if(strcmp(x,"--") == 0) return SUB;
+	else if(strcmp(x,">") == 0) return GREATER;
+	else if(strcmp(x,"<") == 0) return LESS;
+	else if(strcmp(x,">=") == 0) return GREATER_EQUAL;
+	else if(strcmp(x,"<=") == 0) return LESS_EQUAL;
+}
+
+punctuation Convert_p_to_enum(char *x){
+	if(strcmp(x,"{") == 0) return LEFT_BRACER;
+	else if(strcmp(x,"}") == 0) return RIGHT_BRACER;
+	else if(strcmp(x,"[") == 0) return LEFT_BRACKET;
+	else if(strcmp(x,"]") == 0) return RIGHT_BRACKET;
+	else if(strcmp(x,"(") == 0) return LEFT_PARENTHESES;
+	else if(strcmp(x,")") == 0) return RIGHT_PARENTHESES;
+	else if(strcmp(x,";") == 0) return SEMICOLON;
+	else if(strcmp(x,",") == 0) return COMMA;
+	else if(strcmp(x,":") == 0) return COLON;
+	else if(strcmp(x,"::") == 0) return DOUBLE_COLON;
+	else if(strcmp(x,".") == 0) return DOT;
+	else if(strcmp(x,"..") == 0) return DOUBLE_DOT;
+}
+
+char *Convert_key_to_string(keyword keywrd){
+	if(keywrd == IF) return "IF";
+	else if(keywrd == ELSE) return "ELSE";
+	else if(keywrd == WHILE) return "WHILE";
+	else if(keywrd == FOR) return "FOR";
+	else if(keywrd == FUNCTION) return "FUNCTION";
+	else if(keywrd == RETURN) return "RETURN";
+	else if(keywrd == BREAK) return "BREAK";
+	else if(keywrd == CONTINUE) return "CONTINUE";
+	else if(keywrd == AND) return "AND";
+	else if(keywrd == NOT) return "NOT";
+	else if(keywrd == OR) return "OR";
+	else if(keywrd == LOCAL) return "LOCAL";
+	else if(keywrd == TRUE) return "TRUE";
+	else if(keywrd == FALSE) return "FALSE";
+	else if(keywrd == NIL) return "NIL";
+}
+
+char *Convert_op_to_string(operator op){
+	if(op == ASSIGN) return "ASSIGN";
+	else if(op == PLUS) return "PLUS";
+	else if(op == MINUS) return "MINUS";
+	else if(op == MUL) return "MUL";
+	else if(op == DIV) return "DIV";
+	else if(op == MOD) return "MOD";
+	else if(op == EQUAL) return "EQUAL";
+	else if(op == NOT_EQUAL) return "NOT_EQUAL";
+	else if(op == ADD) return "ADD";
+	else if(op == SUB) return "SUB";
+	else if(op == GREATER) return "GREATER";
+	else if(op == LESS) return "LESS";
+	else if(op == GREATER_EQUAL) return "GREATER_EQUAL";
+	else if(op == LESS_EQUAL) return "LESS_EQUAL";
+}
+
+char *Convert_p_to_string(punctuation p){
+	if(p == LEFT_BRACER) return "LEFT_BRACER";
+	else if(p == RIGHT_BRACER) return "RIGHT_BRACER";
+	else if(p == LEFT_BRACKET) return "LEFT_BRACKET";
+	else if(p == RIGHT_BRACKET) return "RIGHT_BRACKET";
+	else if(p == LEFT_PARENTHESES) return "LEFT_PARENTHESES";
+	else if(p == RIGHT_PARENTHESES) return "RIGHT_PARENTHESES";
+	else if(p == SEMICOLON) return "SEMICOLON";
+	else if(p == COMMA) return "COMMA";
+	else if(p == COLON) return "COLON";
+	else if(p == DOUBLE_COLON) return "DOUBLE_COLON";
+	else if(p == DOT) return "DOT";
+	else if(p == DOUBLE_DOT) return "DOUBLE_DOT";
+}
 
 struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	struct token_t *list;
@@ -71,20 +142,45 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	list->id=id;
 	list->buffer=strdup(buffer);
 	list->category=strdup(category);
-	list->next=head;
-	head=list;
+	if(strcmp(list->category,"KEYWORD") == 0)
+		list->keywrd = Convert_key_to_enum(list->buffer);
+	else if(strcmp(list->category,"OPERATOR") == 0)
+		list->op = Convert_op_to_enum(list->buffer);
+	else if(strcmp(list->category,"PUNCTUATION") == 0)
+		list->p = Convert_p_to_enum(list->buffer);
+	else if(strcmp(list->category,"INTEGER") == 0)
+		list->intconst = atoi(list->buffer);
+	else if(strcmp(list->category,"DOUBLE") == 0)
+		list->fl = atof(list->buffer);
+	list->next=NULL;
+	if(head==NULL){
+		head=list;
+		tail=head;
+		return head;
+	}
+	if(head->next==NULL)
+		head->next=list;
+	else
+		tail->next=list;
+	tail=list;
 	return head;
 };
 
-void print_token(int id){
-	struct token_t *tmp = head;
-	while(tmp!=NULL){
-		if(tmp->id == id)
-			if(strcmp(tmp->category,"STRING") == 0){
-				
-			}
-   			else
-   				printf("%d:    %d    %s    \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category);
+void print_list(struct token_t *head){
+ 	struct token_t *tmp = head;
+ 	while(tmp!=NULL){
+ 		if(strcmp(tmp->category,"KEYWORD") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_key_to_string(tmp->keywrd));
+ 		else if(strcmp(tmp->category,"OPERATOR") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_op_to_string(tmp->op));
+ 		else if(strcmp(tmp->category,"PUNCTUATION") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_p_to_string(tmp->p));
+ 		else if(strcmp(tmp->category,"INTEGER") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%d\n",tmp->line,tmp->id,tmp->buffer,tmp->category,tmp->intconst);
+ 		else if(strcmp(tmp->category,"DOUBLE") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%f\n",tmp->line,tmp->id,tmp->buffer,tmp->category,tmp->fl);
+ 		else
+   			printf("%d: #%d    \"%s\"    \t%s \t\"%s\"\n",tmp->line,tmp->id,tmp->buffer,tmp->category, tmp->buffer);
    		tmp=tmp->next;
    	}
 }
@@ -147,7 +243,7 @@ int gettoken(void){
 			return UNKNOWN_TOKEN;
 		if(feof(inputFile))
 			return END_OF_FILE;
-		//printf("state = %d\n",state);
+		printf("state = %d\n",state);
 		char c = GetNextChar();
 		
 		switch(state){
@@ -179,31 +275,31 @@ int gettoken(void){
 				if(c == '"') state = 11; else
 				if(c == ':') state = 12; else
 				if(c == '.') state = 13; else
-				if(c == ';') { ExtendLexeme(c); return SEMICOLON; } else
-				if(c == '[') { ExtendLexeme(c); return LBRACKET; } else
-				if(c == '[') { ExtendLexeme(c); return RBRACKET; } else
-				if(c == '(') { ExtendLexeme(c); return LPARENTHESES; } else
-				if(c == ')') { ExtendLexeme(c); return RPARENTHESES; } else
-				if(c == '{') { ExtendLexeme(c); return LBRACE; } else
-				if(c == '}') { ExtendLexeme(c); return RBRACE; } else
-				if(c == ',') { ExtendLexeme(c); return COMMA; } else
-				if(c == '*') { ExtendLexeme(c); return MUL; } else
-				if(c == '%') { ExtendLexeme(c); return DIV; }
+				if(c == ';') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == '[') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == ']') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == '(') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == ')') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == '{') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == '}') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == ',') { ExtendLexeme(c); return PUNCTUATION; } else
+				if(c == '*') { ExtendLexeme(c); return OPERATOR; } else
+				if(c == '%') { ExtendLexeme(c); return OPERATOR; }
 				else
 					{ state = -1; continue; }
 				break;
 			case 1:
-				if(c == '=') { ExtendLexeme(c); return LE; }
-				Retract(c); return LT;
+				if(c == '=') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 2:
-				if(c == '=') { ExtendLexeme(c); return NE; }
-				Retract(c); return NOT;
+				if(c == '=') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 3:
-				if(c == '=') { ExtendLexeme(c); return EQ; }
-				Retract(c); return ASSIGN;
+				if(c == '=') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 4:
-				if(c == '=') { ExtendLexeme(c); return GE; }
-				Retract(c); return GT;
+				if(c == '=') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 5:
 				if(isalpha(c) || isdigit(c) || c == '_') state = 5;
 				else { Retract(c); return IDENTIFIER; }
@@ -219,30 +315,30 @@ int gettoken(void){
 				else if(c == '/') { state = 16; ExtendLexeme(c); continue; }
 				else { Retract(c); return DIV; }
 			case 8:
-				if(c == '+') { ExtendLexeme(c); return ADDONE; }
-				Retract(c); return ADD;
+				if(c == '+') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 9:
-				if(c == '-') { ExtendLexeme(c); return SUBONE; }
-				Retract(c); return SUB;
+				if(c == '-') { ExtendLexeme(c); return OPERATOR; }
+				Retract(c); return OPERATOR;
 			case 10:
 				if(isdigit(c)) { state = 10; ExtendLexeme(c); continue; }
 				else if(c == '.') { state = 14; ExtendLexeme(c); continue; }
 				else { Retract(c); return INTCONST; } 
 			case 11:
-				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 11; ExtendLexeme(c); continue; }
+				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 11; CheckLine(c); ExtendLexeme(c); continue; }
 				else if(c == '"') { ExtendLexeme(c); return STRING; }
 				else state = -1;					//ERROR
 			case 12:
-				if(c == ':') { ExtendLexeme(c); return DCOLON; }
-				Retract(c); return COLON;
+				if(c == ':') { ExtendLexeme(c); return PUNCTUATION; }
+				Retract(c); return PUNCTUATION;
 			case 13:
-				if(c == '.') { ExtendLexeme(c); return DDOT; }
-				Retract(c); return DOT;
+				if(c == '.') { ExtendLexeme(c); return PUNCTUATION; }
+				Retract(c); return PUNCTUATION;
 			case 14:
 				if(isdigit(c)) { state = 14; ExtendLexeme(c); continue; }
 				else { Retract(c); return DOUBLE; } 
 			case 15:
-				if(isalpha(c) || isdigit(c) || isspace(c)) { state = 15; ExtendLexeme(c); continue; }
+				if(isalpha(c) || isdigit(c) || isspace(c) || c == '\n') { CheckLine(c); state = 15; ExtendLexeme(c); continue; }
 				else if(c == '/') { state = 84; ExtendLexeme(c); continue; }
 				else if(c == '*') { state = 17; ExtendLexeme(c); continue; }
 				break;
@@ -250,21 +346,20 @@ int gettoken(void){
 				if(c == '*') { anoigei++; state = 15; ExtendLexeme(c); continue; }
 				else { state = 15; ExtendLexeme(c); continue; }
 			case 16:
-				if(isalpha(c) || isdigit(c) || isspace(c) && c != '\n') { state = 16; ExtendLexeme(c); continue; }
-				else if(c == '\n') { CheckLine(c); return COMMENTS; }
-				else state = -1;					//ERROR
+				if(c != '\n') { state = 16; ExtendLexeme(c); continue; }
+				else if(c == '\n') { CheckLine(c); return SINGLE_LINE_COMMENTS; }
 				break;
 			case 17:
 				if(anoigei > kleinei+1 && c == '/') { kleinei++; ExtendLexeme(c); return NESTED_COMMENTS;}
-				if(c == '/') { kleinei++; printf("anoigei = %d kleinei = %d\n",anoigei,kleinei ); ExtendLexeme(c); return COMMENTS; }
-				else state = 15;	 				//ERROR
+				if(c == '/') { kleinei++; printf("anoigei = %d kleinei = %d\n",anoigei,kleinei ); ExtendLexeme(c); return MULTI_LINE_COMMENTS; }
+				else state = 15;
 				break;
 			case 18:
 				if(c == 'f') { state = 33; ExtendLexeme(c); continue; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 33:
-				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_IF; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 20:
@@ -284,7 +379,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 37:
-				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_WHILE; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 21:
@@ -298,7 +393,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 39:
-				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD_FOR; }
+				if(isspace(c) || c == '(' || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 40:
@@ -326,7 +421,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 46:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_FUNCTION; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 47:
@@ -342,7 +437,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 50:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_FALSE; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 22:
@@ -366,7 +461,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 55:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_RETURN; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 23:
@@ -382,7 +477,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 58:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_ELSE; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 24:
@@ -402,7 +497,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 62:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_RETURN; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 25:
@@ -434,7 +529,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 69:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_CONTINUE; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 26:
@@ -446,7 +541,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 71:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_AND; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 27:
@@ -459,7 +554,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 73:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_NOT; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 74:
@@ -467,7 +562,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 75:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_NIL; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 28:
@@ -475,7 +570,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 76:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_OR; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 29:
@@ -495,7 +590,7 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 80:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_LOCAL; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 			case 30:
@@ -511,11 +606,11 @@ int gettoken(void){
 				else { ExtendLexeme(c); state = 5; continue; }	
 				break;
 			case 83:
-				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD_TRUE; }
+				if(isspace(c) || c == '\n') { Retract(c); return KEYWORD; }
 				else { ExtendLexeme(c); state = 5; continue; }
 				break;
 
-			default: assert(0); /*Giwrgadakhs*/
+			default: assert(0);
 		}
 		ExtendLexeme(c);
 	}
@@ -526,101 +621,25 @@ char* Convert(int x){
 		case 0:
 			return "END_OF_FILE";
 		case 1:
-			return "LE";
+			return "OPERATOR";
 		case 2:
-			return "LT";
+			return "KEYWORD";
 		case 3:
-			return "GE";
-		case 4:
-			return "GT";
-		case 5:
-			return "NE";
-		case 6:
-			return "NOT";
-		case 7:
-			return "EQ";
-		case 8:
-			return "ASSIGN";
-		case 9:
-			return "ADD";
-		case 10:
-			return "SUB";
-		case 11:
-			return "MUL";
-		case 12:
-			return "DIV";
-		case 13:
-			return "MOD";
-		case 14:
-			return "ADDONE";
-		case 15:
-			return "SUBONE";
-		case 16:
 			return "IDENTIFIER";
-		case 17:
-			return "KEYWORD_IF";
-		case 18:
-			return "KEYWORD_ELSE";
-		case 19:
-			return "KEYWORD_WHILE";
-		case 20:
-			return "KEYWORD_FOR";
-		case 21:
-			return "KEYWORD_FUNCTION";
-		case 22:
-			return "KEYWORD_RETURN";
-		case 23:
-			return "KEYWORD_BREAK";
-		case 24:
-			return "KEYWORD_CONTINUE";
-		case 25:
-			return "KEYWORD_AND";
-		case 26:
-			return "KEYWORD_NOT";
-		case 27:
-			return "KEYWORD_OR";
-		case 28:
-			return "KEYWORD_LOCAL";
-		case 29:
-			return "KEYWORD_TRUE";
-		case 30:
-			return "KEYWORD_FALSE";
-		case 31:
-			return "KEYWORD_NIL";
-		case 32:
+		case 4:
 			return "INTCONST";
-		case 33:
+		case 5:
 			return "DOUBLE";
-		case 34:
+		case 6:
 			return "STRING";
-		case 35:
-			return "SEMICOLON";
-		case 36:
-			return "LBRACKET";
-		case 37:
-			return "RBRACKET";
-		case 38:
-			return "LPARENTHESES";
-		case 39:
-			return "RPARENTHESES";
-		case 40:
-			return "LBRACE";
-		case 41:
-			return "RBRACE";
-		case 42:
-			return "COMMA";
-		case 43:
-			return "DOT";
-		case 44:
-			return "DDOT";
-		case 45:
-			return "COLON";
-		case 46:
-			return "DCOLON";
-		case 47:
-			return "COMMENTS";
-		case 48:
+		case 7:
+			return "PUNCTUATION";
+		case 8:
+			return "SINGLE_LINE_COMMENTS";
+		case 9:
 			return "NESTED_COMMENTS";
+		case 10:
+			return "MULTI_LINE_COMMENTS";
 	}
 	return "ERROR";
 }
@@ -637,13 +656,11 @@ void main(int argc, char const *argv[])
 	while(i != 0)
 	{
 		if(i == -1){
-			//printf("ERROR\n");
+			printf("ERROR\n");
 			break;
 		}
 		head = list_w_tokens(lineNo,id++,lexeme,Convert(i));
 		i = gettoken();
 	}
-	int j = 0;
-	for(j = 1; j <= id; j++)
-		print_token(j);
+	print_list(head);
 }
