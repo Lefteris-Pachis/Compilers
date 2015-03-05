@@ -237,13 +237,21 @@ comment1			"//".*
 
 "/*"	{
 			int anoigei = 1, kleinei = 0;
+			int line_of_nested = 0;
+			int line_of_simple = yylineno;
 			int c;
+			
 			int nested_comment(){
 				while ((c = input()) != EOF ){
+					if(anoigei == kleinei+1){
+						unput(c);
+						break;
+					}
 					if(c=='*'){
 						if((c = input()) == '/'){
 							kleinei++;
-							head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT");
+							head = list_w_tokens(line_of_nested,id++,yytext,"NESTED COMMENT");
+							continue;
 						}
 						else
 							unput(c);
@@ -251,6 +259,7 @@ comment1			"//".*
 					if(c=='/'){
 						if(c=input()=='*'){
 							anoigei++;
+							line_of_nested = yylineno;
 							nested_comment();
 						}
 					}
@@ -261,7 +270,7 @@ comment1			"//".*
 				if(c == '*') {
 					if((c = input()) == '/'){
 						kleinei++;
-						head = list_w_tokens(yylineno,id++,yytext,"COMMENT");
+						head = list_w_tokens(line_of_simple,id++,yytext,"MULTI-LINE COMMENT");
 						break;
 					}else
 						unput(c);
@@ -269,6 +278,7 @@ comment1			"//".*
 				if(c=='/'){
 					if(c=input()=='*'){
 						anoigei++;
+						line_of_nested = yylineno;
 						nested_comment();
 					}
 				}
@@ -286,7 +296,7 @@ comment1			"//".*
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
-{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"COMMENT"); }
+{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"SINGLE-LINE COMMENT"); }
 {undefined}         { printf("undefined character %s in line %d\n",yytext,yylineno); }
 
 [\t\r\n]   {}

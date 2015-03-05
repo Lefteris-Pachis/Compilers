@@ -1077,13 +1077,21 @@ YY_RULE_SETUP
 #line 238 "test-lex.l"
 {
 			int anoigei = 1, kleinei = 0;
+			int line_of_nested = 0;
+			int line_of_simple = alpha_yylineno;
 			int c;
+			
 			int nested_comment(){
 				while ((c = input()) != EOF ){
+					if(anoigei == kleinei+1){
+						unput(c);
+						break;
+					}
 					if(c=='*'){
 						if((c = input()) == '/'){
 							kleinei++;
-							head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"NESTED_COMMENT");
+							head = list_w_tokens(line_of_nested,id++,alpha_yytext,"NESTED COMMENT");
+							continue;
 						}
 						else
 							unput(c);
@@ -1091,6 +1099,7 @@ YY_RULE_SETUP
 					if(c=='/'){
 						if(c=input()=='*'){
 							anoigei++;
+							line_of_nested = alpha_yylineno;
 							nested_comment();
 						}
 					}
@@ -1101,7 +1110,7 @@ YY_RULE_SETUP
 				if(c == '*') {
 					if((c = input()) == '/'){
 						kleinei++;
-						head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMENT");
+						head = list_w_tokens(line_of_simple,id++,alpha_yytext,"MULTI-LINE COMMENT");
 						break;
 					}else
 						unput(c);
@@ -1109,10 +1118,12 @@ YY_RULE_SETUP
 				if(c=='/'){
 					if(c=input()=='*'){
 						anoigei++;
+						line_of_nested = alpha_yylineno;
 						nested_comment();
 					}
 				}
 			}
+			printf("%d %d\n",anoigei,kleinei);
 			if(anoigei != kleinei){
 				if(kleinei > anoigei)
 					printf("Error.Comment closes more times than needed in line %d\nExit\n",alpha_yylineno);
@@ -1124,44 +1135,44 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 285 "test-lex.l"
+#line 296 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"IDENTIFIER"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 286 "test-lex.l"
+#line 297 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"INTEGER"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 287 "test-lex.l"
+#line 298 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 288 "test-lex.l"
+#line 299 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"CHARACTER"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 289 "test-lex.l"
-{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"COMMENT"); }
+#line 300 "test-lex.l"
+{ head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"SINGLE-LINE COMMENT"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 290 "test-lex.l"
+#line 301 "test-lex.l"
 { printf("undefined character %s in line %d\n",alpha_yytext,alpha_yylineno); }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 292 "test-lex.l"
+#line 303 "test-lex.l"
 {}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 case YY_STATE_EOF(STRING):
-#line 294 "test-lex.l"
+#line 305 "test-lex.l"
 {	printf("(eof %u)\n", alpha_yylineno); 
 			print_list(head);
 			return 0;
@@ -1169,10 +1180,10 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 299 "test-lex.l"
+#line 310 "test-lex.l"
 ECHO;
 	YY_BREAK
-#line 1176 "test-lex.c"
+#line 1187 "test-lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2177,7 +2188,7 @@ void alpha_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 299 "test-lex.l"
+#line 310 "test-lex.l"
 
 
 
