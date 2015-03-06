@@ -194,7 +194,7 @@ comment1			"//".*
 			char get[10000];
 			char* get_ptr;
 			get_ptr=get;
-			int ill;
+			int ill=0;
 			int flag=0;
 			while ((c = input()) != EOF ) {
 				
@@ -202,11 +202,13 @@ comment1			"//".*
 					if(flag==1){
 						head = list_w_tokens(yylineno,id++," INVALID ESCAPE CHARACTER ","ERROR");
 						flag=0;
+						ill=0;
 						break;
 					}
 					else{
 						*get_ptr++='\0';
 						head = list_w_tokens(yylineno,id++,get,"STRING");
+						ill=0;
 						break;
 					}
 					
@@ -247,8 +249,13 @@ comment1			"//".*
 					}
 
 				}
-				else
+				else{
+					ill++;
 					*get_ptr++=c;
+				}
+			}
+			if(ill>0){
+				head = list_w_tokens(yylineno,id++," NON TERMINATED STRING ","ERROR");
 			}
 		}
 
