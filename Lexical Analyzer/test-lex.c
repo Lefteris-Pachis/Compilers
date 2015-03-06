@@ -28,7 +28,7 @@
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
 #define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 39
+#define YY_FLEX_SUBMINOR_VERSION 35
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -161,7 +161,15 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -173,12 +181,7 @@ typedef unsigned int flex_uint32_t;
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 #endif
 
-#ifndef YY_TYPEDEF_YY_SIZE_T
-#define YY_TYPEDEF_YY_SIZE_T
-typedef size_t yy_size_t;
-#endif
-
-extern yy_size_t alpha_yyleng;
+extern int alpha_yyleng;
 
 extern FILE *alpha_yyin, *alpha_yyout;
 
@@ -200,13 +203,6 @@ extern FILE *alpha_yyin, *alpha_yyout;
                     if ( alpha_yytext[yyl] == '\n' )\
                         --alpha_yylineno;\
             }while(0)
-    #define YY_LINENO_REWIND_TO(dst) \
-            do {\
-                const char *p;\
-                for ( p = yy_cp-1; p >= (dst); --p)\
-                    if ( *p == '\n' )\
-                        --alpha_yylineno;\
-            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -223,6 +219,11 @@ extern FILE *alpha_yyin, *alpha_yyout;
 	while ( 0 )
 
 #define unput(c) yyunput( c, (yytext_ptr)  )
+
+#ifndef YY_TYPEDEF_YY_SIZE_T
+#define YY_TYPEDEF_YY_SIZE_T
+typedef size_t yy_size_t;
+#endif
 
 #ifndef YY_STRUCT_YY_BUFFER_STATE
 #define YY_STRUCT_YY_BUFFER_STATE
@@ -241,7 +242,7 @@ struct yy_buffer_state
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -311,8 +312,8 @@ static YY_BUFFER_STATE * yy_buffer_stack = 0; /**< Stack as an array. */
 
 /* yy_hold_char holds the character lost when alpha_yytext is formed. */
 static char yy_hold_char;
-static yy_size_t yy_n_chars;		/* number of characters read into yy_ch_buf */
-yy_size_t alpha_yyleng;
+static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+int alpha_yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
@@ -340,7 +341,7 @@ static void alpha_yy_init_buffer (YY_BUFFER_STATE b,FILE *file  );
 
 YY_BUFFER_STATE alpha_yy_scan_buffer (char *base,yy_size_t size  );
 YY_BUFFER_STATE alpha_yy_scan_string (yyconst char *yy_str  );
-YY_BUFFER_STATE alpha_yy_scan_bytes (yyconst char *bytes,yy_size_t len  );
+YY_BUFFER_STATE alpha_yy_scan_bytes (yyconst char *bytes,int len  );
 
 void *alpha_yyalloc (yy_size_t  );
 void *alpha_yyrealloc (void *,yy_size_t  );
@@ -372,7 +373,7 @@ void alpha_yyfree (void *  );
 
 /* Begin user sect3 */
 
-#define alpha_yywrap() 1
+#define alpha_yywrap(n) 1
 #define YY_SKIP_YYWRAP
 
 typedef unsigned char YY_CHAR;
@@ -569,7 +570,7 @@ typedef enum { IF, ELSE, WHILE, FOR, FUNCTION, RETURN, BREAK, CONTINUE, AND, NOT
 typedef enum { ASSIGN, PLUS, MINUS, MUL, DIV, MOD, EQUAL, NOT_EQUAL, ADD, SUB, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL }operator;
 typedef enum { LEFT_BRACER, RIGHT_BRACER, LEFT_BRACKET, RIGHT_BRACKET, LEFT_PARENTHESES, RIGHT_PARENTHESES, SEMICOLON, COMMA, COLON, DOUBLE_COLON, DOT, DOUBLE_DOT }punctuation;
 
-struct token_t{
+struct alpha_token_t{
 	int id;
 	char *buffer;
 	char *category;
@@ -579,7 +580,7 @@ struct token_t{
 	punctuation p;
 	int intconst;
 	float fl;
-	struct token_t *next;
+	struct alpha_token_t *next;
 }*head,*tail;
 
 keyword Convert_key_to_enum(char *x){
@@ -682,9 +683,9 @@ char *Convert_p_to_string(punctuation p){
 	else if(p == DOUBLE_DOT) return "DOUBLE_DOT";
 }
 
-struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
-	struct token_t *list;
-	list = (struct token_t *)malloc(sizeof(struct token_t));
+struct alpha_token_t* list_w_tokens(int line,int id,char* buffer,char* category){
+	struct alpha_token_t *list;
+	list = (struct alpha_token_t *)malloc(sizeof(struct alpha_token_t));
 	list->line=line;
 	list->id=id;
 	list->buffer=strdup(buffer);
@@ -713,8 +714,8 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	return head;
 };
 
-void print_list(struct token_t *head){
- 	struct token_t *tmp = head;
+void print_list(struct alpha_token_t *head){
+ 	struct alpha_token_t *tmp = head;
  	while(tmp!=NULL){
  		if(strcmp(tmp->category,"KEYWORD") == 0)
  			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_key_to_string(tmp->keywrd));
@@ -734,7 +735,7 @@ void print_list(struct token_t *head){
 
 
 
-#line 738 "test-lex.c"
+#line 739 "test-lex.c"
 
 #define INITIAL 0
 #define COMMENT 1
@@ -775,7 +776,7 @@ FILE *alpha_yyget_out (void );
 
 void alpha_yyset_out  (FILE * out_str  );
 
-yy_size_t alpha_yyget_leng (void );
+int alpha_yyget_leng (void );
 
 char *alpha_yyget_text (void );
 
@@ -817,7 +818,12 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -918,6 +924,11 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
+#line 190 "test-lex.l"
+
+
+#line 931 "test-lex.c"
+
 	if ( !(yy_init) )
 		{
 		(yy_init) = 1;
@@ -944,12 +955,6 @@ YY_DECL
 		alpha_yy_load_buffer_state( );
 		}
 
-	{
-#line 190 "test-lex.l"
-
-
-#line 952 "test-lex.c"
-
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
 		yy_cp = (yy_c_buf_p);
@@ -966,7 +971,7 @@ YY_DECL
 yy_match:
 		do
 			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)] ;
+			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
 			if ( yy_accept[yy_current_state] )
 				{
 				(yy_last_accepting_state) = yy_current_state;
@@ -996,7 +1001,7 @@ yy_find_action:
 
 		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
 			{
-			yy_size_t yyl;
+			int yyl;
 			for ( yyl = 0; yyl < alpha_yyleng; ++yyl )
 				if ( alpha_yytext[yyl] == '\n' )
 					   
@@ -1020,61 +1025,88 @@ YY_RULE_SETUP
 #line 192 "test-lex.l"
 {
 			int c;
-			char get[10000];
+			char *get;
+			get=malloc(4);
+			int size=4;
 			char* get_ptr;
 			get_ptr=get;
+			int ill;
+			int flag=0;
 			while ((c = input()) != EOF ) {
-				if(c  == '\\'){
-					if((c=input())=='n')
-						*get_ptr++ ='\n';
-					else
-						unput(c);					
-					if((c=input())=='t')
-						*get_ptr++ ='\t';
-					else
+				
+				if(c=='\"'){
+						get=realloc(get,size+4);
+						*get_ptr++='\0';
+						head = list_w_tokens(alpha_yylineno,id++,get,"STRING");
+						break;
+					
+				}else if(c=='\\'){
+					c=input();
+					if((c)=='"'){
+						get=realloc(get,size+4);
+						*get_ptr++='\"';
+						size+=4;
+					}
+					else if((c)=='n'){
+						get=realloc(get,size+4);
+						*get_ptr++='\n';
+						size+=4;
+					}
+					else if((c)=='\\'){
+						get=realloc(get,size+4);
+						*get_ptr++='\\';
+						size+=4;
+					}
+					else if((c)=='t'){
+						get=realloc(get,size+4);
+						*get_ptr++='\t';
+						size+=4;
+					}
+					else{
+						flag=1;
 						unput(c);
-					if((c=input())=='\\')
-						*get_ptr++ ='\\';
-					else
-						unput(c);
-					if((c=input())=='\"')
-						*get_ptr++ ='\"';
-					else
-						unput(c);
-				}else if(c == '\"'){
-					*get_ptr++ = '\0';
-					break;
-				}else{
-					*get_ptr++ = c;
+					}
+
+					if(flag==1){
+						printf("INVALID ESCAPE CHARACTERER at line %d\n",alpha_yylineno );
+						flag=0;
+						return -1;
+
+					}
+
+				}
+				else{
+					get=realloc(get,size+4);
+					*get_ptr++=c;
+					size+=4;
 				}
 			}
-			head = list_w_tokens(alpha_yylineno,id++,get,"STRING");
 		}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 226 "test-lex.l"
+#line 253 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"KEYWORD"); 
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 230 "test-lex.l"
+#line 257 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); 
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 234 "test-lex.l"
+#line 261 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PUNCTUATION"); 
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 238 "test-lex.l"
+#line 265 "test-lex.l"
 {
 			int anoigei = 1, kleinei = 0;
 			int line_of_nested = 0;
@@ -1123,7 +1155,6 @@ YY_RULE_SETUP
 					}
 				}
 			}
-			printf("%d %d\n",anoigei,kleinei);
 			if(anoigei != kleinei){
 				if(kleinei > anoigei)
 					printf("Error.Comment closes more times than needed in line %d\nExit\n",alpha_yylineno);
@@ -1135,55 +1166,55 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 296 "test-lex.l"
+#line 322 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"IDENTIFIER"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 297 "test-lex.l"
+#line 323 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"INTEGER"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 298 "test-lex.l"
+#line 324 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 299 "test-lex.l"
+#line 325 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"CHARACTER"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 300 "test-lex.l"
+#line 326 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"SINGLE-LINE COMMENT"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 301 "test-lex.l"
+#line 327 "test-lex.l"
 { printf("undefined character %s in line %d\n",alpha_yytext,alpha_yylineno); }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 303 "test-lex.l"
+#line 329 "test-lex.l"
 {}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 case YY_STATE_EOF(STRING):
-#line 305 "test-lex.l"
+#line 331 "test-lex.l"
 {	printf("(eof %u)\n", alpha_yylineno); 
-			print_list(head);
+			
 			return 0;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 310 "test-lex.l"
+#line 336 "test-lex.l"
 ECHO;
 	YY_BREAK
-#line 1187 "test-lex.c"
+#line 1218 "test-lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1312,7 +1343,6 @@ ECHO;
 			"fatal flex scanner internal error--no action found" );
 	} /* end of action switch */
 		} /* end of scanning one token */
-	} /* end of user's declarations */
 } /* end of alpha_yylex */
 
 /* yy_get_next_buffer - try to read in a new buffer
@@ -1368,21 +1398,21 @@ static int yy_get_next_buffer (void)
 
 	else
 		{
-			yy_size_t num_to_read =
+			int num_to_read =
 			YY_CURRENT_BUFFER_LVALUE->yy_buf_size - number_to_move - 1;
 
 		while ( num_to_read <= 0 )
 			{ /* Not enough room in the buffer - grow it. */
 
 			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = YY_CURRENT_BUFFER_LVALUE;
+			YY_BUFFER_STATE b = YY_CURRENT_BUFFER;
 
 			int yy_c_buf_p_offset =
 				(int) ((yy_c_buf_p) - b->yy_ch_buf);
 
 			if ( b->yy_is_our_buffer )
 				{
-				yy_size_t new_size = b->yy_buf_size * 2;
+				int new_size = b->yy_buf_size * 2;
 
 				if ( new_size <= 0 )
 					b->yy_buf_size += b->yy_buf_size / 8;
@@ -1413,7 +1443,7 @@ static int yy_get_next_buffer (void)
 
 		/* Read in more data. */
 		YY_INPUT( (&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move]),
-			(yy_n_chars), num_to_read );
+			(yy_n_chars), (size_t) num_to_read );
 
 		YY_CURRENT_BUFFER_LVALUE->yy_n_chars = (yy_n_chars);
 		}
@@ -1508,7 +1538,7 @@ static int yy_get_next_buffer (void)
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 	yy_is_jam = (yy_current_state == 87);
 
-		return yy_is_jam ? 0 : yy_current_state;
+	return yy_is_jam ? 0 : yy_current_state;
 }
 
     static void yyunput (int c, register char * yy_bp )
@@ -1523,7 +1553,7 @@ static int yy_get_next_buffer (void)
 	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
 		{ /* need to shift things up to make room */
 		/* +2 for EOB chars. */
-		register yy_size_t number_to_move = (yy_n_chars) + 2;
+		register int number_to_move = (yy_n_chars) + 2;
 		register char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
 					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
 		register char *source =
@@ -1576,7 +1606,7 @@ static int yy_get_next_buffer (void)
 
 		else
 			{ /* need more input */
-			yy_size_t offset = (yy_c_buf_p) - (yytext_ptr);
+			int offset = (yy_c_buf_p) - (yytext_ptr);
 			++(yy_c_buf_p);
 
 			switch ( yy_get_next_buffer(  ) )
@@ -1741,6 +1771,10 @@ static void alpha_yy_load_buffer_state  (void)
 	alpha_yyfree((void *) b  );
 }
 
+#ifndef __cplusplus
+extern int isatty (int );
+#endif /* __cplusplus */
+    
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
  * such as during a alpha_yyrestart() or at EOF.
@@ -1853,7 +1887,7 @@ void alpha_yypop_buffer_state (void)
  */
 static void alpha_yyensure_buffer_stack (void)
 {
-	yy_size_t num_to_alloc;
+	int num_to_alloc;
     
 	if (!(yy_buffer_stack)) {
 
@@ -1950,12 +1984,12 @@ YY_BUFFER_STATE alpha_yy_scan_string (yyconst char * yystr )
  * 
  * @return the newly allocated buffer state object.
  */
-YY_BUFFER_STATE alpha_yy_scan_bytes  (yyconst char * yybytes, yy_size_t  _yybytes_len )
+YY_BUFFER_STATE alpha_yy_scan_bytes  (yyconst char * yybytes, int  _yybytes_len )
 {
 	YY_BUFFER_STATE b;
 	char *buf;
 	yy_size_t n;
-	yy_size_t i;
+	int i;
     
 	/* Get memory for full buffer, including space for trailing EOB's. */
 	n = _yybytes_len + 2;
@@ -2037,7 +2071,7 @@ FILE *alpha_yyget_out  (void)
 /** Get the length of the current token.
  * 
  */
-yy_size_t alpha_yyget_leng  (void)
+int alpha_yyget_leng  (void)
 {
         return alpha_yyleng;
 }
@@ -2188,7 +2222,7 @@ void alpha_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 310 "test-lex.l"
+#line 336 "test-lex.l"
 
 
 
@@ -2202,5 +2236,7 @@ int main(int argc, char* argv[]) {
 	else
 		alpha_yyin = stdin;
   	alpha_yylex();
+  	print_list(head);
+
     return 0;
 }
