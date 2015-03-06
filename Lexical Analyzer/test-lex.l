@@ -194,32 +194,62 @@ comment1			"//".*
 			char get[10000];
 			char* get_ptr;
 			get_ptr=get;
+			int ill;
+			int flag=0;
 			while ((c = input()) != EOF ) {
-				if(c  == '\\'){
-					if((c=input())=='n')
-						*get_ptr++ ='\n';
-					else
-						unput(c);					
-					if((c=input())=='t')
-						*get_ptr++ ='\t';
-					else
+				
+				if(c=='\"'){
+					if(flag==1){
+						head = list_w_tokens(yylineno,id++," INVALID ESCAPE CHARACTER ","ERROR");
+						flag=0;
+						break;
+					}
+					else{
+						*get_ptr++='\0';
+						head = list_w_tokens(yylineno,id++,get,"STRING");
+						break;
+					}
+					
+				}else if(c=='\\'){
+					int ch=0;
+					if((c=input())=='"'){
+						*get_ptr++='\"';
+					}
+					else{
+						ch++;
 						unput(c);
-					if((c=input())=='\\')
-						*get_ptr++ ='\\';
-					else
+					}
+					if((c=input())=='n'){
+						*get_ptr++='\n';
+					}
+					else{
+						ch++;
 						unput(c);
-					if((c=input())=='\"')
-						*get_ptr++ ='\"';
-					else
+					}
+					if((c=input())=='\\'){
+						*get_ptr++='\\';
+					}
+					else{
+						ch++;
 						unput(c);
-				}else if(c == '\"'){
-					*get_ptr++ = '\0';
-					break;
-				}else{
-					*get_ptr++ = c;
+					}
+					if((c=input())=='t'){
+						*get_ptr++='\t';
+					}
+					else{
+						ch++;
+						unput(c);
+					}
+
+					if(ch==4){
+						ch=0;
+						flag=1;
+					}
+
 				}
+				else
+					*get_ptr++=c;
 			}
-			head = list_w_tokens(yylineno,id++,get,"STRING");
 		}
 
 
