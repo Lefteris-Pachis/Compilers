@@ -191,7 +191,9 @@ comment1			"//".*
 
 "\""	{
 			int c;
-			char get[10000];
+			char *get;
+			get=malloc(4);
+			int size=4;
 			char* get_ptr;
 			get_ptr=get;
 			int ill;
@@ -199,56 +201,51 @@ comment1			"//".*
 			while ((c = input()) != EOF ) {
 				
 				if(c=='\"'){
-					if(flag==1){
-						head = list_w_tokens(yylineno,id++," INVALID ESCAPE CHARACTER ","ERROR");
-						flag=0;
-						break;
-					}
-					else{
+						get=realloc(get,size+4);
 						*get_ptr++='\0';
 						head = list_w_tokens(yylineno,id++,get,"STRING");
 						break;
-					}
 					
 				}else if(c=='\\'){
-					int ch=0;
-					if((c=input())=='"'){
+					c=input();
+					if((c)=='"'){
+						get=realloc(get,size+4);
 						*get_ptr++='\"';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='n'){
+					else if((c)=='n'){
+						get=realloc(get,size+4);
 						*get_ptr++='\n';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='\\'){
+					else if((c)=='\\'){
+						get=realloc(get,size+4);
 						*get_ptr++='\\';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='t'){
+					else if((c)=='t'){
+						get=realloc(get,size+4);
 						*get_ptr++='\t';
+						size+=4;
 					}
 					else{
-						ch++;
+						flag=1;
 						unput(c);
 					}
 
-					if(ch==4){
-						ch=0;
-						flag=1;
+					if(flag==1){
+						printf("INVALID ESCAPE CHARACTERER at line %d\n",yylineno );
+						flag=0;
+						return -1;
+
 					}
 
 				}
-				else
+				else{
+					get=realloc(get,size+4);
 					*get_ptr++=c;
+					size+=4;
+				}
 			}
 		}
 

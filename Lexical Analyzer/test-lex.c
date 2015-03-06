@@ -1025,7 +1025,9 @@ YY_RULE_SETUP
 #line 192 "test-lex.l"
 {
 			int c;
-			char get[10000];
+			char *get;
+			get=malloc(4);
+			int size=4;
 			char* get_ptr;
 			get_ptr=get;
 			int ill;
@@ -1033,83 +1035,78 @@ YY_RULE_SETUP
 			while ((c = input()) != EOF ) {
 				
 				if(c=='\"'){
-					if(flag==1){
-						head = list_w_tokens(alpha_yylineno,id++," INVALID ESCAPE CHARACTER ","ERROR");
-						flag=0;
-						break;
-					}
-					else{
+						get=realloc(get,size+4);
 						*get_ptr++='\0';
 						head = list_w_tokens(alpha_yylineno,id++,get,"STRING");
 						break;
-					}
 					
 				}else if(c=='\\'){
-					int ch=0;
-					if((c=input())=='"'){
+					c=input();
+					if((c)=='"'){
+						get=realloc(get,size+4);
 						*get_ptr++='\"';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='n'){
+					else if((c)=='n'){
+						get=realloc(get,size+4);
 						*get_ptr++='\n';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='\\'){
+					else if((c)=='\\'){
+						get=realloc(get,size+4);
 						*get_ptr++='\\';
+						size+=4;
 					}
-					else{
-						ch++;
-						unput(c);
-					}
-					if((c=input())=='t'){
+					else if((c)=='t'){
+						get=realloc(get,size+4);
 						*get_ptr++='\t';
+						size+=4;
 					}
 					else{
-						ch++;
+						flag=1;
 						unput(c);
 					}
 
-					if(ch==4){
-						ch=0;
-						flag=1;
+					if(flag==1){
+						printf("INVALID ESCAPE CHARACTERER at line %d\n",alpha_yylineno );
+						flag=0;
+						return -1;
+
 					}
 
 				}
-				else
+				else{
+					get=realloc(get,size+4);
 					*get_ptr++=c;
+					size+=4;
+				}
 			}
 		}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 256 "test-lex.l"
+#line 253 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"KEYWORD"); 
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 260 "test-lex.l"
+#line 257 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"OPERATOR"); 
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 264 "test-lex.l"
+#line 261 "test-lex.l"
 {
 	head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"PUNCTUATION"); 
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 268 "test-lex.l"
+#line 265 "test-lex.l"
 {
 			int anoigei = 1, kleinei = 0;
 			int line_of_nested = 0;
@@ -1169,44 +1166,44 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 325 "test-lex.l"
+#line 322 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"IDENTIFIER"); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 326 "test-lex.l"
+#line 323 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"INTEGER"); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 327 "test-lex.l"
+#line 324 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"DOUBLE"); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 328 "test-lex.l"
+#line 325 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"CHARACTER"); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 329 "test-lex.l"
+#line 326 "test-lex.l"
 { head = list_w_tokens(alpha_yylineno,id++,alpha_yytext,"SINGLE-LINE COMMENT"); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 330 "test-lex.l"
+#line 327 "test-lex.l"
 { printf("undefined character %s in line %d\n",alpha_yytext,alpha_yylineno); }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 332 "test-lex.l"
+#line 329 "test-lex.l"
 {}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 case YY_STATE_EOF(STRING):
-#line 334 "test-lex.l"
+#line 331 "test-lex.l"
 {	printf("(eof %u)\n", alpha_yylineno); 
 			
 			return 0;
@@ -1214,10 +1211,10 @@ case YY_STATE_EOF(STRING):
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 339 "test-lex.l"
+#line 336 "test-lex.l"
 ECHO;
 	YY_BREAK
-#line 1221 "test-lex.c"
+#line 1218 "test-lex.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2225,7 +2222,7 @@ void alpha_yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 339 "test-lex.l"
+#line 336 "test-lex.l"
 
 
 
