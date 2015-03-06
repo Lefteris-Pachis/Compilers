@@ -7,7 +7,7 @@ typedef enum { IF, ELSE, WHILE, FOR, FUNCTION, RETURN, BREAK, CONTINUE, AND, NOT
 typedef enum { ASSIGN, PLUS, MINUS, MUL, DIV, MOD, EQUAL, NOT_EQUAL, ADD, SUB, GREATER, LESS, GREATER_EQUAL, LESS_EQUAL }operator;
 typedef enum { LEFT_BRACER, RIGHT_BRACER, LEFT_BRACKET, RIGHT_BRACKET, LEFT_PARENTHESES, RIGHT_PARENTHESES, SEMICOLON, COMMA, COLON, DOUBLE_COLON, DOT, DOUBLE_DOT }punctuation;
 
-struct token_t{
+struct alpha_token_t{
 	int id;
 	char *buffer;
 	char *category;
@@ -17,7 +17,7 @@ struct token_t{
 	punctuation p;
 	int intconst;
 	float fl;
-	struct token_t *next;
+	struct alpha_token_t *next;
 }*head,*tail;
 
 keyword Convert_key_to_enum(char *x){
@@ -120,9 +120,9 @@ char *Convert_p_to_string(punctuation p){
 	else if(p == DOUBLE_DOT) return "DOUBLE_DOT";
 }
 
-struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
-	struct token_t *list;
-	list = (struct token_t *)malloc(sizeof(struct token_t));
+struct alpha_token_t* list_w_tokens(int line,int id,char* buffer,char* category){
+	struct alpha_token_t *list;
+	list = (struct alpha_token_t *)malloc(sizeof(struct alpha_token_t));
 	list->line=line;
 	list->id=id;
 	list->buffer=strdup(buffer);
@@ -151,8 +151,8 @@ struct token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	return head;
 };
 
-void print_list(struct token_t *head){
- 	struct token_t *tmp = head;
+void print_list(struct alpha_token_t *head){
+ 	struct alpha_token_t *tmp = head;
  	while(tmp!=NULL){
  		if(strcmp(tmp->category,"KEYWORD") == 0)
  			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_key_to_string(tmp->keywrd));
@@ -332,7 +332,7 @@ comment1			"//".*
 [\t\r\n]   {}
 
 <<EOF>> {	printf("(eof %u)\n", yylineno); 
-			print_list(head);
+			
 			return 0;
 }
 
@@ -347,6 +347,8 @@ int main(int argc, char* argv[]) {
 	}
 	else
 		yyin = stdin;
-  	yylex();
+  	alpha_yylex();
+  	print_list(head);
+
     return 0;
 }
