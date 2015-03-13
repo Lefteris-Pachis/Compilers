@@ -180,9 +180,7 @@ id          [A-Za-z_][A-Za-z_0-9]*
 integer		[0-9]+
 double		[0-9]+\.[0-9]+
 character	'.'
-
 space		" "
-
 comment1			"//".*	
 
 %x COMMENT
@@ -324,13 +322,14 @@ comment1			"//".*
 				exit(1);
 			}
 		}
-
+"_"					{ printf("undefined character %s in line %d\n",yytext,yylineno); }
 {id}				{ head = list_w_tokens(yylineno,id++,yytext,"IDENTIFIER"); }
 {integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"SINGLE-LINE COMMENT"); }
 {space}				{}
+
 [\t\r\n]   			{}
 .					{ printf("undefined character %s in line %d\n",yytext,yylineno); }
 <<EOF>> {	printf("(eof %u)\n", yylineno); 
