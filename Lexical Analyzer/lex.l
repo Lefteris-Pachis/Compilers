@@ -180,7 +180,8 @@ id          [A-Za-z_][A-Za-z_0-9]*
 integer		[0-9]+
 double		[0-9]+\.[0-9]+
 character	'.'
-undefined  	(.)
+
+space		" "
 
 comment1			"//".*	
 
@@ -249,6 +250,7 @@ comment1			"//".*
 			}
 			if(nt>0){
 					printf("NON TERMINATED STRING at line %d\n",yylineno );
+					exit(1);
 			}
 		}
 
@@ -313,6 +315,7 @@ comment1			"//".*
 					}
 				}
 			}
+			printf("%d::%d\n",anoigei,kleinei);
 			if(anoigei != kleinei){
 				if(kleinei > anoigei)
 					printf("Error.Comment closes more times than needed in line %d\nExit\n",yylineno);
@@ -327,10 +330,9 @@ comment1			"//".*
 {double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
 {character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHARACTER"); }
 {comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"SINGLE-LINE COMMENT"); }
-{undefined}         { printf("undefined character %s in line %d\n",yytext,yylineno); }
-
-[\t\r\n]   {}
-
+{space}				{}
+[\t\r\n]   			{}
+.					{ printf("undefined character %s in line %d\n",yytext,yylineno); }
 <<EOF>> {	printf("(eof %u)\n", yylineno); 
 			
 			return 0;
