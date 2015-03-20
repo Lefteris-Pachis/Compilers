@@ -267,51 +267,56 @@ comment1			"//".*
 
 "/*"	{
 			int anoigei = 1, kleinei = 0;
-			int line_of_nested = 0;
-			int line_of_simple = yylineno;
 			int c;
 			
 			int nested_comment(){
 				while ((c = input()) != EOF ){
 					if(anoigei == kleinei+1){
+						printf("giwrgadakhs\n");
 						unput(c);
 						break;
 					}
 					if(c=='*'){
 						if((c = input()) == '/'){
 							kleinei++;
-							head = list_w_tokens(line_of_nested,id++,yytext,"NESTED COMMENT");
 							continue;
 						}
 						else
 							unput(c);
 					}
 					if(c=='/'){
-						if(c=input()=='*'){
+						if((c=input())=='*'){
 							anoigei++;
-							line_of_nested = yylineno;
+							head = list_w_tokens(yylineno,id++,yytext,"NESTED COMMENT");
 							nested_comment();
 						}
+						else
+							unput(c);
 					}
+					else
+						continue;
 				}
 			}
-
+			head = list_w_tokens(yylineno,id++,yytext,"MULTI-LINE COMMENT");
 			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
 						kleinei++;
-						head = list_w_tokens(line_of_simple,id++,yytext,"MULTI-LINE COMMENT");
 						break;
 					}else
 						unput(c);
 				}
 				if(c=='/'){
-					if(c=input()=='*'){
+					if((c=input())=='*'){
 						anoigei++;
-						line_of_nested = yylineno;
+						head = list_w_tokens(yylineno,id++,yytext,"NESTED COMMENT");
 						nested_comment();
 					}
+					else
+						unput(c);
 				}
+				else
+					continue;
 			}
 			printf("%d::%d\n",anoigei,kleinei);
 			if(anoigei != kleinei){
