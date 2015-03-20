@@ -1,8 +1,6 @@
 all:
-	flex --outfile=al.c lex.l
-	gcc al.c -o al
-bonus:
-	gcc scanner.c -o scanner
+	bison --yacc --defines --output=parser.c parser.y
+	flex --outfile=scanner.c scanner.l
+	gcc -o calc scanner.c parser.c
 clean:
-	rm -rf al.c al
-	rm -rf scanner
+	rm -rf parser.c scanner.c calc
