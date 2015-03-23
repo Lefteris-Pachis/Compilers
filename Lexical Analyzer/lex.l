@@ -1,5 +1,4 @@
 %{
-#include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 int id = 1;
@@ -11,7 +10,7 @@ typedef enum { LEFT_BRACER, RIGHT_BRACER, LEFT_BRACKET, RIGHT_BRACKET, LEFT_PARE
 struct alpha_token_t{
 	int id;
 	char *buffer;
-	int category;
+	char *category;
 	int line;
 	keyword keywrd;
 	operator op;
@@ -121,36 +120,22 @@ char *Convert_p_to_string(punctuation p){
 	else if(p == DOUBLE_DOT) return "DOUBLE_DOT";
 }
 
-char *Convert_token_to_string(int p){
-	if(p == ID) return "IDENTIFIER";
-	else if(p == INTEGER) return "INTEGER";
-	else if(p == OPERATOR) return "OPERATOR";
-	else if(p == PUNCTUATION) return "PUNCTUATION";
-	else if(p == KEYWORD) return "KEYWORD";
-	else if(p == DOUBLE) return "DOUBLE";
-	else if(p == CHAR) return "CHARACTER";
-	else if(p == STR) return "STRING";
-	else if(p == SINGLE_LINE_COMMENT) return "SINGLE_LINE_COMMENT";
-	else if(p == MULTI_LINE_COMMENT) return "MULTI_LINE_COMMENT";
-	else if(p == NESTED_COMMENT) return "NESTED_COMMENT";
-}
-
-struct alpha_token_t* list_w_tokens(int line,int id,char* buffer,int category){
+struct alpha_token_t* list_w_tokens(int line,int id,char* buffer,char* category){
 	struct alpha_token_t *list;
 	list = (struct alpha_token_t *)malloc(sizeof(struct alpha_token_t));
 	list->line=line;
 	list->id=id;
 	list->buffer=strdup(buffer);
-	list->category = category;
-	if(list->category == KEYWORD)
+	list->category = strdup(category);
+	if(strcmp(list->category, "KEYWORD") == 0)
 		list->keywrd = Convert_key_to_enum(list->buffer);
-	else if(list->category == OPERATOR)
+	else if(strcmp(list->category, "OPERATOR") == 0)
 		list->op = Convert_op_to_enum(list->buffer);
-	else if(list->category == PUNCTUATION)
+	else if(strcmp(list->category, "PUNCTUATION") == 0)
 		list->p = Convert_p_to_enum(list->buffer);
-	else if(list->category == INTEGER)
+	else if(strcmp(list->category, "INTEGER") == 0)
 		list->intconst = atoi(list->buffer);
-	else if(list->category == DOUBLE)
+	else if(strcmp(list->category, "DOUBLE") == 0)
 		list->fl = atof(list->buffer);
 	list->next=NULL;
 	if(head==NULL){
@@ -169,18 +154,18 @@ struct alpha_token_t* list_w_tokens(int line,int id,char* buffer,int category){
 void print_list(struct alpha_token_t *head){
  	struct alpha_token_t *tmp = head;
  	while(tmp!=NULL){
- 		if(tmp->category == KEYWORD)
- 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category),Convert_key_to_string(tmp->keywrd));
- 		else if(tmp->category == OPERATOR)
- 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category),Convert_op_to_string(tmp->op));
- 		else if(tmp->category == PUNCTUATION)
- 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category),Convert_p_to_string(tmp->p));
- 		else if(tmp->category == INTEGER)
- 			printf("%d: #%d    \"%s\"    \t%s \t%d\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category),tmp->intconst);
- 		else if(tmp->category == DOUBLE)
- 			printf("%d: #%d    \"%s\"    \t%s \t%f\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category),tmp->fl);
+ 		if(strcmp(tmp->category, "KEYWORD") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_key_to_string(tmp->keywrd));
+ 		else if(strcmp(tmp->category, "OPERATOR") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_op_to_string(tmp->op));
+ 		else if(strcmp(tmp->category, "PUNCTUATION") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%s\n",tmp->line,tmp->id,tmp->buffer,tmp->category,Convert_p_to_string(tmp->p));
+ 		else if(strcmp(tmp->category, "INTEGER") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%d\n",tmp->line,tmp->id,tmp->buffer,tmp->category,tmp->intconst);
+ 		else if(strcmp(tmp->category, "DOUBLE") == 0)
+ 			printf("%d: #%d    \"%s\"    \t%s \t%f\n",tmp->line,tmp->id,tmp->buffer,tmp->category,tmp->fl);
  		else
-   			printf("%d: #%d    \"%s\"    \t%s \t\"%s\"\n",tmp->line,tmp->id,tmp->buffer,Convert_token_to_string(tmp->category), tmp->buffer);
+   			printf("%d: #%d    \"%s\"    \t%s \t\"%s\"\n",tmp->line,tmp->id,tmp->buffer,tmp->category, tmp->buffer);
    		tmp=tmp->next;
    	}
 }
@@ -196,10 +181,8 @@ integer		[0-9]+
 double		[0-9]+\.[0-9]+
 character	'.'
 space		" "
-comment1			"//".*	
+comment1	"//".*
 
-%x COMMENT
-%s STRING
 
 %%
 
@@ -219,7 +202,7 @@ comment1			"//".*
 					nt=0;
 					get=realloc(get,size+4);
 					*get_ptr++='\0';
-					head = list_w_tokens(save_line,id++,get,STR);
+					head = list_w_tokens(save_line,id++,get,"STRING");
 					break;
 					
 				}else if(c=='\\'){
@@ -270,15 +253,15 @@ comment1			"//".*
 
 
 "if"|"else"|"for"|"function"|"return"|"break"|"continue"|"and"|"not"|"or"|"local"|"true"|"while"|"false"|"nil" {
-	head = list_w_tokens(yylineno,id++,yytext,KEYWORD); 
+	head = list_w_tokens(yylineno,id++,yytext,"KEYWORD"); 
 }
 
 "="|"+"|"-"|"*"|"/"|"%"|"=="|"!="|"++"|"--"|">"|"<"|">="|"<=" {
-	head = list_w_tokens(yylineno,id++,yytext,OPERATOR); 
+	head = list_w_tokens(yylineno,id++,yytext,"OPERATOR"); 
 }
 
 "{"|"}"|"["|"]"|"("|")"|";"|","|":"|"::"|"."|".." {
-	head = list_w_tokens(yylineno,id++,yytext,PUNCTUATION); 
+	head = list_w_tokens(yylineno,id++,yytext,"PUNCTUATION"); 
 }
 
 "/*"	{
@@ -303,7 +286,7 @@ comment1			"//".*
 					if(c=='/'){
 						if((c=input())=='*'){
 							anoigei++;
-							head = list_w_tokens(yylineno,id++,yytext,NESTED_COMMENT);
+							head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT");
 							nested_comment();
 						}
 						else
@@ -313,7 +296,7 @@ comment1			"//".*
 						continue;
 				}
 			}
-			head = list_w_tokens(yylineno,id++,yytext,MULTI_LINE_COMMENT);
+			head = list_w_tokens(yylineno,id++,yytext,"MULTI_LINE_COMMENT");
 			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
@@ -325,7 +308,7 @@ comment1			"//".*
 				if(c=='/'){
 					if((c=input())=='*'){
 						anoigei++;
-						head = list_w_tokens(yylineno,id++,yytext,NESTED_COMMENT);
+						head = list_w_tokens(yylineno,id++,yytext,"NESTED_COMMENT");
 						nested_comment();
 					}
 					else
@@ -344,11 +327,11 @@ comment1			"//".*
 			}
 		}
 "_"					{ printf("undefined character %s in line %d\n",yytext,yylineno); }
-{id}				{ head = list_w_tokens(yylineno,id++,yytext,ID); }
-{integer} 			{ head = list_w_tokens(yylineno,id++,yytext,INTEGER); }
-{double} 			{ head = list_w_tokens(yylineno,id++,yytext,DOUBLE); }
-{character} 		{ head = list_w_tokens(yylineno,id++,yytext,CHAR); }
-{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,SINGLE_LINE_COMMENT); }
+{id}				{ head = list_w_tokens(yylineno,id++,yytext,"ID"); }
+{integer} 			{ head = list_w_tokens(yylineno,id++,yytext,"INTEGER"); }
+{double} 			{ head = list_w_tokens(yylineno,id++,yytext,"DOUBLE"); }
+{character} 		{ head = list_w_tokens(yylineno,id++,yytext,"CHAR"); }
+{comment1} 			{ head = list_w_tokens(yylineno,id++,yytext,"SINGLE_LINE_COMMENT"); }
 {space}				{}
 
 [\t\r\n]   			{}

@@ -46,38 +46,120 @@ extern int yydebug;
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     ID = 258,
-     INTEGER = 259,
-     OPERATOR = 260,
-     PUNCTUATION = 261,
-     KEYWORD = 262,
-     DOUBLE = 263,
-     CHAR = 264,
-     STR = 265,
-     SINGLE_LINE_COMMENT = 266,
-     MULTI_LINE_COMMENT = 267,
-     NESTED_COMMENT = 268,
-     UMINUS = 269
+     INTEGER = 258,
+     DOUBLE = 259,
+     STRING = 260,
+     CHAR = 261,
+     ID = 262,
+     L_BRACE = 263,
+     R_BRACE = 264,
+     L_PARENTHESIS = 265,
+     R_PARENTHESIS = 266,
+     L_BRACKET = 267,
+     R_BRACKET = 268,
+     SEMICOLON = 269,
+     COMMA = 270,
+     COLON = 271,
+     D_COLON = 272,
+     DOT = 273,
+     D_DOT = 274,
+     PLUS = 275,
+     MINUS = 276,
+     MUL = 277,
+     DIV = 278,
+     MOD = 279,
+     PLUS_PLUS = 280,
+     MINUS_MINUS = 281,
+     ASSIGN = 282,
+     EQ = 283,
+     NOT_EQ = 284,
+     LESS_THAN = 285,
+     GREATER_THAN = 286,
+     LESS_EQ = 287,
+     GREATER_EQ = 288,
+     IF = 289,
+     ELSE = 290,
+     AND = 291,
+     NOT = 292,
+     OR = 293,
+     LOCAL = 294,
+     TRUE = 295,
+     FALSE = 296,
+     WHILE = 297,
+     FOR = 298,
+     FUNCTION = 299,
+     RETURN = 300,
+     BREAK = 301,
+     CONTINUE = 302,
+     NIL = 303,
+     UMINUS = 304
    };
 #endif
 /* Tokens.  */
-#define ID 258
-#define INTEGER 259
-#define OPERATOR 260
-#define PUNCTUATION 261
-#define KEYWORD 262
-#define DOUBLE 263
-#define CHAR 264
-#define STR 265
-#define SINGLE_LINE_COMMENT 266
-#define MULTI_LINE_COMMENT 267
-#define NESTED_COMMENT 268
-#define UMINUS 269
+#define INTEGER 258
+#define DOUBLE 259
+#define STRING 260
+#define CHAR 261
+#define ID 262
+#define L_BRACE 263
+#define R_BRACE 264
+#define L_PARENTHESIS 265
+#define R_PARENTHESIS 266
+#define L_BRACKET 267
+#define R_BRACKET 268
+#define SEMICOLON 269
+#define COMMA 270
+#define COLON 271
+#define D_COLON 272
+#define DOT 273
+#define D_DOT 274
+#define PLUS 275
+#define MINUS 276
+#define MUL 277
+#define DIV 278
+#define MOD 279
+#define PLUS_PLUS 280
+#define MINUS_MINUS 281
+#define ASSIGN 282
+#define EQ 283
+#define NOT_EQ 284
+#define LESS_THAN 285
+#define GREATER_THAN 286
+#define LESS_EQ 287
+#define GREATER_EQ 288
+#define IF 289
+#define ELSE 290
+#define AND 291
+#define NOT 292
+#define OR 293
+#define LOCAL 294
+#define TRUE 295
+#define FALSE 296
+#define WHILE 297
+#define FOR 298
+#define FUNCTION 299
+#define RETURN 300
+#define BREAK 301
+#define CONTINUE 302
+#define NIL 303
+#define UMINUS 304
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+typedef union YYSTYPE
+{
+/* Line 2053 of yacc.c  */
+#line 13 "parser.y"
+
+	int intVal;
+	double realVal;
+	char *strVal;
+
+
+/* Line 2053 of yacc.c  */
+#line 162 "parser.h"
+} YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
