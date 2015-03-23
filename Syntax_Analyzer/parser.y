@@ -45,7 +45,62 @@ program:	stmt program
 		|/* empty */
 		;
 
-stmt:	BREAK SEMICOLON { Handle_stmt_break_semicolon(yylineno); }
+
+stmt:	expr SEMICOLON
+		| ifstmt
+		| whilestmt
+		| forstmt
+		| returnstmt
+		| brk
+		| cont
+		| block
+		| funcdef
+		;
+
+ifstmt:	IF L_PARENTHESIS expr R_PARENTHESIS block ELSE block {printf(" IF STATEMENT IN LINE %d \n",yylineno);}
+		;
+
+whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS block {printf(" WHILE STATEMENT IN LINE %d \n",yylineno);}
+			;
+
+forstmt:	FOR L_PARENTHESIS expr SEMICOLON expr SEMICOLON expr R_PARENTHESIS block {printf(" FOR STATEMENT IN LINE %d \n",yylineno);}
+			;
+
+returnstmt:	RETURN expr SEMICOLON {printf(" RETURN STATEMENT IN LINE %d \n",yylineno);}
+			;
+
+brk:	BREAK SEMICOLON { Handle_stmt_break_semicolon(yylineno); }
+		;
+
+cont: 	CONTINUE SEMICOLON {printf(" CONTINUE STATEMENT IN LINE %d \n",yylineno);}
+		;
+
+funcdef FUNCTION L_PARENTHESIS  R_PARENTHESIS block {printf(" FUNCTION STATEMENT IN LINE %d \n",yylineno);}
+		;
+
+block:	L_BRACE stmt R_BRACE
+		;
+
+expr:	
+		| expr op expr
+		| expr 
+		;
+
+
+op:		/*empty*/
+		|'+'
+		|'-'
+		|'<'
+		|'>'
+		|'=='
+		|'<='
+		|'>='
+		|'!='
+		|'*'
+		|'/'
+		|'%'
+		|'and'
+		|'or'
 		;
 
 %%
