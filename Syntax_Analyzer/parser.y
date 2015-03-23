@@ -46,62 +46,59 @@ program:	stmt program
 		;
 
 
-stmt:	expr SEMICOLON
-		| ifstmt
-		| whilestmt
-		| forstmt
-		| returnstmt
-		| brk
-		| cont
-		| block
-		| funcdef
+stmt:	expr SEMICOLON 			{ Handle_stmt_expr_semicolon(yylineno); }
+		| ifstmt				{ Handle_stmt_ifstmt(yylineno); }
+		| whilestmt				{ Handle_stmt_whilestmt(yylineno); }
+		| forstmt				{ Handle_stmt_forstmt(yylineno); }
+		| returnstmt			{ Handle_stmt_returnstmt(yylineno); }
+		| BREAK SEMICOLON 		{ Handle_stmt_break_semicolon(yylineno); }
+		| CONTINUE SEMICOLON 	{ Handle_stmt_continue_semicolon(yylineno); }
+		| block					{ Handle_stmt_block(yylineno); }
 		;
 
-ifstmt:	IF L_PARENTHESIS expr R_PARENTHESIS block ELSE block {printf(" IF STATEMENT IN LINE %d \n",yylineno);}
+ifstmt:	IF L_PARENTHESIS expr R_PARENTHESIS stmt 			{ Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
+		|IF L_PARENTHESIS expr R_PARENTHESIS stmt ELSE stmt { Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(yylineno); }
 		;
 
-whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS block {printf(" WHILE STATEMENT IN LINE %d \n",yylineno);}
+whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS stmt 	{ Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
 			;
 
-forstmt:	FOR L_PARENTHESIS expr SEMICOLON expr SEMICOLON expr R_PARENTHESIS block {printf(" FOR STATEMENT IN LINE %d \n",yylineno);}
+forstmt:	FOR L_PARENTHESIS expr SEMICOLON expr SEMICOLON expr R_PARENTHESIS stmt { Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(yylineno); }
 			;
 
-returnstmt:	RETURN expr SEMICOLON {printf(" RETURN STATEMENT IN LINE %d \n",yylineno);}
+returnstmt:	RETURN expr SEMICOLON 	{ Handle_returnstmt_return_expr_semicolon(yylineno); }
+			|RETURN SEMICOLON 		{ Handle_returnstmt_return_semicolon(yylineno); }
 			;
 
-brk:	BREAK SEMICOLON { Handle_stmt_break_semicolon(yylineno); }
-		;
-
-cont: 	CONTINUE SEMICOLON {printf(" CONTINUE STATEMENT IN LINE %d \n",yylineno);}
-		;
-
-funcdef FUNCTION L_PARENTHESIS  R_PARENTHESIS block {printf(" FUNCTION STATEMENT IN LINE %d \n",yylineno);}
-		;
-
-block:	L_BRACE stmt R_BRACE
-		;
-
-expr:	
-		| expr op expr
-		| expr 
-		;
 
 
-op:		/*empty*/
-		|'+'
-		|'-'
-		|'<'
-		|'>'
-		|'=='
-		|'<='
-		|'>='
-		|'!='
-		|'*'
-		|'/'
-		|'%'
-		|'and'
-		|'or'
+block:	L_BRACE stmt R_BRACE 		{ }
 		;
+
+expr:	assignexpr					{ Handle_expr_assignexpr(yylineno); }
+		| expr PLUS expr 			{ Handle_expr_expr_plus_expr(yylineno); }
+		| expr MINUS expr 			{ Handle_expr_expr_minus_expr(yylineno); }
+		| expr MUL expr 			{ Handle_expr_expr_mul_expr(yylineno); }
+		| expr DIV expr 			{ Handle_expr_expr_div_expr(yylineno); }
+		| expr MOD expr 			{ Handle_expr_expr_mod_expr(yylineno); }
+		| expr EQ expr 				{ Handle_expr_expr_eq_expr(yylineno); }
+		| expr NOT_EQ expr  		{ Handle_expr_expr_not_eq_expr(yylineno); }
+		| expr LESS_THAN expr  		{ Handle_expr_expr_less_than_expr(yylineno); }
+		| expr GREATER_THAN expr  	{ Handle_expr_expr_greater_than_expr(yylineno); }
+		| expr LESS_EQ expr 		{ Handle_expr_expr_less_eq_expr(yylineno); }
+		| expr GREATER_EQ expr 		{ Handle_expr_expr_greater_eq_expr(yylineno); }
+		| expr AND expr  			{ Handle_expr_expr_and_expr(yylineno); }
+		| expr OR expr 				{ Handle_expr_expr_or_expr(yylineno); }
+		| expr 						{ Handle_expr_term(yylineno); }
+		;
+
+assignexpr:	lvalue ASSIGN expr 		{ Handle_assignexpr_lvalue_assign_expr(yylineno); }
+			;
+
+lvalue:		ID
+			|LOCAL ID
+			|D_COLON ID
+			;
 
 %%
 
