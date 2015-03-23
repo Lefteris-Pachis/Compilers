@@ -1,5 +1,6 @@
 %{
 	#include <stdio.h>
+	#include "actions_handler.h"
 	int yyerror(char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	
@@ -44,7 +45,7 @@ program:	stmt program
 		|/* empty */
 		;
 
-stmt:	BREAK SEMICOLON {printf("Vrhka BREAK sto line %d\n",yylineno);}
+stmt:	BREAK SEMICOLON { Handle_stmt_break_semicolon(yylineno); }
 		;
 
 %%
