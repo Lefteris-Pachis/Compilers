@@ -36,8 +36,11 @@
 
 %%
 
-program:	 program
+program:	stmt program
 		|/* empty */
+		;
+
+stmt:	BREAK SEMICOLON {printf("Vrhka BREAK sto line %d\n",yylineno);}
 		;
 
 %%
