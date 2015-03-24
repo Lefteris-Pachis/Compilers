@@ -9,6 +9,18 @@
 #ifndef _SYM_TABLE_H_
 #define _SYM_TABLE_H_
 
+
+typedef struct Node{
+
+	char* symbol;
+	char* name;
+	char* type;
+	int scope;
+	char* formal_args;
+	int line;
+	struct Node *next;
+}*node_t;
+
 /* my symbol table structure */
 typedef struct table *SymTable_T;
 
