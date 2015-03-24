@@ -28,48 +28,64 @@ void Handle_stmt_block(int lineNo){
 void Handle_stmt_funcdef(int lineNo){
 	printf("Line: %d \tstmt: funcdef\n", lineNo);
 }
+void Handle_stmt_semicolon(int lineNo){
+	printf("Line: %d \tstmt: ;\n", lineNo);
+}
 
 void Handle_expr_assignexpr(int lineNo){
 	printf("Line: %d \texpr: assignexpr\n", lineNo);
 }
-void Handle_expr_expr_plus_expr(int lineNo){
-	printf("Line: %d \texpr: + expr\n", lineNo);
+int Handle_expr_expr_plus_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr + expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return exp1 + exp2;
 }
-void Handle_expr_expr_minus_expr(int lineNo){
-	printf("Line: %d \texpr: - expr\n", lineNo);
+int Handle_expr_expr_minus_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr - expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return exp1 - exp2;
 }
-void Handle_expr_expr_mul_expr(int lineNo){
-	printf("Line: %d \texpr: * expr\n", lineNo);
+int Handle_expr_expr_mul_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr * expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return exp1 * exp2;
 }
-void Handle_expr_expr_div_expr(int lineNo){
-	printf("Line: %d \texpr: / expr\n", lineNo);
+int Handle_expr_expr_div_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr / expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return exp1 / exp2;
 }
-void Handle_expr_expr_mod_expr(int lineNo){
-	printf("Line: %d \texpr: %% expr\n", lineNo);
+int Handle_expr_expr_mod_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr %% expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return exp1 % exp2;
 }
-void Handle_expr_expr_greater_than_expr(int lineNo){
-	printf("Line: %d \texpr: > expr\n", lineNo);
+int Handle_expr_expr_greater_than_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr > expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 > exp2)?1:0;
 }
-void Handle_expr_expr_less_than_expr(int lineNo){
-	printf("Line: %d \texpr: < expr\n", lineNo);
+int Handle_expr_expr_less_than_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr < expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 < exp2)?1:0;
 }
-void Handle_expr_expr_greater_eq_expr(int lineNo){
-	printf("Line: %d \texpr: >= expr\n", lineNo);
+int Handle_expr_expr_greater_eq_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr >= expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 >= exp2)?1:0;
 }
-void Handle_expr_expr_less_eq_expr(int lineNo){
-	printf("Line: %d \texpr: <= expr\n", lineNo);
+int Handle_expr_expr_less_eq_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr <= expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 <= exp2)?1:0;
 }
-void Handle_expr_expr_eq_expr(int lineNo){
-	printf("Line: %d \texpr: == expr\n", lineNo);
+int Handle_expr_expr_eq_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr == expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 == exp2)?1:0;
 }
-void Handle_expr_expr_not_eq_expr(int lineNo){
-	printf("Line: %d \texpr: != expr\n", lineNo);
+int Handle_expr_expr_not_eq_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr != expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 != exp2)?1:0;
 }
-void Handle_expr_expr_and_expr(int lineNo){
-	printf("Line: %d \texpr: and expr\n", lineNo);
+int Handle_expr_expr_and_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr and expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 && exp2)?1:0;
 }
-void Handle_expr_expr_or_expr(int lineNo){
-	printf("Line: %d \texpr: or expr\n", lineNo);
+int Handle_expr_expr_or_expr(int exp1,int exp2,int lineNo){
+	printf("Line: %d \texpr: expr or expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
+	return (exp1 || exp2)?1:0;
 }
 void Handle_expr_term(int lineNo){
 	printf("Line: %d \texpr: term\n", lineNo);
@@ -101,7 +117,7 @@ void Handle_term_primary(int lineNo){
 }
 
 void Handle_assignexpr_lvalue_assign_expr(int lineNo){
-	printf("Line: %d \tassignexpr: lvalue = expr\n", lineNo);
+	printf("Line: %d \tassignexpr: expr lvalue = expr\n", lineNo);
 }
 
 void Handle_primary_lvalue(int lineNo){
@@ -137,13 +153,13 @@ void Handle_lvalue_member(int lineNo){
 void Handle_member_lvalue_dot_id(int lineNo){
 	printf("Line: %d \tmember: lvalue.id\n", lineNo);
 }
-void Handle_member_lvalue_l_bracket_expr_r_bracket(int lineNo){
+void Handle_member_lvalue_l_brace_expr_r_brace(int lineNo){
 	printf("Line: %d \tmember: lvalue[expr]\n", lineNo);
 }
 void Handle_member_call_dot_id(int lineNo){
 	printf("Line: %d \tmember: call.id\n", lineNo);
 }
-void Handle_member_call_l_bracket_expr_r_bracket(int lineNo){
+void Handle_member_call_l_brace_expr_r_brace(int lineNo){
 	printf("Line: %d \tmember: call[expr]\n", lineNo);
 }
 
@@ -171,38 +187,35 @@ void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tmethodcall: ..id(elist)\n", lineNo);
 }
 
-void Handle_elist_expr_elist1(int lineNo){
+void Handle_elist_expr_elist_1(int lineNo){
 	printf("Line: %d \telist: expr elist_1\n", lineNo);
 }
-void Handle_elist1_comma_elist(int lineNo){
-	printf("Line: %d \telist1: ,elist\n", lineNo);
+void Handle_elist_1_comma_elist(int lineNo){
+	printf("Line: %d \telist_1: ,elist\n", lineNo);
 }
 
-void Handle_objectdef_l_bracket_objectdef1_r_bracket(int lineNo){
-	printf("Line: %d \tobjectdef: [objectdef_1]\n", lineNo);
+void Handle_objectdef_l_brace_elist_r_brace(int lineNo){
+	printf("Line: %d \tobjectdef: [elist]\n", lineNo);
 }
-void Handle_objectdef1_elist(int lineNo){
-	printf("Line: %d \tobjectdef1: elist\n", lineNo);
-}
-void Handle_objectdef1_indexed(int lineNo){
-	printf("Line: %d \tobjectdef1: indexed\n", lineNo);
+void Handle_objectdef_l_brace_indexed_r_brace(int lineNo){
+	printf("Line: %d \tobjectdef: [indexed]\n", lineNo);
 }
 
-void Handle_indexed_indexedelem_indexed1(int lineNo){
+void Handle_indexed_indexedelem_indexed_1(int lineNo){
 	printf("Line: %d \tindexed: indexedelem indexed_1\n", lineNo);
 }
-void Handle_indexed1_comma_indexedelem_indexed1(int lineNo){
-	printf("Line: %d \tindexed1: ,indexedelem indexed_1\n", lineNo);
+void Handle_indexed_1_comma_indexed(int lineNo){
+	printf("Line: %d \tindexed_1: ,indexed\n", lineNo);
 }
-void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
-	printf("Line: %d \tindexedelem: {expr:expr}\n", lineNo);
+void Handle_indexedelem_l_bracket_expr_colon_expr_r_bracket(int lineNo){
+	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);
 }
 
-int Handle_block_l_brace_block1_r_brace(int scope, int flag, int lineNo){
+int Handle_block_l_bracket_block_1_r_bracket(int scope, int flag, int lineNo){
 	printf("Line: %d \tblock: {block_1}\n", lineNo);
 }
-void Handle_block1_stmt_block1(int lineNo){
-	printf("Line: %d \tblock1: stmt block_1\n", lineNo);
+void Handle_block_1_stmt_block_1(int lineNo){
+	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
 }
 
 void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
@@ -233,12 +246,12 @@ void Handle_const_false(int lineNo){
 	printf("Line: %d \tconst: false\n", lineNo);
 }
 
-void Handle_idlist_id_idlist1(char* name, char* functionName, int scope, int lineNo){
+void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
 
 }
-void Handle_idlist1_comma_id_idlist1(char* name, char* functionName, int scope, int lineNo){
-	printf("Line: %d \tidlist1: ,id idlist_1\n", lineNo);
+void Handle_idlist_1_comma_idlist(char* name, char* functionName, int scope, int lineNo){
+	printf("Line: %d \tidlist_1: ,idlist\n", lineNo);
 
 }
 
