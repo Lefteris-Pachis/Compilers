@@ -10,7 +10,7 @@
 #define _SYM_TABLE_H_
 
 
-struct table{
+struct Node{
 	char* var_name;
 	char* var_type;
 	int var_scope;
@@ -23,7 +23,7 @@ struct table{
 	struct Node *next;
 };
 
-/* my symbol table structure */
+/* my symbol table */
 typedef struct table *SymTable_T;
 
 /* returns a new empty item of type SymTable_T */
