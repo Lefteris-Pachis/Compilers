@@ -153,13 +153,13 @@ void Handle_lvalue_member(int lineNo){
 void Handle_member_lvalue_dot_id(int lineNo){
 	printf("Line: %d \tmember: lvalue.id\n", lineNo);
 }
-void Handle_member_lvalue_l_brace_expr_r_brace(int lineNo){
+void Handle_member_lvalue_l_bracket_expr_r_bracket(int lineNo){
 	printf("Line: %d \tmember: lvalue[expr]\n", lineNo);
 }
 void Handle_member_call_dot_id(int lineNo){
 	printf("Line: %d \tmember: call.id\n", lineNo);
 }
-void Handle_member_call_l_brace_expr_r_brace(int lineNo){
+void Handle_member_call_l_bracket_expr_r_bracket(int lineNo){
 	printf("Line: %d \tmember: call[expr]\n", lineNo);
 }
 
@@ -194,10 +194,10 @@ void Handle_elist_1_comma_elist(int lineNo){
 	printf("Line: %d \telist_1: ,elist\n", lineNo);
 }
 
-void Handle_objectdef_l_brace_elist_r_brace(int lineNo){
+void Handle_objectdef_l_bracket_elist_r_bracket(int lineNo){
 	printf("Line: %d \tobjectdef: [elist]\n", lineNo);
 }
-void Handle_objectdef_l_brace_indexed_r_brace(int lineNo){
+void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo){
 	printf("Line: %d \tobjectdef: [indexed]\n", lineNo);
 }
 
@@ -207,11 +207,11 @@ void Handle_indexed_indexedelem_indexed_1(int lineNo){
 void Handle_indexed_1_comma_indexed(int lineNo){
 	printf("Line: %d \tindexed_1: ,indexed\n", lineNo);
 }
-void Handle_indexedelem_l_bracket_expr_colon_expr_r_bracket(int lineNo){
+void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);
 }
 
-int Handle_block_l_bracket_block_1_r_bracket(int scope, int flag, int lineNo){
+int Handle_block_l_brace_block_1_r_brace(int scope, int flag, int lineNo){
 	printf("Line: %d \tblock: {block_1}\n", lineNo);
 }
 void Handle_block_1_stmt_block_1(int lineNo){

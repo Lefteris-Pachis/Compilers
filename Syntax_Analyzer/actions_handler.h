@@ -51,9 +51,9 @@ void Handle_lvalue_d_colon_id(char* name, int lineNo);
 void Handle_lvalue_member(int lineNo);
 
 void Handle_member_lvalue_dot_id(int lineNo);
-void Handle_member_lvalue_l_brace_expr_r_brace(int lineNo);
+void Handle_member_lvalue_l_bracket_expr_r_bracket(int lineNo);
 void Handle_member_call_dot_id(int lineNo);
-void Handle_member_call_l_brace_expr_r_brace(int lineNo);
+void Handle_member_call_l_bracket_expr_r_bracket(int lineNo);
 
 void Handle_call_call_l_parenthesis_elist_r_parenthesis(int lineNo);
 void Handle_call_lvalue_callsuffix(int lineNo);
@@ -68,14 +68,14 @@ void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo);
 void Handle_elist_expr_elist_1(int lineNo);
 void Handle_elist_1_comma_elist(int lineNo);
 
-void Handle_objectdef_l_brace_elist_r_brace(int lineNo);
-void Handle_objectdef_l_brace_indexed_r_brace(int lineNo);
+void Handle_objectdef_l_bracket_elist_r_bracket(int lineNo);
+void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo);
 
 void Handle_indexed_indexedelem_indexed_1(int lineNo);
 void Handle_indexed_1_comma_indexed(int lineNo);
-void Handle_indexedelem_l_bracket_expr_colon_expr_r_bracket(int lineNo);
+void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo);
 
-int Handle_block_l_bracket_block_1_r_bracket(int scope, int flag, int lineNo);
+int Handle_block_l_brace_block_1_r_brace(int scope, int flag, int lineNo);
 void Handle_block_1_stmt_block_1(int lineNo);
 
 void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);

@@ -40,7 +40,7 @@
 %left		DOT D_DOT
 %left		L_BRACKET R_BRACKET
 %left		L_PARENTHESIS R_PARENTHESIS
-
+%left 		ELSE
 %%
 
 program:	stmt program
@@ -104,9 +104,9 @@ lvalue:		ID 				{ Handle_lvalue_id(NULL,0,yylineno,0); }
 			;
 
 member:		lvalue DOT ID 					{ Handle_member_lvalue_dot_id(yylineno); }
-			| lvalue L_BRACE expr R_BRACE 	{ Handle_member_lvalue_l_brace_expr_r_brace(yylineno); }
+			| lvalue L_BRACKET expr R_BRACKET 	{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); }
 			| call DOT ID 					{ Handle_member_call_dot_id(yylineno); }
-			| call L_BRACE expr R_BRACE 	{ Handle_member_call_l_brace_expr_r_brace(yylineno); }
+			| call L_BRACKET expr R_BRACKET 	{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
 
 call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno); }
@@ -124,30 +124,27 @@ normcall: 	L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_normcall_l_parenthesis_e
 methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(yylineno); }
 			;
 
-elist: 		expr elist_1 		{ Handle_elist_expr_elist_1(yylineno); }
-			|					{  }
+elist: 		expr  		{ Handle_elist_expr_elist_1(yylineno); }
+			| elist COMMA expr
+			|
 			;
 
-elist_1: 	COMMA elist 		{ Handle_elist_1_comma_elist(yylineno); }
-			|					{  }
+
+
+objectdef: 	L_BRACKET elist R_BRACKET 		{ Handle_objectdef_l_bracket_elist_r_bracket(yylineno); }
+			| L_BRACKET indexed R_BRACKET 	{ Handle_objectdef_l_bracket_indexed_r_bracket(yylineno); }
 			;
 
-objectdef: 	L_BRACE elist R_BRACE 		{ Handle_objectdef_l_brace_elist_r_brace(yylineno); }
-			| L_BRACE indexed R_BRACE 	{ Handle_objectdef_l_brace_indexed_r_brace(yylineno); }
+indexed: 	indexedelem  		{ Handle_indexed_indexedelem_indexed_1(yylineno); }
+			| indexed COMMA indexedelem {  }
 			;
 
-indexed: 	indexedelem indexed_1 		{ Handle_indexed_indexedelem_indexed_1(yylineno); }
-			|							{  }
-			;
 
-indexed_1: 	COMMA indexed 	 			{ Handle_indexed_1_comma_indexed(yylineno); }
-			| 							{  }
-			;
 
-indexedelem: 	L_BRACKET expr COLON expr L_BRACKET 	{ Handle_indexedelem_l_bracket_expr_colon_expr_r_bracket(yylineno); }
+indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACKET block_1 R_BRACKET 		{ Handle_block_l_bracket_block_1_r_bracket(0,0,yylineno); }
+block: 		L_BRACE block_1 R_BRACE 		{ Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
 			;
 
 block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
