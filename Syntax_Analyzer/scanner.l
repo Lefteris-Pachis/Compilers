@@ -65,6 +65,7 @@ comment1	"//".*
 
 					if(flag==1){
 						printf("INVALID ESCAPE CHARACTER at line %d\n",yylineno );
+						exit(1);
 						flag=0;
 					}
 
@@ -140,7 +141,7 @@ comment1	"//".*
 					if(c=='*'){
 						if((c = input()) == '/'){
 							kleinei++;
-							return 0;
+							continue;
 						}
 						else
 							unput(c);
@@ -157,12 +158,11 @@ comment1	"//".*
 						continue;
 				}
 			}
-			
 			while ((c = input()) != EOF ) {
 				if(c == '*') {
 					if((c = input()) == '/'){
 						kleinei++;
-						return 0;
+						break;
 					}else
 						unput(c);
 				}

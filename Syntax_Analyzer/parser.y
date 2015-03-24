@@ -94,7 +94,7 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| call 									{ Handle_primary_call(yylineno); }
 			| objectdef 							{ Handle_primary_objectdef(yylineno); }
 			| L_PARENTHESIS funcdef R_PARENTHESIS 	{ Handle_primary_l_parenthesis_funcdef_r_parenthesis(yylineno); }
-			|const 									{ Handle_primary_const(yylineno); }
+			| const 								{ Handle_primary_const(yylineno); }
 			;
 
 lvalue:		ID 				{ Handle_lvalue_id(NULL,0,yylineno,0); }

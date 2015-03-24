@@ -271,7 +271,6 @@ comment1	"//".*
 			int nested_comment(){
 				while ((c = input()) != EOF ){
 					if(anoigei == kleinei+1){
-						printf("giwrgadakhs\n");
 						unput(c);
 						break;
 					}

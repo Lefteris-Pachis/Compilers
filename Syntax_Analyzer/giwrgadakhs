@@ -1,110 +1,149 @@
+/*
+//proper	output
+parent
+childL
+grandChildLL
+grandChildLR
+childR
+grandChildRL
+grandChildRR
 
-a1 = a2 = a3 = a4 = nil;
 
-global_var = 0;
 
-{
-        local a1 = 2;
+
+parent
+childR
+grandChildRR
+grandChildRL
+childL
+grandChildLR
+grandChildLL
+*/
+nl = "\n";
+
+function TreeNode (p, l, r) {
+	parent  = 0;
+	left	= 0;
+	right	= 0; 
+	if (argument(0)) parent = p;
+	if (argument(1)) left = l;
+	if (argument(totalarguments()-1)) right = r; //or if (argument[2]) right = r;
+
+	return  [
+		{"class" : "\mTreeNode"},
+		{"parent": parent},	
+		{"left"	 : left},
+		{"right" : right},
+		{"info"	 : 0},
+		{"marked": false}
+	];
 }
 
-function foo() {
-        ::global_var = 1;
+function Stack () {
+
+	return [
+		{"class" : "Stack"},
+		{"next"  : 0},
+		{"data"  : []},
+		{"empty" : (function (self){
+			return self.next == 0;
+		})},
+		
+		{"push"	 : (function (self, data){
+			self.data[self.next++] = data;
+		})},
+		
+		{"pop"	 : (function (self){
+			if (self.next > 0)
+				self.data[--self.next] = nil;
+		})},
+		
+		{"top" 	 : (function (self){
+			return self.data[self.next-1];
+		})}
+	];
 }
 
-//here global_var must be 1;
-//print(global_var, "\n");
+function PrintTree (root) {
+	if (root)
+		print(root.info, ::nl);
 
-function foo1(){
-        local global_var = 2;
-        //here (local) global_var must be 2
-        //print(global_var, "\n");
+	if (root.left)
+		PrintTree(root.left);
+
+	if (root.right)
+		PrintTree(root.right);
 }
 
-//here global_var must be 1
-//print(global_var, "\n");
+function PostOrder(root) {
+	k = Stack();
+	k..push(root);
 
-
-global_var = global_var + 1;
-global_var = global_var - 1;
-global_var = global_var * 2;
-global_var = global_var / 2;
-global_var = global_var % global_var;
-
-global_var = true;
-
-if (not global_var)
-        global_var = true;
-
-else
-        global_var = false;
-
-for (i = 0; (i < 10 and global_var) or (i > 20); ++i) {
-        i++;
-
-        if( i != 1)
-                print();
-
-        if ( i <= 2) {
-                i=9;
-                print();
-                i--;
-                --i;
-        }
-
-        if (i == 1)
-                ;
-
-        else if (i >= 4)
-                ;
-        else
-                continue;
+	while(not k.empty()){
+		tmp = k..top();
+		k..pop();
+		
+		if (tmp.marked)
+			print(tmp.info, nl);
+		else {
+			if (tmp.left)   k..push(tmp.left);
+			if (tmp.right)	k..push(tmp.right);
+			tmp.marked = true;
+			k..push(tmp);
+		}
+	}
 }
+/*
+							  root
+							 /    \   
+						    /      \
+						   /  	    \
+						  /    	     \
+					  childL	     childR
+					  /     \        /     \
+					 /       \  grandChildRR\
+				    /         \			     \
+			grandChildLL  grandChildLR      grandChildRR
+*/
 
-while (not global_var) {
+root 			= TreeNode();
+childL 			= TreeNode();
+childR 			= TreeNode();
+grandChildLL 	= TreeNode();
+grandChildLR 	= TreeNode();
+grandChildRL 	= TreeNode();
+grandChildRR 	= TreeNode();
 
-        if ( local j = not global_var)
-                break;
-}
+root.info 	  		= "parent";
+childL.info 	  	= "childL";
+childR.info 	  	= "childR";
+grandChildLL.info 	= "grandChildLL";
+grandChildLR.info 	= "grandChildLR";
+grandChildRL.info 	= "grandChildRL";
+grandChildRR.info 	= "grandChildRR";
 
+root.left  = childL;
+root.right = childR;
 
+childL.parent	= root;
+childL.left		= grandChildLL;
+childL.right	= grandChildLR;
 
-object = [];
-
-object = [1, 2, "test"];
-
-object = [{"a":2}, {"b":2}, {"c":3}];
-
-
-object..f();
-object[0] = 2;
-object["test"] = 2;
-object.test = 2;
-
-object = (function (){});
-
-function test (){
-        function test1(){
-                return test;
-        }
-        return test1;
-}
-
-test();
-test()();
-test()()();
+childR.parent 	= root;
+childR.left		= grandChildRL;
+childR.right	= grandChildRR;
 
 
+grandChildLL.parent = childL;
+grandChildLR.parent = childL;
 
-function test1 (){
-        return [
-                {"a":1},
-                {"x" : [ {"y":[]}] }
-        ];
-}
+grandChildRL.parent = childR;
+grandChildRL.parnet = childR;
 
-test1().a = 2;
-test1().test1f();
-test1().test1f(1, 2);
 
-//print(a1.a2.a3.a4, "\n");
+PrintTree(root);
+print("\n", ::nl, "\n", nl);
+PostOrder(root);
+
+
 
