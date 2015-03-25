@@ -1,8 +1,10 @@
 %{
 	#include <stdio.h>
 	#include "actions_handler.h"
+	#include "symtable.h"
 	int yyerror(char* yaccProvidedMessage);
 	int alpha_yylex(void);
+	int scope_count = 0;
 	
 	extern int yylineno;
 	extern char* yytext;
@@ -97,8 +99,8 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| const 								{ Handle_primary_const(yylineno); }
 			;
 
-lvalue:		ID 				{ Handle_lvalue_id(NULL,0,yylineno,0); }
-			| LOCAL ID 		{ Handle_lvalue_local_id(NULL,0,yylineno); }
+lvalue:		ID 				{ Handle_lvalue_id($1,scope_count,yylineno,0); }
+			| LOCAL ID 		{ Handle_lvalue_local_id($2,scope_count,yylineno); }
 			| D_COLON ID 	{ Handle_lvalue_d_colon_id(NULL,yylineno); }
 			| member 		{ Handle_lvalue_member(yylineno); }
 			;
@@ -124,8 +126,8 @@ normcall: 	L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_normcall_l_parenthesis_e
 methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(yylineno); }
 			;
 
-elist: 		expr  		{ Handle_elist_expr_elist_1(yylineno); }
-			| elist COMMA expr
+elist: 		expr  				{ Handle_elist_expr(yylineno); }
+			| elist COMMA expr 	{ Handle_elist_elist_comma_expr(yylineno); }
 			|
 			;
 
@@ -135,8 +137,8 @@ objectdef: 	L_BRACKET elist R_BRACKET 		{ Handle_objectdef_l_bracket_elist_r_bra
 			| L_BRACKET indexed R_BRACKET 	{ Handle_objectdef_l_bracket_indexed_r_bracket(yylineno); }
 			;
 
-indexed: 	indexedelem  		{ Handle_indexed_indexedelem_indexed_1(yylineno); }
-			| indexed COMMA indexedelem {  }
+indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
+			| indexed COMMA indexedelem { Handle_indexed_indexed_comma_indexedelem(yylineno); }
 			;
 
 
@@ -144,15 +146,15 @@ indexed: 	indexedelem  		{ Handle_indexed_indexedelem_indexed_1(yylineno); }
 indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACE block_1 R_BRACE 		{ Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
+block: 		L_BRACE { scope_count++; } block_1 R_BRACE 		{ scope_count--; Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
 			;
 
 block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION L_PARENTHESIS idlist R_PARENTHESIS block 		{ Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(NULL,0,yylineno); }
-			| FUNCTION ID L_PARENTHESIS idlist R_PARENTHESIS block 	{ Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(0,yylineno); }
+funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(NULL,0,yylineno); }
+			| FUNCTION ID L_PARENTHESIS idlist R_PARENTHESIS block 					{ Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(0,yylineno); }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }
@@ -203,7 +205,14 @@ int main(int argc, char** argv){
 	}
 	else
 		yyin = stdin;
+	mytable = SymTable_new();
 
 	yyparse();
+
+
+	//Insert_Var(mytable, "giwrgadakis", "pro" , 0, 1);
+	//Insert_Func(mytable, "giwrgadakis", "pro","x,y" , 0, 1);
+
+	Print_Hash(mytable);
 	return 0;
 }

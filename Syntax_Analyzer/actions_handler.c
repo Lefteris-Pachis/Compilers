@@ -138,10 +138,11 @@ void Handle_primary_const(int lineNo){
 
 void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 	printf("Line: %d \tlvalue: id\n", lineNo);
-
+	Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
 }
 void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
+	Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
 }
 void Handle_lvalue_d_colon_id(char* name, int lineNo){
 	printf("Line: %d \tlvalue: ::id\n", lineNo);
@@ -187,11 +188,11 @@ void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tmethodcall: ..id(elist)\n", lineNo);
 }
 
-void Handle_elist_expr_elist_1(int lineNo){
-	printf("Line: %d \telist: expr elist_1\n", lineNo);
+void Handle_elist_expr(int lineNo){
+	printf("Line: %d \telist: expr\n", lineNo);
 }
-void Handle_elist_1_comma_elist(int lineNo){
-	printf("Line: %d \telist_1: ,elist\n", lineNo);
+void Handle_elist_elist_comma_expr(int lineNo){
+	printf("Line: %d \telist: elist , expr\n", lineNo);
 }
 
 void Handle_objectdef_l_bracket_elist_r_bracket(int lineNo){
@@ -201,11 +202,11 @@ void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo){
 	printf("Line: %d \tobjectdef: [indexed]\n", lineNo);
 }
 
-void Handle_indexed_indexedelem_indexed_1(int lineNo){
-	printf("Line: %d \tindexed: indexedelem indexed_1\n", lineNo);
+void Handle_indexed_indexedelem(int lineNo){
+	printf("Line: %d \tindexed: indexedelem\n", lineNo);
 }
-void Handle_indexed_1_comma_indexed(int lineNo){
-	printf("Line: %d \tindexed_1: ,indexed\n", lineNo);
+void Handle_indexed_indexed_comma_indexedelem(int lineNo){
+	printf("Line: %d \tindexed: indexed , indexedelem\n", lineNo);
 }
 void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);

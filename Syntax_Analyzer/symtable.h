@@ -32,6 +32,7 @@ typedef struct table{
 	node_t hashtable[BUCKETS];
 }*SymTable_T;
 /* my symbol table structure */
+SymTable_T mytable;
 
 /* returns a new empty item of type SymTable_T */
 SymTable_T SymTable_new();

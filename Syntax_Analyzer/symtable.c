@@ -259,7 +259,7 @@ void Print_Hash(SymTable_T oSymTable)
 	}
 }
 
-int main(){
+/*int main(){
 
 	SymTable_T mytable = SymTable_new();
 
@@ -267,4 +267,4 @@ int main(){
 	Insert_Func(mytable, "giwrgadakis", "pro","x,y" , 0, 1);
 
 	Print_Hash(mytable);
-}
+}*/

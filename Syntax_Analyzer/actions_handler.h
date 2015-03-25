@@ -1,5 +1,6 @@
 #ifndef ACTIONS_HANDLER_H
 #define ACTIONS_HANDLER_H
+#include "symtable.h"
 
 void Handle_stmt_expr_semicolon(int lineNo);
 void Handle_stmt_ifstmt(int lineNo);
@@ -65,14 +66,14 @@ void Handle_callsuffix_methodcall(int lineNo);
 void Handle_normcall_l_parenthesis_elist_r_parenthesis(int lineNo);
 void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo);
 
-void Handle_elist_expr_elist_1(int lineNo);
-void Handle_elist_1_comma_elist(int lineNo);
+void Handle_elist_expr(int lineNo);
+void Handle_elist_elist_comma_expr(int lineNo);
 
 void Handle_objectdef_l_bracket_elist_r_bracket(int lineNo);
 void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo);
 
-void Handle_indexed_indexedelem_indexed_1(int lineNo);
-void Handle_indexed_1_comma_indexed(int lineNo);
+void Handle_indexed_indexedelem(int lineNo);
+void Handle_indexed_indexed_comma_indexedelem(int lineNo);
 void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo);
 
 int Handle_block_l_brace_block_1_r_brace(int scope, int flag, int lineNo);
