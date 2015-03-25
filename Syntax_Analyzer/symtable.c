@@ -73,7 +73,7 @@ void SymTable_free(SymTable_T oSymTable)
 }
 
 
-int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line, int called)
+int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line)
 {
 	int hashcode=SymTable_hash(var_name);
 	node_t put;
@@ -97,8 +97,6 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 	put->line = var_line;
 
 	put->hiden = 0;
-
-	put->called = called;
 
 	put->next = NULL;
 
@@ -185,14 +183,14 @@ void Hide(SymTable_T oSymTable, int scope)
 			}
 			else if(parse->scope == scope)
 			{
-				hiden = 0;
+				parse->hiden = 0;
 			}
 			parse = parse->next;
 		}
 	}
 }
 
-int Lookup(SymTable_T oSymTable, const char *name)
+node_t Lookup(SymTable_T oSymTable, const char *name)
 {
 	assert(name != NULL && oSymTable != NULL);
 	int hashcode=SymTable_hash(name);
@@ -202,17 +200,17 @@ int Lookup(SymTable_T oSymTable, const char *name)
 	while(parse!=NULL)
 	{
 		if(parse->var_name!=NULL && parse->func_name==NULL){
-			if(strcmp(parse->var_name,name))
+			if(strcmp(parse->var_name,name) == 0)
 				return parse;
 		}
 		else if(parse->var_name==NULL && parse->func_name!=NULL)
 		{
-			if(strcmp(parse->func_name,name))
+			if(strcmp(parse->func_name,name) == 0)
 				return parse;
 		}
 		parse=parse->next;
 	}
-	return 0;
+	return NULL;
 }
 
 void Print_Hash(SymTable_T oSymTable)
@@ -244,7 +242,7 @@ void Print_Hash(SymTable_T oSymTable)
 	}
 }
 
-int main(){
+/*int main(){
 
 	SymTable_T mytable = SymTable_new();
 
@@ -252,4 +250,4 @@ int main(){
 	Insert_Func(mytable, "giwrgadakis", "pro","x,y" , 0, 1);
 
 	Print_Hash(mytable);
-}
+}*/

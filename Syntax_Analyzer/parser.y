@@ -30,6 +30,8 @@
 %token IF ELSE AND NOT OR LOCAL TRUE FALSE WHILE FOR FUNCTION RETURN BREAK CONTINUE NIL
 
 %type <intVal> expr
+%type <strVal> idlist
+%type <strVal> funcdef
 
 %right		ASSIGN
 %left		OR
@@ -50,46 +52,46 @@ program:	stmt program
 		;
 
 
-stmt:	expr SEMICOLON 			{ Handle_stmt_expr_semicolon(yylineno); }
-		| ifstmt				{ Handle_stmt_ifstmt(yylineno); }
-		| whilestmt				{ Handle_stmt_whilestmt(yylineno); }
-		| forstmt				{ Handle_stmt_forstmt(yylineno); }
-		| returnstmt			{ Handle_stmt_returnstmt(yylineno); }
-		| BREAK SEMICOLON 		{ Handle_stmt_break_semicolon(yylineno); }
-		| CONTINUE SEMICOLON 	{ Handle_stmt_continue_semicolon(yylineno); }
-		| block					{ Handle_stmt_block(yylineno); }
-		| funcdef				{ Handle_stmt_funcdef(yylineno); }
-		| SEMICOLON 			{ Handle_stmt_semicolon(yylineno); }
+stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
+		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
+		| whilestmt									{ Handle_stmt_whilestmt(yylineno); }
+		| forstmt									{ Handle_stmt_forstmt(yylineno); }
+		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
+		| BREAK SEMICOLON 							{ Handle_stmt_break_semicolon(yylineno); }
+		| CONTINUE SEMICOLON 						{ Handle_stmt_continue_semicolon(yylineno); }
+		| block										{ Handle_stmt_block(yylineno); }
+		| funcdef									{ Handle_stmt_funcdef(yylineno); }
+		| SEMICOLON 								{ Handle_stmt_semicolon(yylineno); }
 		;
 
-expr:	assignexpr					{ Handle_expr_assignexpr(yylineno); }
-		| expr PLUS expr 			{ Handle_expr_expr_plus_expr($1,$3,yylineno); }
-		| expr MINUS expr 			{ Handle_expr_expr_minus_expr($1,$3,yylineno); }
-		| expr MUL expr 			{ Handle_expr_expr_mul_expr($1,$3,yylineno); }
-		| expr DIV expr 			{ Handle_expr_expr_div_expr($1,$3,yylineno); }
-		| expr MOD expr 			{ Handle_expr_expr_mod_expr($1,$3,yylineno); }
-		| expr EQ expr 				{ Handle_expr_expr_eq_expr($1,$3,yylineno); }
-		| expr NOT_EQ expr  		{ Handle_expr_expr_not_eq_expr($1,$3,yylineno); }
-		| expr LESS_THAN expr  		{ Handle_expr_expr_less_than_expr($1,$3,yylineno); }
-		| expr GREATER_THAN expr  	{ Handle_expr_expr_greater_than_expr($1,$3,yylineno); }
-		| expr LESS_EQ expr 		{ Handle_expr_expr_less_eq_expr($1,$3,yylineno); }
-		| expr GREATER_EQ expr 		{ Handle_expr_expr_greater_eq_expr($1,$3,yylineno); }
-		| expr AND expr  			{ Handle_expr_expr_and_expr($1,$3,yylineno); }
-		| expr OR expr 				{ Handle_expr_expr_or_expr($1,$3,yylineno); }
-		| term 						{ Handle_expr_term(yylineno); }
+expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
+		| expr PLUS expr 							{ Handle_expr_expr_plus_expr($1,$3,yylineno); }
+		| expr MINUS expr 							{ Handle_expr_expr_minus_expr($1,$3,yylineno); }
+		| expr MUL expr 							{ Handle_expr_expr_mul_expr($1,$3,yylineno); }
+		| expr DIV expr 							{ Handle_expr_expr_div_expr($1,$3,yylineno); }
+		| expr MOD expr 							{ Handle_expr_expr_mod_expr($1,$3,yylineno); }
+		| expr EQ expr 								{ Handle_expr_expr_eq_expr($1,$3,yylineno); }
+		| expr NOT_EQ expr  						{ Handle_expr_expr_not_eq_expr($1,$3,yylineno); }
+		| expr LESS_THAN expr  						{ Handle_expr_expr_less_than_expr($1,$3,yylineno); }
+		| expr GREATER_THAN expr  					{ Handle_expr_expr_greater_than_expr($1,$3,yylineno); }
+		| expr LESS_EQ expr 						{ Handle_expr_expr_less_eq_expr($1,$3,yylineno); }
+		| expr GREATER_EQ expr 						{ Handle_expr_expr_greater_eq_expr($1,$3,yylineno); }
+		| expr AND expr  							{ Handle_expr_expr_and_expr($1,$3,yylineno); }
+		| expr OR expr 								{ Handle_expr_expr_or_expr($1,$3,yylineno); }
+		| term 										{ Handle_expr_term(yylineno); }
 		;
 
-term: 	L_PARENTHESIS expr R_PARENTHESIS 	{ Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
-		| UMINUS expr 						{ Handle_term_uminus_expr(yylineno); }
-		| NOT expr 							{ Handle_term_not_expr(yylineno); }
-		| PLUS_PLUS lvalue 					{ Handle_term_plus_plus_lvalue(yylineno); }
-		| lvalue PLUS_PLUS					{ Handle_term_lvalue_plus_plus(yylineno); }
-		| MINUS_MINUS lvalue 				{ Handle_term_minus_minus_lvalue(yylineno); }
-		| lvalue MINUS_MINUS 				{ Handle_term_lvalue_minus_minus(yylineno); }
-		| primary 							{ Handle_term_primary(yylineno); }
+term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
+		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
+		| NOT expr 									{ Handle_term_not_expr(yylineno); }
+		| PLUS_PLUS lvalue 							{ Handle_term_plus_plus_lvalue(yylineno); }
+		| lvalue PLUS_PLUS							{ Handle_term_lvalue_plus_plus(yylineno); }
+		| MINUS_MINUS lvalue 						{ Handle_term_minus_minus_lvalue(yylineno); }
+		| lvalue MINUS_MINUS 						{ Handle_term_lvalue_minus_minus(yylineno); }
+		| primary 									{ Handle_term_primary(yylineno); }
 		;
 
-assignexpr:	lvalue ASSIGN expr 		{ Handle_assignexpr_lvalue_assign_expr(yylineno); }
+assignexpr:	lvalue ASSIGN expr 						{ Handle_assignexpr_lvalue_assign_expr(yylineno); }
 			;	
 
 primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
@@ -99,16 +101,16 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| const 								{ Handle_primary_const(yylineno); }
 			;
 
-lvalue:		ID 				{ Handle_lvalue_id($1,scope_count,yylineno,0); }
-			| LOCAL ID 		{ Handle_lvalue_local_id($2,scope_count,yylineno); }
-			| D_COLON ID 	{ Handle_lvalue_d_colon_id(NULL,yylineno); }
-			| member 		{ Handle_lvalue_member(yylineno); }
+lvalue:		ID 										{ Handle_lvalue_id($1,scope_count,yylineno,0); }
+			| LOCAL ID 								{ Handle_lvalue_local_id($2,scope_count,yylineno); }
+			| D_COLON ID 							{ Handle_lvalue_d_colon_id(NULL,yylineno); }
+			| member 								{ Handle_lvalue_member(yylineno); }
 			;
 
-member:		lvalue DOT ID 					{ Handle_member_lvalue_dot_id(yylineno); }
-			| lvalue L_BRACKET expr R_BRACKET 	{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); }
-			| call DOT ID 					{ Handle_member_call_dot_id(yylineno); }
-			| call L_BRACKET expr R_BRACKET 	{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
+member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno); }
+			| lvalue L_BRACKET expr R_BRACKET 		{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); }
+			| call DOT ID 							{ Handle_member_call_dot_id(yylineno); }
+			| call L_BRACKET expr R_BRACKET 		{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
 
 call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno); }
@@ -153,8 +155,8 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(NULL,0,yylineno); }
-			| FUNCTION ID L_PARENTHESIS idlist R_PARENTHESIS block 					{ Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(0,yylineno); }
+funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 				{ scope_count--; Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(scope_count, $4, yylineno); }
+			| FUNCTION ID L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, $5, scope_count, yylineno); }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }

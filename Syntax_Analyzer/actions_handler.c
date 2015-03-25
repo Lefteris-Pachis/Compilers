@@ -1,5 +1,9 @@
 #include "actions_handler.h"
+#include "symtable.h"
 #include <stdio.h>
+#include <string.h>
+
+char* lib_functions[12] = { "print", "input", "objectmemberkeys", "objecttotalmembers", "objectcopy", "totalarguments", "argument", "typeof", "strtonum", "sqrt", "cos", "sin" };
 
 void Handle_stmt_expr_semicolon(int lineNo){
 	printf("Line: %d \tstmt: expr;\n", lineNo);
@@ -138,11 +142,25 @@ void Handle_primary_const(int lineNo){
 
 void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 	printf("Line: %d \tlvalue: id\n", lineNo);
-	Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
+	int i = 0, error_flag = 0;
+	for(i = 0; i < 12; i++)
+		if(strcmp(name,lib_functions[i]) == 0)
+			error_flag = 1;
+	if(error_flag == 0)
+		Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
+	else
+		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
 void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
-	Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
+	int i = 0, error_flag = 0;
+	for(i = 0; i < 12; i++)
+		if(strcmp(name,lib_functions[i]) == 0)
+			error_flag = 1;
+	if(error_flag == 0)
+		Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
+	else
+		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
 void Handle_lvalue_d_colon_id(char* name, int lineNo){
 	printf("Line: %d \tlvalue: ::id\n", lineNo);
@@ -219,13 +237,25 @@ void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
 }
 
-void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
+void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, char* args, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
-
+	int i = 0, error_flag = 0;
+	for(i = 0; i < 12; i++)
+		if(strcmp(name,lib_functions[i]) == 0)
+			error_flag = 1;
+	node_t tmp = Lookup(mytable,name);
+	if(strcmp(tmp->var_name,name) == 0 && tmp->hiden == 0)
+		error_flag = 2;
+	if(error_flag == 0)
+		Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
+	else if(error_flag == 1)
+		printf("Error at line: %d name of function is a library function\n",lineNo);
+	else if(error_flag == 2)
+		printf("Error at line: %d name of function is a variable function\n",lineNo);
 }
-char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(int scope, int lineNo){
+char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(int scope, char* args, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-
+	Insert_Func(mytable, NULL, "USER DEFINED", args, scope, lineNo, 0);
 }
 
 void Handle_const_integer(int lineNo){
