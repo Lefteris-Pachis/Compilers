@@ -23,6 +23,7 @@ typedef struct Node{
 	int scope;
 	int line;
 	int hiden;
+	int called;
 
 	struct Node *next;
 }*node_t;
@@ -32,7 +33,6 @@ typedef struct table{
 	node_t hashtable[BUCKETS];
 }*SymTable_T;
 /* my symbol table structure */
-SymTable_T mytable;
 
 /* returns a new empty item of type SymTable_T */
 SymTable_T SymTable_new();
@@ -41,15 +41,15 @@ SymTable_T SymTable_new();
 void SymTable_free(SymTable_T oSymTable);
 
 /* inserts a new binding in oSymTable. Returns True on success and False on failure */
-int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line);
+int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line, int called);
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const void *func_args, int func_scope, int func_line);
+int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const void *func_args, int func_scope, int func_line , int called);
 
 /* removes the binding of given pcKey. Returns True on success and False on failure */
-int Hide(SymTable_T oSymTable, const char *name, int line, int hiden);
+int Hide(SymTable_T oSymTable, int scope);
 
 /* Returns True if binding with given pcKey is found or False on failure */
-int Lookup(SymTable_T oSymTable, const char *name, int line, int scope);
+int Lookup(SymTable_T oSymTable, const char *name);
 
 
 void Print_Hash(SymTable_T oSymTable);
