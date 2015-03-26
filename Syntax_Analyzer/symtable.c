@@ -15,8 +15,7 @@ int SymTable_hash(const char *str)
 
     return hash;
 }
-
-void Insert_args(node_t node, char *arg_name){
+A_list Insert_args(node_t node, char *arg_name){
 	A_list tmp;
 	A_list head = node->args;
 
@@ -30,7 +29,7 @@ void Insert_args(node_t node, char *arg_name){
 	if(head==NULL){
 		head = tmp;
 		tail = head;
-		node->args=head;	
+		return head;	
 	}
 	if(head->next == NULL){
 		head->next = tmp;
@@ -41,7 +40,7 @@ void Insert_args(node_t node, char *arg_name){
 		tail = tmp;
 	}
 
-	node->args= head;	
+	return  head;	
 }
 
 void Print_args(node_t node){
@@ -293,16 +292,17 @@ void Print_Hash(SymTable_T oSymTable)
 					if(parse->func_name != NULL)
 						printf(" Function Name = %s ", parse->func_name);
 					//else
-						//printf(" Function Name = ");
+						printf(" Function Name = ");
 					//Print_args(parse);
 					tmp = parse->args;
-					while(tmp != NULL)
-					{
-						printf("%s\n",tmp->arg );
-						tmp = tmp->next;
-					}
+					//while(tmp != NULL)
+					//{
+						//printf("%s\n",tmp->arg );
+						//tmp = tmp->next;
+					//}
 					//printf("%s\n",parse->args->arg );
 					//printf("%s\n",parse->args->next->arg );
+					Print_args(parse);
 					printf(" Function Type = %s ", parse->func_type);
 					printf(" Function Scope = %d \n", parse->scope);
 				}

@@ -61,7 +61,7 @@ node_t Lookup(SymTable_T oSymTable, const char *name);
 void Print_args(node_t node);
 char* Create_Function_Id();
 void Print_Hash(SymTable_T oSymTable);
-void Insert_args(node_t node, char *arg_name);
+A_list Insert_args(node_t node, char *arg_name);
 
 
 #endif
