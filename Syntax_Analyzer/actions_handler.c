@@ -244,7 +244,7 @@ void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
 }
 
-void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, char* args, int scope, int lineNo){
+void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
 	int i = 0, error_flag = 0;
 	for(i = 0; i < 12; i++)
@@ -254,10 +254,7 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 	if(tmp != NULL && tmp->hiden == 0)
 		error_flag = 2;
 	if(error_flag == 0){
-		if(args != NULL)
-			Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
-		else
-			Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
+		Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
 	}
 	else if(error_flag == 1)
 		printf("Error at line: %d name of function is a library function\n",lineNo);
