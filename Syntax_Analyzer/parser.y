@@ -105,7 +105,7 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 
 lvalue:		ID 										{ Handle_lvalue_id($1,scope_count,yylineno,0); }
 			| LOCAL ID 								{ Handle_lvalue_local_id($2,scope_count,yylineno); }
-			| D_COLON ID 							{ Handle_lvalue_d_colon_id(NULL,yylineno); }
+			| D_COLON ID 							{ Handle_lvalue_d_colon_id($2,yylineno); }
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
 
@@ -150,7 +150,7 @@ indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
 indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACE block_1 R_BRACE 		{ Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
+block: 		L_BRACE {scope_count++;} block_1 R_BRACE 		{ scope_count--; Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
 			;
 
 block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
