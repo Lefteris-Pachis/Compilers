@@ -90,7 +90,7 @@ void Handle_const_true(int lineNo);
 void Handle_const_false(int lineNo);
 
 void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo);
-void Handle_idlist_1_comma_idlist(char* name, char* functionName, int scope, int lineNo);
+void Handle_idlist_1_comma_idlist(int lineNo);
 
 void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
 void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(int lineNo);
