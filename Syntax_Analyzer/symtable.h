@@ -56,6 +56,8 @@ void Hide(SymTable_T oSymTable, int scope);
 /* Returns True if binding with given pcKey is found or False on failure */
 node_t Lookup(SymTable_T oSymTable, const char *name);
 
+/* Print the list of args */
+void Print_args(node_t node);
 
 void Print_Hash(SymTable_T oSymTable);
 void Insert_args(node_t node, char *arg_name);

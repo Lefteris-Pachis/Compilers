@@ -29,7 +29,8 @@ void Insert_args(node_t node, char *arg_name){
 
 	if(head==NULL){
 		head = tmp;
-		tail = head;	
+		tail = head;
+		node->args=head;	
 	}
 	if(head->next == NULL){
 		head->next = tmp;
@@ -38,8 +39,23 @@ void Insert_args(node_t node, char *arg_name){
 	else{
 		tail->next = tmp;
 		tail = tmp;
-	}	
+	}
+
+	node->args= head;	
 }
+
+void Print_args(node_t node){
+
+	A_list head = node->args;
+	int x=0;
+	while(head!=NULL){
+		printf("Arg_%d: %s\t",x,head->arg);
+		x++;
+		head=head->next;
+	}
+	printf("\n");
+}
+
 
 
 SymTable_T SymTable_new(void)
@@ -267,10 +283,7 @@ void Print_Hash(SymTable_T oSymTable)
 						printf(" Function Name = %s ", parse->func_name);
 					else
 						printf(" Function Name = ");
-					//if(parse->func_args != NULL)
-						//printf(" Function Arguments = %s", parse->args);
-					//else
-						//printf(" Function Arguments = ");
+					Print_args(parse);
 					printf(" Function Type = %s ", parse->func_type);
 					printf(" Function Scope = %d \n", parse->scope);
 				}
