@@ -1,6 +1,6 @@
 /* Hatzidakis Emmanouil AM:2571*/
 #include "symtable.h"
-
+int func_id_un=0;
 
 
 int SymTable_hash(const char *str)
@@ -55,6 +55,17 @@ void Print_args(node_t node){
 	}
 	printf("\n");
 }
+
+/*create Function_id*/
+ char* Create_Function_Id(void){
+ 	char * f_id;
+ 	strcpy(f_id, "_F");
+ 	char buffer[100];
+ 	sprintf(buffer, "%d",func_id_un);
+ 	strcat(f_id, buffer);
+ 	func_id_un++;
+ 	return(f_id);
+ }
 
 
 
