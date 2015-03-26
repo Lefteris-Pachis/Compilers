@@ -117,27 +117,41 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 	return 1;
 }
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const void *func_args, int func_scope, int func_line, int called)
+int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const char *func_args, int func_scope, int func_line, int called)
 {
-	int hashcode=SymTable_hash(func_name);
+	int hashcode;
+	if(func_name != NULL)
+		hashcode = SymTable_hash(func_name);
+	else
+		hashcode = 0;
+
 	node_t put;
 	node_t parse;
 
-	assert(oSymTable!=NULL && func_name!=NULL);
+	assert(oSymTable!=NULL);
 
 	/*if(Lookup(oSymTable,func_name)==0)	
 		return -1;*/
 
 	put=malloc(sizeof(struct Node));
 
-	put->func_name=malloc((strlen(func_name)+1)*sizeof(char));
-	put->func_name = strdup(func_name);
+	if(func_name != NULL){
+		
+		put->func_name=malloc((strlen(func_name)+1)*sizeof(char));
+		put->func_name = strdup(func_name);
+	}
 
-	put->func_type=malloc((strlen(func_type)+1)*sizeof(char));
-	put->func_type = strdup(func_type);
+	if(func_type != NULL){
+		
+		put->func_type=malloc((strlen(func_type)+1)*sizeof(char));
+		put->func_type = strdup(func_type);
+	}
 
-	put->func_args=malloc((strlen(func_args)+1)*sizeof(char));
-	put->func_args = strdup(func_args);
+	if(func_args != NULL){
+		
+		put->func_args=malloc((strlen(func_args)+1)*sizeof(char));
+		put->func_args = strdup(func_args);
+	}
 
 	put->scope = func_scope;
 
@@ -224,10 +238,19 @@ void Print_Hash(SymTable_T oSymTable)
 		parse= oSymTable->hashtable[i];
 		while(parse)
 		{
-			if(parse->var_name == NULL && parse->func_name != NULL)
+			if(parse->var_name == NULL)
 			{
-				printf(" Function Name = %s ", parse->func_name);
-				printf(" Function Type = %s \n", parse->func_type);
+				if(parse->func_type != NULL){
+					if(parse->func_name != NULL)
+						printf(" Function Name = %s ", parse->func_name);
+					else
+						printf(" Function Name = ");
+					if(parse->func_args != NULL)
+						printf(" Function Arguments = %s", parse->func_args);
+					else
+						printf(" Function Arguments = ");
+					printf(" Function Type = %s \n", parse->func_type);
+				}
 			}
 			else if(parse->var_name != NULL && parse->func_name == NULL)
 			{

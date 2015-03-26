@@ -5,6 +5,7 @@
 	int yyerror(char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
+	char *arguments;
 	
 	extern int yylineno;
 	extern char* yytext;
@@ -31,6 +32,7 @@
 
 %type <intVal> expr
 %type <strVal> idlist
+%type <strVal> idlist_1
 %type <strVal> funcdef
 
 %right		ASSIGN
@@ -155,7 +157,7 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 				{ scope_count--; Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(scope_count, $4, yylineno); }
+funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 				{ scope_count--; Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(scope_count, arguments, yylineno); }
 			| FUNCTION ID L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, $5, scope_count, yylineno); }
 			;
 
@@ -168,7 +170,7 @@ const:	INTEGER 	{ Handle_const_integer(yylineno); }
 		;
 
 idlist: ID idlist_1 	{ Handle_idlist_id_idlist_1(NULL,NULL,0,yylineno); }
-		|				{  }
+		|				{ arguments = NULL; }
 		;
 
 idlist_1: 	COMMA idlist 	{ Handle_idlist_1_comma_idlist(NULL,NULL,0,yylineno); }

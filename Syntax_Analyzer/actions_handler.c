@@ -146,9 +146,14 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 	for(i = 0; i < 12; i++)
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
-	if(error_flag == 0)
+	node_t tmp = Lookup(mytable,name);
+	if(tmp != NULL && tmp->var_type == NULL && tmp->scope == scope)
+		printf("Error at line: %d name of variable is a user function\n",lineNo);
+	else if(tmp != NULL && tmp->func_type == NULL && tmp->scope == scope)
+		printf("Error at line: %d name of variable is a %s\n",lineNo, tmp->var_type);
+	if(tmp == NULL && error_flag == 0)
 		Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
-	else
+	else if(error_flag == 1)
 		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
 void Handle_lvalue_local_id(char* name, int scope, int lineNo){
@@ -244,18 +249,26 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
 	node_t tmp = Lookup(mytable,name);
-	if(strcmp(tmp->var_name,name) == 0 && tmp->hiden == 0)
+	if(tmp != NULL && tmp->hiden == 0)
 		error_flag = 2;
-	if(error_flag == 0)
-		Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
+	if(error_flag == 0){
+		//if(args != NULL)
+			//Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
+		//else
+			//Insert_Func(mytable, name, "USER DEFINED" , NULL, scope, lineNo, 0);
+	}
 	else if(error_flag == 1)
 		printf("Error at line: %d name of function is a library function\n",lineNo);
 	else if(error_flag == 2)
-		printf("Error at line: %d name of function is a variable function\n",lineNo);
+		printf("Error at line: %d name of function is a %s variable\n",lineNo, tmp->var_type);
 }
 char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(int scope, char* args, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-	Insert_Func(mytable, NULL, "USER DEFINED", args, scope, lineNo, 0);
+	if(args == NULL)
+		Insert_Func(mytable, NULL, "USER DEFINED", NULL, scope, lineNo, 0);
+	//else if (args)
+	//	Insert_Func(mytable, NULL, "USER DEFINED", args, scope, lineNo, 0);
+
 }
 
 void Handle_const_integer(int lineNo){
