@@ -147,6 +147,7 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
 	node_t tmp = Lookup(mytable,name);
+
 	if(tmp != NULL && tmp->var_type == NULL && tmp->scope == scope)
 		printf("Error at line: %d name of variable is a user function\n",lineNo);
 	else if(tmp != NULL && tmp->func_type == NULL && tmp->scope == scope)
@@ -164,13 +165,31 @@ void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	for(i = 0; i < 12; i++)
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
-	if(error_flag == 0)
-		Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
+	if(error_flag == 0){
+		node_t tmp = Lookup(mytable,name);
+		if(tmp != NULL && tmp->scope == scope)
+			printf("");
+		else
+			Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
+	}
 	else
 		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
 void Handle_lvalue_d_colon_id(char* name, int lineNo){
 	printf("Line: %d \tlvalue: ::id\n", lineNo);
+	int i = 0, error_flag = 0;
+	for(i = 0; i < 12; i++)
+		if(strcmp(name,lib_functions[i]) == 0)
+			error_flag = 1;
+	if(error_flag == 0){
+		node_t tmp = Lookup(mytable,name);
+		if(tmp != NULL && tmp->scope == 0)
+			printf("");
+		else
+			printf("Error at line: %d name of variable isn't a global variable\n",lineNo);
+	}
+	else
+		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
 void Handle_lvalue_member(int lineNo){
 	printf("Line: %d \tlvalue: member\n", lineNo);
