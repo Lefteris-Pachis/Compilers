@@ -279,22 +279,30 @@ node_t Lookup(SymTable_T oSymTable, const char *name)
 void Print_Hash(SymTable_T oSymTable)
 {
 	node_t parse;
-
+	A_list tmp;
 	int i=0;
 
 	while(i<BUCKETS){
 
 		parse= oSymTable->hashtable[i];
-		while(parse)
+		while(parse != NULL)
 		{
 			if(parse->var_name == NULL)
 			{
 				if(parse->func_type != NULL){
 					if(parse->func_name != NULL)
 						printf(" Function Name = %s ", parse->func_name);
-					else
-						printf(" Function Name = ");
-					Print_args(parse);
+					//else
+						//printf(" Function Name = ");
+					//Print_args(parse);
+					tmp = parse->args;
+					while(tmp != NULL)
+					{
+						printf("%s\n",tmp->arg );
+						tmp = tmp->next;
+					}
+					//printf("%s\n",parse->args->arg );
+					//printf("%s\n",parse->args->next->arg );
 					printf(" Function Type = %s ", parse->func_type);
 					printf(" Function Scope = %d \n", parse->scope);
 				}
@@ -307,6 +315,7 @@ void Print_Hash(SymTable_T oSymTable)
 			}
 			//printf("\n");
 			parse = parse->next;
+
 		}
 
 		i++;
