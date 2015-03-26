@@ -252,20 +252,19 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 	if(tmp != NULL && tmp->hiden == 0)
 		error_flag = 2;
 	if(error_flag == 0){
-		//if(args != NULL)
-			//Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
-		//else
-			//Insert_Func(mytable, name, "USER DEFINED" , NULL, scope, lineNo, 0);
+		if(args != NULL)
+			Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
+		else
+			Insert_Func(mytable, name, "USER DEFINED" , NULL, scope, lineNo, 0);
 	}
 	else if(error_flag == 1)
 		printf("Error at line: %d name of function is a library function\n",lineNo);
 	else if(error_flag == 2)
 		printf("Error at line: %d name of function is a %s variable\n",lineNo, tmp->var_type);
 }
-char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(int scope, char* args, int lineNo){
+char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-	if(args == NULL)
-		Insert_Func(mytable, NULL, "USER DEFINED", NULL, scope, lineNo, 0);
+		Insert_Func(mytable, name, "USER DEFINED", NULL, scope, lineNo, 0);
 	//else if (args)
 	//	Insert_Func(mytable, NULL, "USER DEFINED", args, scope, lineNo, 0);
 

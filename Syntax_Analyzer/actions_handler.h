@@ -80,7 +80,7 @@ int Handle_block_l_brace_block_1_r_brace(int scope, int flag, int lineNo);
 void Handle_block_1_stmt_block_1(int lineNo);
 
 void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, char* args, int scope, int lineNo);
-char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(int scope, char* args, int lineNo);
+char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
 
 void Handle_const_integer(int lineNo);
 void Handle_const_double(int lineNo);
