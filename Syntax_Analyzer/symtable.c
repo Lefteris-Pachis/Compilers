@@ -16,6 +16,31 @@ int SymTable_hash(const char *str)
     return hash;
 }
 
+void Insert_args(node_t node, char *arg_name){
+
+	A_list tmp;
+	A_list head=node->args;
+
+	if(arg!=NULL){
+		tmp=malloc(sizeof(A_list));
+		tmp->arg=malloc((strlen(arg)+1)* sizeof(char));
+		tmp->arg=strdup(arg);
+		tmp->next=NULL;
+	}
+
+		if(head==NULL){
+			head=tmp;
+			tail=head;
+			
+		}
+		if(head->next==NULL)
+			head->next=tmp;
+		else
+			tail->next=tmp;
+
+		tail=tmp;		
+}
+
 
 SymTable_T SymTable_new(void)
 {
@@ -33,7 +58,7 @@ SymTable_T SymTable_new(void)
 	node->line = 0;
 	node->func_name = NULL;
 	node->func_type = NULL;
-	node->func_args = NULL;
+	node->args = NULL;
 	node->hiden = 0;
 	node->next = NULL;
 
@@ -117,7 +142,8 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 	return 1;
 }
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const char *func_args, int func_scope, int func_line, int called)
+
+int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line, int called)
 {
 	int hashcode;
 	if(func_name != NULL)
@@ -147,11 +173,7 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 		put->func_type = strdup(func_type);
 	}
 
-	if(func_args != NULL){
-		
-		put->func_args=malloc((strlen(func_args)+1)*sizeof(char));
-		put->func_args = strdup(func_args);
-	}
+	put->args=NULL;
 
 	put->scope = func_scope;
 

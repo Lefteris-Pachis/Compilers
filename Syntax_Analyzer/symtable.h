@@ -16,7 +16,7 @@ typedef struct Node{
 
 	char* func_name;
 	char* func_type;
-	char* func_args;
+	A_list args;
 
 	int scope;
 	int line;
@@ -25,6 +25,14 @@ typedef struct Node{
 
 	struct Node *next;
 }*node_t;
+
+typedef struct Args{
+	char* arg;
+	struct Args *next;
+
+
+
+}*A_list, *tail;
 
 typedef struct table{
 
@@ -41,7 +49,7 @@ void SymTable_free(SymTable_T oSymTable);
 /* inserts a new binding in oSymTable. Returns True on success and False on failure */
 int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line);
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, const char *func_args, int func_scope, int func_line , int called);
+int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line , int called);
 
 /* removes the binding of given pcKey. Returns True on success and False on failure */
 void Hide(SymTable_T oSymTable, int scope);
@@ -51,6 +59,7 @@ node_t Lookup(SymTable_T oSymTable, const char *name);
 
 
 void Print_Hash(SymTable_T oSymTable);
+void Insert_args(node_t node, char *arg_name);
 
 
 #endif
