@@ -58,7 +58,7 @@ void Print_args(node_t node){
 
 /*create Function_id*/
  char* Create_Function_Id(void){
- 	char * f_id;
+ 	char * f_id=malloc(102);
  	strcpy(f_id, "_F");
  	char buffer[100];
  	sprintf(buffer, "%d",func_id_un);
