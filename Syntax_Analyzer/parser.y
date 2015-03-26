@@ -5,6 +5,7 @@
 	int yyerror(const char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
+	char* funcname = NULL;
 	
 	extern int yylineno;
 	extern char* yytext;
@@ -149,7 +150,7 @@ indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
 indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACE { scope_count++; } block_1 R_BRACE 		{ scope_count--; Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
+block: 		L_BRACE block_1 R_BRACE 		{ Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
 			;
 
 block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
@@ -157,7 +158,7 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			;
 
 funcdef: 	FUNCTION L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 				{ scope_count--; Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block( "NO_ID" ,scope_count, yylineno); }
-			| FUNCTION ID L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, $5, scope_count, yylineno); }
+			| FUNCTION ID L_PARENTHESIS { funcname = $2; scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, $5, scope_count, yylineno); }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }
@@ -168,11 +169,11 @@ const:	INTEGER 	{ Handle_const_integer(yylineno); }
 		| FALSE 	{ Handle_const_false(yylineno); }
 		;
 
-idlist: ID idlist_1 	{ Handle_idlist_id_idlist_1(NULL,NULL,0,yylineno); }
+idlist: ID idlist_1 	{ Handle_idlist_id_idlist_1($1,funcname,scope_count,yylineno); }
 		|				{  }
 		;
 
-idlist_1: 	COMMA idlist 	{ Handle_idlist_1_comma_idlist(NULL,NULL,0,yylineno); }
+idlist_1: 	COMMA idlist 	{ Handle_idlist_1_comma_idlist(yylineno); }
 			| 				{  }
 			;
 

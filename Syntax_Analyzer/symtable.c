@@ -271,13 +271,15 @@ void Print_Hash(SymTable_T oSymTable)
 						printf(" Function Arguments = %s", parse->func_args);
 					else
 						printf(" Function Arguments = ");
-					printf(" Function Type = %s \n", parse->func_type);
+					printf(" Function Type = %s ", parse->func_type);
+					printf(" Function Scope = %d \n", parse->scope);
 				}
 			}
 			else if(parse->var_name != NULL && parse->func_name == NULL)
 			{
 				printf(" Variable Name = %s ", parse->var_name);
-				printf(" Variable Type = %s \n", parse->var_type);
+				printf(" Variable Type = %s ", parse->var_type);
+				printf(" Variable Scope = %d \n", parse->scope);
 			}
 			//printf("\n");
 			parse = parse->next;

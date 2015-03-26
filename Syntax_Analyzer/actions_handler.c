@@ -151,8 +151,10 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 		printf("Error at line: %d name of variable is a user function\n",lineNo);
 	else if(tmp != NULL && tmp->func_type == NULL && tmp->scope == scope)
 		printf("Error at line: %d name of variable is a %s\n",lineNo, tmp->var_type);
-	if(tmp == NULL && error_flag == 0)
+	if(tmp == NULL && error_flag == 0 && scope == 0)
 		Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
+	else if(tmp == NULL && error_flag == 0 && scope > 0)
+		Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
 	else if(error_flag == 1)
 		printf("Error at line: %d name of variable is a library function\n",lineNo);
 }
@@ -265,8 +267,6 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
 		Insert_Func(mytable, name, "USER DEFINED", NULL, scope, lineNo, 0);
-	//else if (args)
-	//	Insert_Func(mytable, NULL, "USER DEFINED", args, scope, lineNo, 0);
 
 }
 
@@ -293,9 +293,8 @@ void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int li
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
 
 }
-void Handle_idlist_1_comma_idlist(char* name, char* functionName, int scope, int lineNo){
+void Handle_idlist_1_comma_idlist(int lineNo){
 	printf("Line: %d \tidlist_1: ,idlist\n", lineNo);
-
 }
 
 void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
