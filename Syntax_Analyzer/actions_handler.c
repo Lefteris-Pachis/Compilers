@@ -255,9 +255,9 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 		error_flag = 2;
 	if(error_flag == 0){
 		if(args != NULL)
-			Insert_Func(mytable, name, "USER DEFINED" , args, scope, lineNo, 0);
+			Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
 		else
-			Insert_Func(mytable, name, "USER DEFINED" , NULL, scope, lineNo, 0);
+			Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
 	}
 	else if(error_flag == 1)
 		printf("Error at line: %d name of function is a library function\n",lineNo);
@@ -266,7 +266,7 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 }
 char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-		Insert_Func(mytable, name, "USER DEFINED", NULL, scope, lineNo, 0);
+		Insert_Func(mytable, name, "USER DEFINED", scope, lineNo, 0);
 
 }
 
@@ -291,6 +291,10 @@ void Handle_const_false(int lineNo){
 
 void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
+	node_t tmp = Lookup(mytable,functionName);
+	if(tmp != NULL){
+		Insert_args(tmp, name);
+	}
 
 }
 void Handle_idlist_1_comma_idlist(int lineNo){

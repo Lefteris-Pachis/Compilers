@@ -9,6 +9,12 @@
 
 #define BUCKETS 100
 
+typedef struct Args{
+	char* arg;
+	struct Args *next;
+}*A_list;
+
+struct Args *tail;
 
 typedef struct Node{
 	char* var_name;
@@ -26,13 +32,6 @@ typedef struct Node{
 	struct Node *next;
 }*node_t;
 
-typedef struct Args{
-	char* arg;
-	struct Args *next;
-
-
-
-}*A_list, *tail;
 
 typedef struct table{
 
