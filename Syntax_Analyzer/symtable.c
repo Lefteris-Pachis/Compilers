@@ -256,23 +256,41 @@ void Hide(SymTable_T oSymTable, char* name, int scope)
 
 node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 {
-	//assert(name != NULL && oSymTable != NULL);
+	
 	int hashcode=SymTable_hash(name);
 	node_t parse=oSymTable->hashtable[hashcode];
 
-
-	while(parse!=NULL)
+	if(scope == NULL)
 	{
-		if(parse->var_name!=NULL && parse->scope == scope){
-			if(strcmp(parse->var_name,name) == 0 && hiden == 0)
-				return parse;
-		}
-		else if(parse->var_name==NULL  && parse->scope == scope)
+		while(parse!=NULL)
 		{
-			if(strcmp(parse->func_name,name) == 0 && hiden == 0)
-				return parse;
+			if(parse->var_name!=NULL){
+				if(strcmp(parse->var_name,name) == 0 && hiden == 0)
+					return parse;
+			}
+			else if(parse->var_name==NULL)
+			{
+				if(strcmp(parse->func_name,name) == 0 && hiden == 0)
+					return parse;
+			}
+			parse=parse->next;
 		}
-		parse=parse->next;
+	}
+	else
+	{
+		while(parse!=NULL)
+		{
+			if(parse->var_name!=NULL && parse->scope == scope){
+				if(strcmp(parse->var_name,name) == 0 && hiden == 0)
+					return parse;
+			}
+			else if(parse->var_name==NULL  && parse->scope == scope)
+			{
+				if(strcmp(parse->func_name,name) == 0 && hiden == 0)
+					return parse;
+			}
+			parse=parse->next;
+		}
 	}
 	return NULL;
 }
