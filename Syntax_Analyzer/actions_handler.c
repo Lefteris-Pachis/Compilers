@@ -146,7 +146,7 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
 	for(i = 0; i < 12; i++)
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
-	node_t tmp = Lookup(mytable,name);
+	node_t tmp = Lookup(mytable,name, scope);
 
 	if(tmp != NULL && tmp->var_type == NULL && tmp->scope == scope)
 		printf("Error at line: %d name of variable is a user function\n",lineNo);
@@ -166,7 +166,7 @@ void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
 	if(error_flag == 0){
-		node_t tmp = Lookup(mytable,name);
+		node_t tmp = Lookup(mytable,name, scope);
 		if(tmp != NULL && tmp->scope == scope)
 			printf("");
 		else
@@ -182,7 +182,7 @@ void Handle_lvalue_d_colon_id(char* name, int lineNo){
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
 	if(error_flag == 0){
-		node_t tmp = Lookup(mytable,name);
+		node_t tmp = Lookup(mytable,name, 0);
 		if(tmp != NULL && tmp->scope == 0)
 			printf("");
 		else
@@ -269,7 +269,7 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 	for(i = 0; i < 12; i++)
 		if(strcmp(name,lib_functions[i]) == 0)
 			error_flag = 1;
-	node_t tmp = Lookup(mytable,name);
+	node_t tmp = Lookup(mytable,name, scope);
 	if(tmp != NULL && tmp->hiden == 0)
 		error_flag = 2;
 	if(error_flag == 0){
@@ -307,7 +307,7 @@ void Handle_const_false(int lineNo){
 
 void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
-	node_t tmp = Lookup(mytable,functionName);
+	node_t tmp = Lookup(mytable,functionName, scope);
 	if(tmp != NULL){
 		tmp->args = Insert_args(tmp, name);
 	}

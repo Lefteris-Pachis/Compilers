@@ -260,17 +260,17 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 	int hashcode=SymTable_hash(name);
 	node_t parse=oSymTable->hashtable[hashcode];
 
-	if(scope == NULL)
+	if(scope == -1)
 	{
 		while(parse!=NULL)
 		{
 			if(parse->var_name!=NULL){
-				if(strcmp(parse->var_name,name) == 0 && hiden == 0)
+				if(strcmp(parse->var_name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
 			else if(parse->var_name==NULL)
 			{
-				if(strcmp(parse->func_name,name) == 0 && hiden == 0)
+				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
 			parse=parse->next;
@@ -281,12 +281,12 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 		while(parse!=NULL)
 		{
 			if(parse->var_name!=NULL && parse->scope == scope){
-				if(strcmp(parse->var_name,name) == 0 && hiden == 0)
+				if(strcmp(parse->var_name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
 			else if(parse->var_name==NULL  && parse->scope == scope)
 			{
-				if(strcmp(parse->func_name,name) == 0 && hiden == 0)
+				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
 			parse=parse->next;
