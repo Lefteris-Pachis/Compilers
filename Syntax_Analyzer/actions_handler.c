@@ -273,7 +273,7 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 	if(tmp != NULL && tmp->hiden == 0)
 		error_flag = 2;
 	if(error_flag == 0){
-		Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo, 0);
+		Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo);
 	}
 	else if(error_flag == 1)
 		printf("Error at line: %d name of function is a library function\n",lineNo);
@@ -282,7 +282,7 @@ void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* n
 }
 char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-		Insert_Func(mytable, name, "USER DEFINED", scope, lineNo, 0);
+		Insert_Func(mytable, name, "USER DEFINED", scope, lineNo);
 
 }
 

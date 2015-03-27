@@ -94,6 +94,19 @@ SymTable_T SymTable_new(void)
 		i++;
 	}
 
+	Insert_Func(myhash,"print","Library Function", 0,0);
+	Insert_Func(myhash,"input","Library Function", 0,0);
+	Insert_Func(myhash,"objectmemberkeys","Library Function", 0,0);
+	Insert_Func(myhash,"objecttotalmembers","Library Function", 0,0);
+	Insert_Func(myhash,"objectcopy","Library Function", 0,0);
+	Insert_Func(myhash,"totalarguments","Library Function", 0,0);
+	Insert_Func(myhash,"arguments","Library Function", 0,0);
+	Insert_Func(myhash,"typeof","Library Function", 0,0);
+	Insert_Func(myhash,"strtonum","Library Function", 0,0);
+	Insert_Func(myhash,"sqrt","Library Function", 0,0);
+	Insert_Func(myhash,"cos","Library Function", 0,0);
+	Insert_Func(myhash,"sin","Library Function", 0,0);
+
 	return myhash;
 }
 
@@ -169,7 +182,7 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 }
 
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line, int called)
+int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line)
 {
 	int hashcode;
 	if(func_name != NULL)
@@ -206,8 +219,6 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 	put->line = func_line;
 
 	put->hiden = 0;
-
-	put->called = called;
 
 	put->next = NULL;
 
