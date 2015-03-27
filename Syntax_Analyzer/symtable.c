@@ -52,7 +52,6 @@ void Print_args(node_t node){
 		x++;
 		head=head->next;
 	}
-	printf("\n");
 }
 
 /*create Function_id*/
@@ -239,29 +238,20 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 	return 1;
 }
 
-void Hide(SymTable_T oSymTable, char* name, int scope)
+void Hide(SymTable_T oSymTable, int scope)
 {
-	int hashcode;
-	node_t parse;
-
-	if(name!=NULL){
-		hashcode = SymTable_hash(name);
-	}
-
-	parse = oSymTable->hashtable[hashcode];
-
-	while(parse){
-		if(parse->func_name!=NULL){
-			if(strcmp(parse->func_name,name)==0 && parse->scope == scope){
-				parse->hiden = 1;
+	if(scope != 0){
+		node_t parse;
+		int i = 0;
+		while(i<BUCKETS){
+			parse = oSymTable->hashtable[i];
+			while(parse){
+					if(parse->scope == scope)
+						parse->hiden = 1;
+				parse = parse->next;
 			}
+			i++;
 		}
-		else if(parse->var_name!=NULL){
-			if(strcmp(parse->var_name,name)==0 && parse->scope == scope){
-				parse->hiden = 1;
-			}
-		}
-		parse = parse->next;
 	}
 }
 
@@ -275,11 +265,11 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 	{
 		while(parse!=NULL)
 		{
-			if(parse->var_name!=NULL){
+			if(parse->var_name != NULL){
 				if(strcmp(parse->var_name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
-			else if(parse->var_name==NULL)
+			else if(parse->func_name != NULL)
 			{
 				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
 					return parse;
@@ -292,12 +282,12 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 		while(parse!=NULL)
 		{
 			if(parse->var_name!=NULL && parse->scope == scope){
-				if(strcmp(parse->var_name,name) == 0 && parse->hiden == 0)
+				if((strcmp(parse->var_name,name) == 0) && parse->hiden == 0)
 					return parse;
 			}
-			else if(parse->var_name==NULL  && parse->scope == scope)
+			else if(parse->func_name!=NULL  && parse->scope == scope)
 			{
-				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
+				if((strcmp(parse->func_name,name) == 0) && parse->hiden == 0)
 					return parse;
 			}
 			parse=parse->next;
@@ -309,7 +299,6 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 void Print_Hash(SymTable_T oSymTable)
 {
 	node_t parse;
-	A_list tmp;
 	int i=0;
 
 	while(i<BUCKETS){
@@ -317,34 +306,30 @@ void Print_Hash(SymTable_T oSymTable)
 		parse= oSymTable->hashtable[i];
 		while(parse != NULL)
 		{
+			
 			if(parse->var_name == NULL)
 			{
-				if(parse->func_type != NULL){
-					if(parse->func_name != NULL)
-						printf(" Function Name = %s ", parse->func_name);
-					//else
-						printf(" Function Name = ");
-					//Print_args(parse);
-					tmp = parse->args;
-					//while(tmp != NULL)
-					//{
-						//printf("%s\n",tmp->arg );
-						//tmp = tmp->next;
-					//}
-					//printf("%s\n",parse->args->arg );
-					//printf("%s\n",parse->args->next->arg );
-					Print_args(parse);
-					printf(" Function Type = %s ", parse->func_type);
-					printf(" Function Scope = %d \n", parse->scope);
+				if(parse->func_type != NULL && strcmp(parse->func_type,"Library Function") != 0){
+					if(parse->func_type != NULL){
+						if(parse->func_name != NULL)
+							printf(" Function Name = %s ", parse->func_name);
+						Print_args(parse);
+						printf(" Function Type = %s ", parse->func_type);
+						printf(" Function Scope = %d ", parse->scope);
+						printf("Line = %d ",parse->line);
+						printf("Hidden = %d \n",parse->hiden);
+					}
 				}
 			}
 			else if(parse->var_name != NULL && parse->func_name == NULL)
 			{
 				printf(" Variable Name = %s ", parse->var_name);
 				printf(" Variable Type = %s ", parse->var_type);
-				printf(" Variable Scope = %d \n", parse->scope);
+				printf(" Variable Scope = %d ", parse->scope);
+				printf("Line = %d ",parse->line);
+				printf("Hidden = %d \n",parse->hiden);
 			}
-			//printf("\n");
+			
 			parse = parse->next;
 
 		}

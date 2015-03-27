@@ -153,15 +153,15 @@ indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
 indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACE {scope_count++;} block_1 R_BRACE 		{ scope_count--; Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
+block: 		L_BRACE { if(function_counter == 0){scope_count++;}} block_1 R_BRACE 		{ Hide(mytable,scope_count); scope_count--; Handle_block_l_brace_block_1_r_brace(0,0,yylineno); }
 			;
 
 block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { function_counter--; scope_count--; }
-			| FUNCTION ID { function_counter++; funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS block 		{ function_counter--; scope_count--; }
+funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { function_counter--;  }
+			| FUNCTION ID { function_counter++; funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS block 		{ function_counter--;  }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }
