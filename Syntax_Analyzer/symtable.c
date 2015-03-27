@@ -218,46 +218,48 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 	return 1;
 }
 
-void Hide(SymTable_T oSymTable, int scope)
+void Hide(SymTable_T oSymTable, char* name, int scope)
 {
+	int hashcode;
 	node_t parse;
 
-	int i=0;
+	if(name!=NULL){
+		hashcode = SymTable_hash(name);
+	}
 
-	while(i<BUCKETS){
+	parse = oSymTable->hashtable[hashcode];
 
-		parse= oSymTable->hashtable[i];
-		while(parse)
-		{
-			if(parse->scope!=scope)
-			{
+	while(parse){
+		if(parse->func_name!=NULL){
+			if(strcmp(parse->func_name,name)==0 && parse->scope == scope){
 				parse->hiden = 1;
 			}
-			else if(parse->scope == scope)
-			{
-				parse->hiden = 0;
-			}
-			parse = parse->next;
 		}
+		else if(parse->var_name!=NULL){
+			if(strcmp(parse->var_name,name)==0 && parse->scope == scope){
+				parse->hiden = 1;
+			}
+		}
+		parse = parse->next;
 	}
 }
 
-node_t Lookup(SymTable_T oSymTable, const char *name)
+node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 {
-	assert(name != NULL && oSymTable != NULL);
+	//assert(name != NULL && oSymTable != NULL);
 	int hashcode=SymTable_hash(name);
 	node_t parse=oSymTable->hashtable[hashcode];
 
 
 	while(parse!=NULL)
 	{
-		if(parse->var_name!=NULL && parse->func_name==NULL){
-			if(strcmp(parse->var_name,name) == 0)
+		if(parse->var_name!=NULL && parse->scope == scope){
+			if(strcmp(parse->var_name,name) == 0 && hiden == 0)
 				return parse;
 		}
-		else if(parse->var_name==NULL && parse->func_name!=NULL)
+		else if(parse->var_name==NULL  && parse->scope == scope)
 		{
-			if(strcmp(parse->func_name,name) == 0)
+			if(strcmp(parse->func_name,name) == 0 && hiden == 0)
 				return parse;
 		}
 		parse=parse->next;

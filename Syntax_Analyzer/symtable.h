@@ -51,10 +51,10 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line , int called);
 
 /* removes the binding of given pcKey. Returns True on success and False on failure */
-void Hide(SymTable_T oSymTable, int scope);
+void Hide(SymTable_T oSymTable, char* name,int scope);
 
 /* Returns True if binding with given pcKey is found or False on failure */
-node_t Lookup(SymTable_T oSymTable, const char *name);
+node_t Lookup(SymTable_T oSymTable, const char *name , int scope);
 
 /* Print the list of args */
 void Print_args(node_t node);
