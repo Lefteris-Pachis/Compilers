@@ -6,6 +6,8 @@
 	int alpha_yylex(void);
 	int scope_count = 0;
 	int function_counter = 0;
+	int state = 0;
+	int error = 0;
 	char* funcname = NULL;
 	
 	extern int yylineno;
@@ -106,9 +108,9 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| const 								{ Handle_primary_const(yylineno); }
 			;
 
-lvalue:		ID 										{ Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1) ); }
-			| LOCAL ID 								{ Handle_lvalue_local_id($2,scope_count,yylineno); }
-			| D_COLON ID 							{ Handle_lvalue_d_colon_id($2,yylineno); }
+lvalue:		ID 										{ state = Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1) ); if(state == -1){error = 1;}}
+			| LOCAL ID 								{ state = Handle_lvalue_local_id($2,scope_count,yylineno); if(state == -1){error = 1;}}
+			| D_COLON ID 							{ state = Handle_lvalue_d_colon_id($2,yylineno); if(state == -1){error = 1;}}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
 
@@ -160,8 +162,8 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS {scope_count--;} block { function_counter--;  }
-			| FUNCTION ID { function_counter++; funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS {scope_count--;} block 		{ function_counter--;  }
+funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS {scope_count--;} block { function_counter--;  }
+			| FUNCTION ID { function_counter++; funcname = $2; state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS {scope_count--;} block 		{ function_counter--;  }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }
@@ -172,7 +174,7 @@ const:	INTEGER 	{ Handle_const_integer(yylineno); }
 		| FALSE 	{ Handle_const_false(yylineno); }
 		;
 
-idlist: ID idlist_1 	{ Handle_idlist_id_idlist_1($1,funcname,scope_count,yylineno); }
+idlist: ID idlist_1 	{ state = Handle_idlist_id_idlist_1($1,funcname,scope_count,yylineno); if(state == -1){error = 1;}}
 		|				{  }
 		;
 
@@ -216,10 +218,9 @@ int main(int argc, char** argv){
 
 	yyparse();
 
-
-	//Insert_Var(mytable, "giwrgadakis", "pro" , 0, 1);
-	//Insert_Func(mytable, "giwrgadakis", "pro","x,y" , 0, 1);
-
-	Print_Hash(mytable);
+	if(error == 0)
+		Print_Hash(mytable);
+	else
+		printf("Errors occured!\n");
 	return 0;
 }

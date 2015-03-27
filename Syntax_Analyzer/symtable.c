@@ -44,12 +44,10 @@ A_list Insert_args(node_t node, char *arg_name){
 }
 
 void Print_args(node_t node){
-
+	printf(" Arguments = ");
 	A_list head = node->args;
-	int x=0;
 	while(head!=NULL){
-		printf("Arg_%d: %s\t",x,head->arg);
-		x++;
+		printf("%s\t",head->arg);
 		head=head->next;
 	}
 }
@@ -300,42 +298,43 @@ void Print_Hash(SymTable_T oSymTable)
 {
 	node_t parse;
 	int i=0;
-
+	printf("-------------------HASHTABLE-------------------\n");
 	while(i<BUCKETS){
-
+		
 		parse= oSymTable->hashtable[i];
 		while(parse != NULL)
 		{
-			
-			if(parse->var_name == NULL)
-			{
-				if(parse->func_type != NULL && strcmp(parse->func_type,"Library Function") != 0){
-					if(parse->func_type != NULL){
-						if(parse->func_name != NULL)
-							printf(" Function Name = %s ", parse->func_name);
-						Print_args(parse);
-						printf(" Function Type = %s ", parse->func_type);
-						printf(" Function Scope = %d ", parse->scope);
-						printf("Line = %d ",parse->line);
-						printf("Hidden = %d \n",parse->hiden);
+			if(parse->line != 0){
+				printf("Bucket : %d\n",i );
+				if(parse->var_name == NULL)
+				{
+					if(parse->func_type != NULL && strcmp(parse->func_type,"Library Function") != 0){
+						if(parse->func_type != NULL){
+							printf(" Function -->");
+							printf(" Name = %s ", parse->func_name);
+							Print_args(parse);
+							printf(" Type = %s ", parse->func_type);
+							printf(" Scope = %d ", parse->scope);
+							printf(" Line = %d ",parse->line);
+							printf(" Hidden = %d \n",parse->hiden);
+						}
 					}
 				}
+				else if(parse->var_name != NULL && parse->func_name == NULL)
+				{
+					printf(" Variable -->");
+					printf(" Name = %s ", parse->var_name);
+					printf(" Type = %s ", parse->var_type);
+					printf(" Scope = %d ", parse->scope);
+					printf(" Line = %d ",parse->line);
+					printf(" Hidden = %d \n",parse->hiden);
+				}
 			}
-			else if(parse->var_name != NULL && parse->func_name == NULL)
-			{
-				printf(" Variable Name = %s ", parse->var_name);
-				printf(" Variable Type = %s ", parse->var_type);
-				printf(" Variable Scope = %d ", parse->scope);
-				printf("Line = %d ",parse->line);
-				printf("Hidden = %d \n",parse->hiden);
-			}
-			
 			parse = parse->next;
-
 		}
-
 		i++;
 	}
+	printf("-----------------------------------------------\n");
 }
 
 /*int main(){

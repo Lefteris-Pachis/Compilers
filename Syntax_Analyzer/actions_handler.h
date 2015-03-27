@@ -46,9 +46,9 @@ void Handle_primary_objectdef(int lineNo);
 void Handle_primary_l_parenthesis_funcdef_r_parenthesis(int lineNo);
 void Handle_primary_const(int lineNo);
 
-void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter);
-void Handle_lvalue_local_id(char* name, int scope, int lineNo);
-void Handle_lvalue_d_colon_id(char* name, int lineNo);
+int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter);
+int Handle_lvalue_local_id(char* name, int scope, int lineNo);
+int Handle_lvalue_d_colon_id(char* name, int lineNo);
 void Handle_lvalue_member(int lineNo);
 
 void Handle_member_lvalue_dot_id(int lineNo);
@@ -79,8 +79,8 @@ void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo);
 void Handle_block_l_brace_block_1_r_brace(int lineNo);
 void Handle_block_1_stmt_block_1(int lineNo);
 
-void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
-char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
+int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
+int Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
 
 void Handle_const_integer(int lineNo);
 void Handle_const_double(int lineNo);
@@ -89,7 +89,7 @@ void Handle_const_nil(int lineNo);
 void Handle_const_true(int lineNo);
 void Handle_const_false(int lineNo);
 
-void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo);
+int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo);
 void Handle_idlist_1_comma_idlist(int lineNo);
 
 void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);

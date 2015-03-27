@@ -140,12 +140,15 @@ void Handle_primary_const(int lineNo){
 	printf("Line: %d \tprimary: const\n", lineNo);
 }
 
-void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
+int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	printf("Line: %d \tlvalue: id\n", lineNo);
 	int error_flag = 0;
 	int i=scope;
 	int found = 0;
-
+	int is_lib_func = 0;
+	node_t tmp = Lookup(mytable,name,0);
+	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0))
+		is_lib_func = 1;
 	node_t parse;
 
 	while(i>=1 && error_flag == 0){
@@ -156,23 +159,23 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 			if(parse->scope == scope)
 			{
 				/* do nothing */
-				return;
+				return 0;
 			}
 			else if(parse->scope == 0)
 			{
 				/* do nothing */
-				return;
+				return 0;
 			}
-			else if(parse->scope < scope && function_counter > 0 )
+			else if(parse->scope < scope && function_counter > 0 && is_lib_func == 0)
 			{
 				printf("Error at line: %d variable cannot access variable at line %d\n",lineNo,parse->line);
 				error_flag = 1;
-				return;
+				return -1;
 			}
 			else if(parse->scope < scope && function_counter == 0)
 			{
 				/* Do Nothing */
-				return;
+				return 0;
 			}
 			found++;
 		}
@@ -187,10 +190,10 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 		Insert_Var(mytable,name,"GLOBAL",0,lineNo);
 	else
 		Insert_Var(mytable,name,"LOCAL",scope,lineNo);
-		
+	return 0;
 }
 
-void Handle_lvalue_local_id(char* name, int scope, int lineNo){
+int Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
 	node_t tmp = Lookup(mytable,name,scope);
 	if(tmp == NULL){
@@ -202,17 +205,19 @@ void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0 && scope > 0)){
 		printf("Error at line: %d name of variable is a library function\n",lineNo);
-		return;
+		return -1;
 	}
-
+	return 0;
 }
 
-void Handle_lvalue_d_colon_id(char* name, int lineNo){
+int Handle_lvalue_d_colon_id(char* name, int lineNo){
 	printf("Line: %d \tlvalue: ::id\n", lineNo);
 	node_t tmp = Lookup(mytable,name,0);
 	if(tmp == NULL){
 		printf("Error at line: %d name of variable isn't a global variable\n",lineNo);
+		return -1;
 	}
+	return 0;
 }
 void Handle_lvalue_member(int lineNo){
 	printf("Line: %d \tlvalue: member\n", lineNo);
@@ -286,44 +291,46 @@ void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
 }
 
-void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
+int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
 	node_t tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->func_type != NULL && tmp->line != 0){
 			printf("Error at line: %d name of function is a user function\n",lineNo);
-			return;
+			return -1;
 		}else if(tmp->var_type != NULL){
 			printf("Error at line: %d name of function is a %s variable\n",lineNo,tmp->var_type);
-			return;
+			return -1;
 		}
 	}
 	tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0)){
 		printf("Error at line: %d name of function is a library function\n",lineNo);
-		return;
+		return -1;
 	}
 	Insert_Func(mytable, name, "USER DEFINED" , scope, lineNo);
+	return 0;
 }
-char* Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
+
+int Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
 	node_t tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->var_type == NULL){
 			printf("Error at line: %d name of function is a user function\n",lineNo);
-			return;
+			return -1;
 		}else {
 			printf("Error at line: %d name of function is a %s variable\n",lineNo,tmp->var_type);
-			return;
+			return -1;
 		}
 	}
 	tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0)){
 		printf("Error at line: %d name of function is a library function\n",lineNo);
-		return;
+		return -1;
 	}
 	Insert_Func(mytable, name, "USER DEFINED", scope, lineNo);
-
+	return 0;
 }
 
 void Handle_const_integer(int lineNo){
@@ -345,12 +352,12 @@ void Handle_const_false(int lineNo){
 	printf("Line: %d \tconst: false\n", lineNo);
 }
 
-void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
+int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
 	node_t tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0)){
 		printf("Error at line: %d name of formal argumet is a library function\n",lineNo);
-		return;
+		return -1;
 	}
 	tmp = Lookup(mytable,functionName, scope - 1);
 	if(tmp != NULL)
@@ -358,10 +365,11 @@ void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int li
 	tmp = Lookup(mytable,name, scope);
 	if(tmp != NULL){
 		printf("Error at line: %d name of formal argumet is already declared\n",lineNo);
-		return;
+		return -1;
 	}
 	else
 		Insert_Var(mytable, name, "FORMAL ARGUMENT", scope, lineNo);
+	return 0;
 }
 void Handle_idlist_1_comma_idlist(int lineNo){
 	printf("Line: %d \tidlist_1: ,idlist\n", lineNo);

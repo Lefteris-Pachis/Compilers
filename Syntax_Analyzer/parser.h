@@ -150,7 +150,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2053 of yacc.c  */
-#line 18 "parser.y"
+#line 20 "parser.y"
 
 	int intVal;
 	double realVal;
