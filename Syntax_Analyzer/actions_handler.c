@@ -140,24 +140,65 @@ void Handle_primary_const(int lineNo){
 	printf("Line: %d \tprimary: const\n", lineNo);
 }
 
-void Handle_lvalue_id(char* name, int scope, int lineNo, int off){
+void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	printf("Line: %d \tlvalue: id\n", lineNo);
-	int i = 0, error_flag = 0;
-	for(i = 0; i < 12; i++)
-		if(strcmp(name,lib_functions[i]) == 0)
-			error_flag = 1;
-	node_t tmp = Lookup(mytable,name, scope);
+	int error_flag = 0;
+	int i=scope;
+	int found = 0;
 
-	if(tmp != NULL && tmp->var_type == NULL && tmp->scope == scope)
-		printf("Error at line: %d name of variable is a user function\n",lineNo);
-	else if(tmp != NULL && tmp->func_type == NULL && tmp->scope == scope)
-		printf("Error at line: %d name of variable is a %s\n",lineNo, tmp->var_type);
-	if(tmp == NULL && error_flag == 0 && scope == 0)
-		Insert_Var(mytable, name, "GLOBAL" , scope, lineNo);
-	else if(tmp == NULL && error_flag == 0 && scope > 0)
-		Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
-	else if(error_flag == 1)
-		printf("Error at line: %d name of variable is a library function\n",lineNo);
+	node_t tmp = Lookup(mytable, name, 0);
+	node_t parse;
+
+	if(tmp != NULL && tmp->func_type != NULL){
+		if(strcmp(tmp->func_type,"Library Function")==0){
+			error_flag =1;
+			printf("Error at line: %d name of variable is a library function\n",lineNo);
+		}
+	}
+	else if(tmp !=NULL){
+		/* Do Nothing */
+	}
+	else if(tmp == NULL && scope == 0 && error_flag == 0){
+		found == 0;
+	}
+
+	while(i>=1 && error_flag == 0){
+
+		parse = Lookup(mytable,name,i);
+		if(parse!=NULL && error_flag == 0){
+
+			if(parse->scope == scope)
+			{
+				/* do nothing */
+			}
+			else if(parse->scope == 0)
+			{
+				/* do nothing */
+			}
+			else if(parse->scope < scope && function_counter > 0 )
+			{
+				printf("Error at line: %d variable cannot access variable at line %d\n",lineNo,parse->line);
+				error_flag = 1;
+				break;
+			}
+			else if(parse->scope<scope && function_counter ==0)
+			{
+				/* Do Nothing */
+			}
+			found++;
+		}
+		else if(parse == NULL && error_flag == 0){
+			found--;
+		}
+		
+		i--;
+	}
+
+	if(found == 0 && error_flag == 0 && scope == 0)
+		Insert_Var(mytable,name,"GLOBAL",0,lineNo);
+	else
+		Insert_Var(mytable,name,"LOCAL",0,lineNo);
+		
 }
 void Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
