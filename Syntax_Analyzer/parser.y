@@ -5,6 +5,7 @@
 	int yyerror(const char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
+	int function_counter = 0;
 	char* funcname = NULL;
 	
 	extern int yylineno;
@@ -18,6 +19,7 @@
 	int intVal;
 	double realVal;
 	char *strVal;
+	struct Node *exprNode;
 }
 
 %start program
@@ -34,6 +36,7 @@
 %type <strVal> idlist
 %type <strVal> idlist_1
 %type <strVal> funcdef
+%type <exprNode> lvalue
 
 %right		ASSIGN
 %left		OR
@@ -103,7 +106,7 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| const 								{ Handle_primary_const(yylineno); }
 			;
 
-lvalue:		ID 										{ Handle_lvalue_id($1,scope_count,yylineno,0); }
+lvalue:		ID 										{ Handle_lvalue_id($1,scope_count,yylineno,function_counter); }
 			| LOCAL ID 								{ Handle_lvalue_local_id($2,scope_count,yylineno); }
 			| D_COLON ID 							{ Handle_lvalue_d_colon_id($2,yylineno); }
 			| member 								{ Handle_lvalue_member(yylineno); }
@@ -157,8 +160,8 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION { funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { scope_count--; }
-			| FUNCTION ID {funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; }
+funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { function_counter--; scope_count--; }
+			| FUNCTION ID { function_counter++; funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS block 		{ function_counter--; scope_count--; }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }

@@ -46,7 +46,7 @@ void Handle_primary_objectdef(int lineNo);
 void Handle_primary_l_parenthesis_funcdef_r_parenthesis(int lineNo);
 void Handle_primary_const(int lineNo);
 
-void Handle_lvalue_id(char* name, int scope, int lineNo, int off);
+void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter);
 void Handle_lvalue_local_id(char* name, int scope, int lineNo);
 void Handle_lvalue_d_colon_id(char* name, int lineNo);
 void Handle_lvalue_member(int lineNo);
