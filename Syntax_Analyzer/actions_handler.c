@@ -279,13 +279,8 @@ void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);
 }
 
-int Handle_block_l_brace_block_1_r_brace(int flag, int lineNo){
+void Handle_block_l_brace_block_1_r_brace(int lineNo){
 	printf("Line: %d \tblock: {block_1}\n", lineNo);
-	if(flag > 0){
-		flag = 0;
-	}
-	
-	return flag;
 }
 void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);

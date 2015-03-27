@@ -76,7 +76,7 @@ void Handle_indexed_indexedelem(int lineNo);
 void Handle_indexed_indexed_comma_indexedelem(int lineNo);
 void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo);
 
-int Handle_block_l_brace_block_1_r_brace(int flag, int lineNo);
+void Handle_block_l_brace_block_1_r_brace(int lineNo);
 void Handle_block_1_stmt_block_1(int lineNo);
 
 void Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo);
