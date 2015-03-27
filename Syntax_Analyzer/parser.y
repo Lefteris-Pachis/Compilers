@@ -157,7 +157,7 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION {Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block( "NO_ID" ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { scope_count--; }
+funcdef: 	FUNCTION { funcname = Create_Function_Id(); Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno);} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS block { scope_count--; }
 			| FUNCTION ID {funcname = $2; Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno);} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS block 		{ scope_count--; }
 			;
 

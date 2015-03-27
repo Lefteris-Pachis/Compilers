@@ -309,7 +309,7 @@ void Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int li
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
 	node_t tmp = Lookup(mytable,functionName);
 	if(tmp != NULL){
-		Insert_args(tmp, name);
+		tmp->args = Insert_args(tmp, name);
 	}
 
 }

@@ -1,6 +1,6 @@
 /* Hatzidakis Emmanouil AM:2571*/
 #include "symtable.h"
-
+int func_id_un=0;
 
 
 int SymTable_hash(const char *str)
@@ -15,8 +15,7 @@ int SymTable_hash(const char *str)
 
     return hash;
 }
-
-void Insert_args(node_t node, char *arg_name){
+A_list Insert_args(node_t node, char *arg_name){
 	A_list tmp;
 	A_list head = node->args;
 
@@ -30,7 +29,7 @@ void Insert_args(node_t node, char *arg_name){
 	if(head==NULL){
 		head = tmp;
 		tail = head;
-		node->args=head;	
+		return head;	
 	}
 	if(head->next == NULL){
 		head->next = tmp;
@@ -41,7 +40,7 @@ void Insert_args(node_t node, char *arg_name){
 		tail = tmp;
 	}
 
-	node->args= head;	
+	return  head;	
 }
 
 void Print_args(node_t node){
@@ -55,6 +54,17 @@ void Print_args(node_t node){
 	}
 	printf("\n");
 }
+
+/*create Function_id*/
+ char* Create_Function_Id(void){
+ 	char * f_id=malloc(102);
+ 	strcpy(f_id, "_F");
+ 	char buffer[100];
+ 	sprintf(buffer, "%d",func_id_un);
+ 	strcat(f_id, buffer);
+ 	func_id_un++;
+ 	return(f_id);
+ }
 
 
 
@@ -270,21 +280,30 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 void Print_Hash(SymTable_T oSymTable)
 {
 	node_t parse;
-
+	A_list tmp;
 	int i=0;
 
 	while(i<BUCKETS){
 
 		parse= oSymTable->hashtable[i];
-		while(parse)
+		while(parse != NULL)
 		{
 			if(parse->var_name == NULL)
 			{
 				if(parse->func_type != NULL){
 					if(parse->func_name != NULL)
 						printf(" Function Name = %s ", parse->func_name);
-					else
+					//else
 						printf(" Function Name = ");
+					//Print_args(parse);
+					tmp = parse->args;
+					//while(tmp != NULL)
+					//{
+						//printf("%s\n",tmp->arg );
+						//tmp = tmp->next;
+					//}
+					//printf("%s\n",parse->args->arg );
+					//printf("%s\n",parse->args->next->arg );
 					Print_args(parse);
 					printf(" Function Type = %s ", parse->func_type);
 					printf(" Function Scope = %d \n", parse->scope);
@@ -298,6 +317,7 @@ void Print_Hash(SymTable_T oSymTable)
 			}
 			//printf("\n");
 			parse = parse->next;
+
 		}
 
 		i++;
