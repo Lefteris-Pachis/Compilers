@@ -146,22 +146,7 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	int i=scope;
 	int found = 0;
 
-	node_t tmp = Lookup(mytable, name, 0);
 	node_t parse;
-
-	if(tmp != NULL && tmp->func_type != NULL && scope > 0){
-		if(strcmp(tmp->func_type,"Library Function")==0){
-			error_flag =1;
-			printf("Error at line: %d name of variable is a library function\n",lineNo);
-		}
-	}
-	else if(tmp !=NULL){
-		/* Do Nothing */
-		return;
-	}
-	else if(tmp == NULL && scope == 0 && error_flag == 0){
-		found == 0;
-	}
 
 	while(i>=1 && error_flag == 0){
 
@@ -182,9 +167,9 @@ void Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 			{
 				printf("Error at line: %d variable cannot access variable at line %d\n",lineNo,parse->line);
 				error_flag = 1;
-				break;
+				return;
 			}
-			else if(parse->scope<scope && function_counter ==0)
+			else if(parse->scope < scope && function_counter == 0)
 			{
 				/* Do Nothing */
 				return;
@@ -294,8 +279,13 @@ void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);
 }
 
-int Handle_block_l_brace_block_1_r_brace(int scope, int flag, int lineNo){
+int Handle_block_l_brace_block_1_r_brace(int flag, int lineNo){
 	printf("Line: %d \tblock: {block_1}\n", lineNo);
+	if(flag > 0){
+		flag = 0;
+	}
+	
+	return flag;
 }
 void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
