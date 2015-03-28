@@ -7,6 +7,9 @@
 	int scope_count = 0;
 	int function_counter = 0;
 	int state = 0;
+	int tmp_state = 0;
+	int count_id = 0;
+	int prev_id_state = 0;
 	int error = 0;
 	char* funcname = NULL;
 	
@@ -98,7 +101,7 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_pa
 		| primary 									{ Handle_term_primary(yylineno); }
 		;
 
-assignexpr:	lvalue ASSIGN expr 						{ Handle_assignexpr_lvalue_assign_expr(yylineno); }
+assignexpr:	lvalue ASSIGN expr 						{ if(count_id > 1){if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 )){tmp_state = 0;}} count_id = 0; state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); if(state == -1){error = 1;} }
 			;	
 
 primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
@@ -108,7 +111,7 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
 			| const 								{ Handle_primary_const(yylineno); }
 			;
 
-lvalue:		ID 										{ state = Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1) ); if(state == -1){error = 1;}}
+lvalue:		ID 										{ state = Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1)); count_id++; if(count_id == 1){prev_id_state = state;} if(state < -1){tmp_state = state;}else{tmp_state = 0;} if(state == -1){error = 1;}}
 			| LOCAL ID 								{ state = Handle_lvalue_local_id($2,scope_count,yylineno); if(state == -1){error = 1;}}
 			| D_COLON ID 							{ state = Handle_lvalue_d_colon_id($2,yylineno); if(state == -1){error = 1;}}
 			| member 								{ Handle_lvalue_member(yylineno); }
@@ -116,7 +119,7 @@ lvalue:		ID 										{ state = Handle_lvalue_id($1,scope_count,yylineno,functio
 
 member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno); }
 			| lvalue L_BRACKET expr R_BRACKET 		{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); }
-			| call DOT ID 							{ Handle_member_call_dot_id(yylineno); }
+			| call DOT ID 							{ tmp_state = 0; Handle_member_call_dot_id(yylineno); }
 			| call L_BRACKET expr R_BRACKET 		{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
 
@@ -162,8 +165,8 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION { function_counter++; funcname = Create_Function_Id(); state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS {scope_count--;} block { function_counter--;  }
-			| FUNCTION ID { function_counter++; funcname = $2; state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS {scope_count--;} block 		{ function_counter--;  }
+funcdef: 	FUNCTION { if(function_counter < scope_count){function_counter = scope_count;} function_counter++; funcname = Create_Function_Id(); state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS {scope_count++;} idlist R_PARENTHESIS {scope_count--;} block { function_counter--;  }
+			| FUNCTION ID { if(function_counter < scope_count){function_counter = scope_count;} function_counter++; funcname = $2; state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno); if(state == -1){error = 1;}} L_PARENTHESIS { scope_count++;} idlist R_PARENTHESIS {scope_count--;} block 		{ function_counter--;  }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }

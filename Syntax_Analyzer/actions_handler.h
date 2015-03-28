@@ -38,7 +38,7 @@ void Handle_term_minus_minus_lvalue(int lineNo);
 void Handle_term_lvalue_minus_minus(int lineNo);
 void Handle_term_primary(int lineNo);
 
-void Handle_assignexpr_lvalue_assign_expr(int lineNo);
+int Handle_assignexpr_lvalue_assign_expr(int lineNo, int state);
 
 void Handle_primary_lvalue(int lineNo);
 void Handle_primary_call(int lineNo);

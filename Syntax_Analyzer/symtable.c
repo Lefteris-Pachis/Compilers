@@ -44,10 +44,13 @@ A_list Insert_args(node_t node, char *arg_name){
 }
 
 void Print_args(node_t node){
-	printf(" Arguments = ");
+	printf(" | Arguments = ");
 	A_list head = node->args;
 	while(head!=NULL){
-		printf("%s\t",head->arg);
+		if(head->next != NULL)
+			printf("%s ,",head->arg);
+		else
+			printf(" %s",head->arg);
 		head=head->next;
 	}
 }
@@ -311,23 +314,23 @@ void Print_Hash(SymTable_T oSymTable)
 					if(parse->func_type != NULL && strcmp(parse->func_type,"Library Function") != 0){
 						if(parse->func_type != NULL){
 							printf(" Function -->");
-							printf(" Name = %s ", parse->func_name);
+							printf(" | Line = %d ",parse->line);
+							printf(" | Name = %s ", parse->func_name);
 							Print_args(parse);
-							printf(" Type = %s ", parse->func_type);
-							printf(" Scope = %d ", parse->scope);
-							printf(" Line = %d ",parse->line);
-							printf(" Hidden = %d \n",parse->hiden);
+							printf(" | Type = %s ", parse->func_type);
+							printf(" | Scope = %d ", parse->scope);
+							printf(" | Hidden = %d |\n",parse->hiden);
 						}
 					}
 				}
 				else if(parse->var_name != NULL && parse->func_name == NULL)
 				{
 					printf(" Variable -->");
-					printf(" Name = %s ", parse->var_name);
-					printf(" Type = %s ", parse->var_type);
-					printf(" Scope = %d ", parse->scope);
-					printf(" Line = %d ",parse->line);
-					printf(" Hidden = %d \n",parse->hiden);
+					printf(" | Line = %d ",parse->line);
+					printf(" | Name = %s ", parse->var_name);
+					printf(" | Type = %s ", parse->var_type);
+					printf(" | Scope = %d ", parse->scope);
+					printf(" | Hidden = %d |\n",parse->hiden);
 				}
 			}
 			parse = parse->next;

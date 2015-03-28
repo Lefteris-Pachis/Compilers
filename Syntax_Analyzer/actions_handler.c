@@ -120,8 +120,16 @@ void Handle_term_primary(int lineNo){
 	printf("Line: %d \tterm: primary\n", lineNo);
 }
 
-void Handle_assignexpr_lvalue_assign_expr(int lineNo){
+int Handle_assignexpr_lvalue_assign_expr(int lineNo, int state){
 	printf("Line: %d \tassignexpr: expr lvalue = expr\n", lineNo);
+	if(state == -2){
+		printf("Error at line: %d trying to assign to Library Function\n",lineNo );
+		return -1;
+	}else if(state == -3){
+		printf("Error at line: %d trying to assign to Program Function\n",lineNo );
+		return -1;
+	}else
+		return 0;
 }
 
 void Handle_primary_lvalue(int lineNo){
@@ -144,12 +152,28 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	printf("Line: %d \tlvalue: id\n", lineNo);
 	int error_flag = 0;
 	int i=scope;
+	int j=scope;
 	int found = 0;
 	int is_lib_func = 0;
+	int is_program_func = 0;
+	int is_global_var = 0;
+	int user_function_found = 0;
+	node_t temp;
 	node_t tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0))
 		is_lib_func = 1;
+	else if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"USER DEFINED") == 0))
+		is_program_func = 1;
+	else if(tmp != NULL && tmp->var_type != NULL)
+		is_global_var = 1;
 	node_t parse;
+
+	while(j>=1){
+		temp = Lookup(mytable,name,j);
+		if(temp != NULL && temp->func_type != NULL && (strcmp(temp->func_type,"USER DEFINED") == 0))
+			user_function_found = 1;
+		j--;
+	}
 
 	while(i>=1 && error_flag == 0){
 
@@ -166,7 +190,7 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 				/* do nothing */
 				return 0;
 			}
-			else if(parse->scope < scope && function_counter > 0 && is_lib_func == 0)
+			else if(parse->scope < scope && function_counter > 0 && is_lib_func == 0 && parse->func_type == NULL && user_function_found == 0)
 			{
 				printf("Error at line: %d variable cannot access variable at line %d\n",lineNo,parse->line);
 				error_flag = 1;
@@ -186,11 +210,16 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 		i--;
 	}
 
-	if(found == 0 && error_flag == 0 && scope == 0)
+	if(found == 0 && error_flag == 0 && scope == 0 && is_lib_func == 0 && is_program_func == 0 && is_global_var == 0)
 		Insert_Var(mytable,name,"GLOBAL",0,lineNo);
-	else
+	else if(is_lib_func == 0 && is_program_func == 0 && is_global_var == 0)
 		Insert_Var(mytable,name,"LOCAL",scope,lineNo);
-	return 0;
+	if(is_lib_func == 1)
+		return -2;
+	else if(is_program_func == 1)
+		return -3;
+	else
+		return 0;
 }
 
 int Handle_lvalue_local_id(char* name, int scope, int lineNo){
