@@ -3,4 +3,4 @@ all:
 	flex --outfile=scanner.c scanner.l
 	gcc -g -o calc symtable.c actions_handler.c scanner.c parser.c
 clean:
-	rm -rf parser.c scanner.c calc parser.output
+	rm -rf parser.c scanner.c calc parser.h parser.output
