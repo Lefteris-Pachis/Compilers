@@ -1,4 +1,3 @@
-/* Hatzidakis Emmanouil AM:2571*/
 #include "symtable.h"
 int func_id_un=0;
 
@@ -143,10 +142,7 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 	node_t put;
 	node_t parse;
 
-	//assert(oSymTable!=NULL && var_name!=NULL);
-
-	/*if(Lookup(oSymTable,var_name)==0)	
-		return -1;*/
+	assert(oSymTable!=NULL && var_name!=NULL);
 
 	put=malloc(sizeof(struct Node));
 
@@ -194,9 +190,6 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 	node_t parse;
 
 	assert(oSymTable!=NULL);
-
-	/*if(Lookup(oSymTable,func_name)==0)	
-		return -1;*/
 
 	put=malloc(sizeof(struct Node));
 
@@ -339,13 +332,3 @@ void Print_Hash(SymTable_T oSymTable)
 	}
 	printf("-----------------------------------------------\n");
 }
-
-/*int main(){
-
-	SymTable_T mytable = SymTable_new();
-
-	Insert_Var(mytable, "giwrgadakis", "pro" , 0, 1);
-	Insert_Func(mytable, "giwrgadakis", "pro","x,y" , 0, 1);
-
-	Print_Hash(mytable);
-}*/

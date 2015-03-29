@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-char* lib_functions[12] = { "print", "input", "objectmemberkeys", "objecttotalmembers", "objectcopy", "totalarguments", "argument", "typeof", "strtonum", "sqrt", "cos", "sin" };
-
 void Handle_stmt_expr_semicolon(int lineNo){
 	printf("Line: %d \tstmt: expr;\n", lineNo);
 }
