@@ -9,6 +9,13 @@
 
 #define BUCKETS 100
 
+typedef enum scopespace_t { 
+	programvar,
+	functionlocal,
+	formalarg				
+ }scopespace_t;
+
+ typedef enum symbol_t { var_s, programfunc_s, libraryfunc_s }symbol_t;
 
 typedef struct Args{
 	char* arg;
@@ -18,6 +25,10 @@ typedef struct Args{
 struct Args *tail;
 
 typedef struct Node{
+	symbol_t 		type;
+	char*			name;
+	scopespace_t	space;
+	unsigned		offset;
 	char* var_name;
 	char* var_type;
 
@@ -25,8 +36,8 @@ typedef struct Node{
 	char* func_type;
 	A_list args;
 
-	int scope;
-	int line;
+	unsigned scope;
+	unsigned line;
 	int hiden;
 
 	struct Node *next;

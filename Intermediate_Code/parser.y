@@ -251,7 +251,7 @@ int main(int argc, char** argv){
 	mytable = SymTable_new();
 
 	yyparse();
-
+	
 	if(error == 0)
 		Print_Hash(mytable);
 	else
