@@ -14,7 +14,7 @@ int SymTable_hash(const char *str)
 
     return hash;
 }
-A_list Insert_args(node_t node, char *arg_name){
+A_list Insert_args(symbol node, char *arg_name){
 	A_list tmp;
 	A_list head = node->args;
 
@@ -42,7 +42,7 @@ A_list Insert_args(node_t node, char *arg_name){
 	return  head;	
 }
 
-void Print_args(node_t node){
+void Print_args(symbol node){
 	printf(" | Arguments = ");
 	A_list head = node->args;
 	while(head!=NULL){
@@ -70,12 +70,12 @@ void Print_args(node_t node){
 SymTable_T SymTable_new(void)
 {
 	SymTable_T myhash;
-	node_t node;
+	symbol node;
 	int i=0;
 
 	myhash=malloc(sizeof(struct table));
 
-	node=malloc(sizeof(struct Node));
+	node=malloc(sizeof(struct symbol));
 
 	node->var_name = NULL;
 	node->var_type = NULL;
@@ -112,8 +112,8 @@ SymTable_T SymTable_new(void)
 void SymTable_free(SymTable_T oSymTable)
 {
 	/*int i = 0;
-	node_t makefree;
-	node_t parse;
+	symbol makefree;
+	symbol parse;
 
 	assert(oSymTable!=NULL);
 
@@ -139,12 +139,12 @@ void SymTable_free(SymTable_T oSymTable)
 int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line)
 {
 	int hashcode=SymTable_hash(var_name);
-	node_t put;
-	node_t parse;
+	symbol put;
+	symbol parse;
 
 	assert(oSymTable!=NULL && var_name!=NULL);
 
-	put=malloc(sizeof(struct Node));
+	put=malloc(sizeof(struct symbol));
 
 	put->var_name=malloc((strlen(var_name)+1)*sizeof(char));
 	put->var_name = strdup(var_name);
@@ -186,12 +186,12 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 	else
 		hashcode = 0;
 
-	node_t put;
-	node_t parse;
+	symbol put;
+	symbol parse;
 
 	assert(oSymTable!=NULL);
 
-	put=malloc(sizeof(struct Node));
+	put=malloc(sizeof(struct symbol));
 
 	if(func_name != NULL){
 		
@@ -235,7 +235,7 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 void Hide(SymTable_T oSymTable, int scope)
 {
 	if(scope != 0){
-		node_t parse;
+		symbol parse;
 		int i = 0;
 		while(i<BUCKETS){
 			parse = oSymTable->hashtable[i];
@@ -249,11 +249,11 @@ void Hide(SymTable_T oSymTable, int scope)
 	}
 }
 
-node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
+symbol Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 {
 	
 	int hashcode=SymTable_hash(name);
-	node_t parse=oSymTable->hashtable[hashcode];
+	symbol parse=oSymTable->hashtable[hashcode];
 
 	if(scope == -1)
 	{
@@ -292,7 +292,7 @@ node_t Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 
 void Print_Hash(SymTable_T oSymTable)
 {
-	node_t parse;
+	symbol parse;
 	int i=0;
 	printf("-------------------HASHTABLE-------------------\n");
 	while(i<BUCKETS){

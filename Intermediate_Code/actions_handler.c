@@ -156,15 +156,15 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	int is_program_func = 0;
 	int is_global_var = 0;
 	int user_function_found = 0;
-	node_t temp;
-	node_t tmp = Lookup(mytable,name,0);
+	symbol temp;
+	symbol tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0))
 		is_lib_func = 1;
 	else if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"USER DEFINED") == 0))
 		is_program_func = 1;
 	else if(tmp != NULL && tmp->var_type != NULL)
 		is_global_var = 1;
-	node_t parse;
+	symbol parse;
 
 	while(j>=1){
 		temp = Lookup(mytable,name,j);
@@ -222,7 +222,7 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 
 int Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
-	node_t tmp = Lookup(mytable,name,scope);
+	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp == NULL){
 		if(scope > 0)
 			Insert_Var(mytable, name, "LOCAL" , scope, lineNo);
@@ -239,7 +239,7 @@ int Handle_lvalue_local_id(char* name, int scope, int lineNo){
 
 int Handle_lvalue_d_colon_id(char* name, int lineNo){
 	printf("Line: %d \tlvalue: ::id\n", lineNo);
-	node_t tmp = Lookup(mytable,name,0);
+	symbol tmp = Lookup(mytable,name,0);
 	if(tmp == NULL){
 		printf("Error at line: %d name of variable isn't a global variable\n",lineNo);
 		return -1;
@@ -320,7 +320,7 @@ void Handle_block_1_stmt_block_1(int lineNo){
 
 int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
-	node_t tmp = Lookup(mytable,name,scope);
+	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->func_type != NULL && tmp->line != 0){
 			printf("Error at line: %d name of function is a user function\n",lineNo);
@@ -341,7 +341,7 @@ int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* na
 
 int Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function (idlist) block\n", lineNo);
-	node_t tmp = Lookup(mytable,name,scope);
+	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->var_type == NULL){
 			printf("Error at line: %d name of function is a user function\n",lineNo);
@@ -381,7 +381,7 @@ void Handle_const_false(int lineNo){
 
 int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo){
 	printf("Line: %d \tidlist: id idlist_1\n", lineNo);
-	node_t tmp = Lookup(mytable,name,0);
+	symbol tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->func_type != NULL && (strcmp(tmp->func_type,"Library Function") == 0)){
 		printf("Error at line: %d name of formal argumet is a library function\n",lineNo);
 		return -1;

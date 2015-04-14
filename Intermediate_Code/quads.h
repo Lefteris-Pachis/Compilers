@@ -6,7 +6,7 @@
 
 typedef enum iopcode { 
 	assign,			add,			sub,
-	mul,			div,			mod,
+	mul,			divv,			mod,
 	uminus,			and, 			or,
 	not,			if_eq,			if_noteq,
 	if_lesseq,		if_greatereq,	if_less,
@@ -16,9 +16,35 @@ typedef enum iopcode {
 	tablegetelem,	tablesetelem
 }iopcode;
 
-typedef struct expr {
+typedef enum expr_t { 
+		var_e,
+		tableitem_e,
 
-}expr;
+		programfunc_e,
+		libraryfunc_e,
+
+		arithexpr_e,
+		boolexpr_e,
+		assignexpr_e,
+		newtable_e,
+		
+		constnum_e,
+		constbool_e,
+		conststring_e,
+		
+		nil_e
+}expr_t;
+
+typedef struct expr expr;
+struct expr {
+	expr_t				type;
+	symbol	 			sym;
+	expr* 				index;
+	double 				numConst;
+	char*				strConst;
+	unsigned char 		boolConst;
+	expr*				next;
+};
 
 typedef struct quad {
 	iopcode		op;
@@ -45,12 +71,13 @@ unsigned 		scopeSpaceCounter = 0;
 
 /*QUADS FUNCTIONS*/
 void expand(void);
-void emit(iopcode op, expr* arg1, expr* arg2, unsigned label, unsigned line);
+void emit(iopcode op, expr* arg1, expr* arg2, expr* result);
 
 /*TEMP VARIABLES FUNCTIONS*/
 char* new_temp_name();
 void reset_temp();
-node_t new_temp();
+symbol new_temp();
+unsigned int istempname(char* s);
 
 /*SCOPE SPACE FUNCTIONS*/
 scopespace_t CurrScopeSpace(void);
@@ -60,5 +87,15 @@ void ExitScopeSpace(void);
 /*SCOPE OFFSET FUNCTIONS*/
 unsigned CurrScopeOffset(void);
 void IncCurrScopeOffset(void);
+
+/*EXPRESSION FUNCTIONS*/
+expr* lvalue_expr(symbol sym);
+expr* newexpr(expr_t t);
+expr* newexpr_conststring(char* s);
+expr* newexpr_constnum(double num);
+expr* newexpr_constbool(unsigned char x);
+expr* emit_iftableitem(expr* e);
+void checkuminus(expr* e);
+unsigned int istempexpr(expr* e);
 
 #endif

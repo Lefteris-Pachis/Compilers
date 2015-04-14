@@ -10,9 +10,9 @@
 #define BUCKETS 100
 
 typedef enum scopespace_t { 
-	programvar,
-	functionlocal,
-	formalarg				
+	programVar,
+	functionLocal,
+	formalArg				
  }scopespace_t;
 
  typedef enum symbol_t { var_s, programfunc_s, libraryfunc_s }symbol_t;
@@ -24,7 +24,7 @@ typedef struct Args{
 
 struct Args *tail;
 
-typedef struct Node{
+typedef struct symbol{
 	symbol_t 		type;
 	char*			name;
 	scopespace_t	space;
@@ -40,13 +40,12 @@ typedef struct Node{
 	unsigned line;
 	int hiden;
 
-	struct Node *next;
-}*node_t;
+	struct symbol *next;
+}*symbol;
 
 
 typedef struct table{
-
-	node_t hashtable[BUCKETS];
+	symbol hashtable[BUCKETS];
 }*SymTable_T;
 /* my symbol table structure */
 SymTable_T mytable;
@@ -65,13 +64,13 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 void Hide(SymTable_T oSymTable,int scope);
 
 /* Returns True if binding with given pcKey is found or False on failure */
-node_t Lookup(SymTable_T oSymTable, const char *name , int scope);
+symbol Lookup(SymTable_T oSymTable, const char *name , int scope);
 
 /* Print the list of args */
-void Print_args(node_t node);
+void Print_args(symbol node);
 char* Create_Function_Id();
 void Print_Hash(SymTable_T oSymTable);
-A_list Insert_args(node_t node, char *arg_name);
+A_list Insert_args(symbol node, char *arg_name);
 
 
 #endif

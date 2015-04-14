@@ -16,15 +16,26 @@ void expand(void){
 	total += EXPAND_SIZE;
 }
 
-void emit(iopcode op, expr* arg1, expr* arg2, unsigned label, unsigned line){
+void emit(iopcode op, expr* arg1, expr* arg2, expr* result){
 	if(currQuad == total)
 		expand();
 	quad* p 		= quads + currQuad++;
 	p->arg1			= arg1;
 	p->arg2 		= arg2;
 	p->result 		= result;
-	unsigned label 	= label;
-	unsigned line 	= line;
+	//p->label 		= label;
+	//p->line 		= line;
+}
+
+expr* emit_iftableitem(expr* e){
+	if(e->type != tableitem_e)
+		return e;
+	else{
+		expr* result = newexpr(var_e);
+		result->sym = new_temp();
+		emit(tablegetelem,e,e->index,result);
+		return result;
+	}
 }
 
 /*TEMP VARIABLES FUNCTIONS*/
@@ -42,9 +53,9 @@ void reset_temp(){
 	temp_counter = 0;
 }
 
-node_t new_temp(){
+symbol new_temp(){
 	char* name = new_temp_name();
-	node_t sym = Lookup(mytable,name,scope_count);
+	symbol sym = Lookup(mytable,name,scope_count);
 	if(sym == NULL){
 		Insert_Var(mytable,name,"TEMP",scope_count,yylineno);
 		return sym;
@@ -52,14 +63,18 @@ node_t new_temp(){
 		return sym;
 }
 
+unsigned int istempname(char* s){
+	return *s == '_';
+}
+
 /*SCOPE SPACE FUNCTIONS*/
 scopespace_t CurrScopeSpace(void){
 	if(scopeSpaceCounter == 1)
 		return programVar;
 	else if(scopeSpaceCounter % 2 == 0)
-		return formalarg;
+		return formalArg;
 	else
-		return functionlocal;
+		return functionLocal;
 }
 
 void EnterScopeSpace(void){
@@ -75,8 +90,8 @@ void ExitScopeSpace(void){
 unsigned CurrScopeOffset(void){
 	switch(CurrScopeSpace()){
 		case programVar: 	return programVarOffset;
-		case functionlocal:	return functionLocalOffset;
-		case formalarg: 	return formalArgOffset;
+		case functionLocal:	return functionLocalOffset;
+		case formalArg: 	return formalArgOffset;
 		default: assert(0);
 	}
 }
@@ -84,8 +99,67 @@ unsigned CurrScopeOffset(void){
 void IncCurrScopeOffset(void){
 	switch(CurrScopeSpace()){
 		case programVar: 	++programVarOffset; break;
-		case functionlocal:	++functionLocalOffset; break;
-		case formalarg: 	++formalArgOffset; break;
+		case functionLocal:	++functionLocalOffset; break;
+		case formalArg: 	++formalArgOffset; break;
 		default: assert(0);
 	}
+}
+
+/*EXPRESSION FUNCTIONS*/
+expr* lvalue_expr(symbol sym){
+	assert(sym);
+	expr* e = (expr*)malloc(sizeof(expr));
+	memset(e,0,sizeof(expr));
+	e->next = (expr*) 0;
+	e->sym = sym;
+
+	switch(sym->type){
+		case var_s:			e->type = var_e; break; 
+		case programfunc_s:	e->type = programfunc_e; break;
+		case libraryfunc_s:	e->type = libraryfunc_e; break;
+		default: assert(0);
+	}
+	return e;
+}
+
+expr* newexpr(expr_t t){
+	expr* e = (expr*)malloc(sizeof(expr));
+	memset(e,0,sizeof(expr));
+	e->type = t;
+	return e;
+}
+
+expr* newexpr_conststring(char* s){
+	expr* e = (expr*)malloc(sizeof(expr));
+	e->strConst = strdup(s);
+	return e;
+}
+
+expr* newexpr_constnum(double num){
+	expr* e = (expr*)malloc(sizeof(expr));
+	e->numConst = num;
+	return e;
+}
+
+expr* newexpr_constbool(unsigned char x){
+	expr* e = (expr*)malloc(sizeof(expr));
+	e->boolConst = x;
+	return e;
+}
+
+void checkuminus(expr* e){
+	if(	e->type == constbool_e		||
+		e->type == conststring_e	||
+		e->type == nil_e			||
+		e->type == newtable_e		||
+		e->type == programfunc_e 	||
+		e->type == libraryfunc_e 	||
+		e->type == boolexpr_e)
+		printf("Compile Error: Illegal expr to unary -\n");
+}
+
+unsigned int istempexpr(expr* e){
+	return 	e->sym &&
+			e->sym->type == var_s &&
+			istempname(e->sym->name);
 }
