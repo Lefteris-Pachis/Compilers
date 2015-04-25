@@ -12,7 +12,7 @@
 typedef enum scopespace_t { 
 	programVar,
 	functionLocal,
-	formalArg				
+	formalArg,
  }scopespace_t;
 
  typedef enum symbol_t { var_s, programfunc_s, libraryfunc_s }symbol_t;
@@ -29,17 +29,11 @@ typedef struct symbol{
 	char*			name;
 	scopespace_t	space;
 	unsigned		offset;
-	char* var_name;
-	char* var_type;
-
-	char* func_name;
-	char* func_type;
 	A_list args;
 
 	unsigned scope;
 	unsigned line;
 	int hiden;
-
 	struct symbol *next;
 }*symbol;
 
@@ -56,9 +50,9 @@ SymTable_T SymTable_new();
 void SymTable_free(SymTable_T oSymTable);
 
 /* inserts a new binding in oSymTable. Returns True on success and False on failure */
-int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line);
+int Insert_to_Hash(SymTable_T oSymTable, const char *name, symbol_t type, unsigned scope, unsigned line);
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line);
+//int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line);
 
 /* removes the binding of given pcKey. Returns True on success and False on failure */
 void Hide(SymTable_T oSymTable,int scope);

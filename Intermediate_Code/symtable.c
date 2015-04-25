@@ -77,14 +77,12 @@ SymTable_T SymTable_new(void)
 
 	node=malloc(sizeof(struct symbol));
 
-	node->var_name = NULL;
-	node->var_type = NULL;
+	node->name = NULL;
 	node->scope = 0;
 	node->line = 0;
-	node->func_name = NULL;
-	node->func_type = NULL;
 	node->args = NULL;
 	node->hiden = 0;
+	node->offset = 0;
 	node->next = NULL;
 
 	while(i<BUCKETS)
@@ -93,18 +91,18 @@ SymTable_T SymTable_new(void)
 		i++;
 	}
 
-	Insert_Func(myhash,"print","Library Function", 0,0);
-	Insert_Func(myhash,"input","Library Function", 0,0);
-	Insert_Func(myhash,"objectmemberkeys","Library Function", 0,0);
-	Insert_Func(myhash,"objecttotalmembers","Library Function", 0,0);
-	Insert_Func(myhash,"objectcopy","Library Function", 0,0);
-	Insert_Func(myhash,"totalarguments","Library Function", 0,0);
-	Insert_Func(myhash,"arguments","Library Function", 0,0);
-	Insert_Func(myhash,"typeof","Library Function", 0,0);
-	Insert_Func(myhash,"strtonum","Library Function", 0,0);
-	Insert_Func(myhash,"sqrt","Library Function", 0,0);
-	Insert_Func(myhash,"cos","Library Function", 0,0);
-	Insert_Func(myhash,"sin","Library Function", 0,0);
+	Insert_to_Hash(myhash,"print",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"input",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"objectmemberkeys",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"objecttotalmembers",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"objectcopy",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"totalarguments",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"arguments",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"typeof",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"strtonum",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"sqrt",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"cos",libraryfunc_s, 0,0);
+	Insert_to_Hash(myhash,"sin",libraryfunc_s, 0,0);
 
 	return myhash;
 }
@@ -136,35 +134,29 @@ void SymTable_free(SymTable_T oSymTable)
 }
 
 
-int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type, int var_scope, int var_line)
+int Insert_to_Hash(SymTable_T oSymTable, const char *name, symbol_t type, unsigned scope, unsigned line)
 {
-	int hashcode=SymTable_hash(var_name);
+	int hashcode=SymTable_hash(name);
 	symbol put;
 	symbol parse;
 
-	assert(oSymTable!=NULL && var_name!=NULL);
+	assert(oSymTable!=NULL && name!=NULL);
 
 	put=malloc(sizeof(struct symbol));
 
-	put->var_name=malloc((strlen(var_name)+1)*sizeof(char));
-	put->var_name = strdup(var_name);
-
-	put->var_type=malloc((strlen(var_type)+1)*sizeof(char));
-	put->var_type = strdup(var_type);
-
-	put->scope = var_scope;
-
-	put->line = var_line;
-
+	put->name=malloc((strlen(name)+1)*sizeof(char));
+	put->name = strdup(name);
+	put->type = type;
+	put->scope = scope;
+	put->line = line;
 	put->hiden = 0;
-
 	put->next = NULL;
+	put->space = CurrScopeSpace();
 
 
-	if(oSymTable->hashtable[hashcode]->var_name==NULL && oSymTable->hashtable[hashcode]->func_name==NULL)
+	if(oSymTable->hashtable[hashcode]->name==NULL)
 	{
 		oSymTable->hashtable[hashcode] = put;
-
 	}
 	else{
 		parse = oSymTable->hashtable[hashcode];
@@ -172,13 +164,11 @@ int Insert_Var(SymTable_T oSymTable, const char *var_name, const char *var_type,
 		parse = put;
 		oSymTable->hashtable[hashcode] = parse;
 	}
-
-
 	return 1;
 }
 
 
-int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line)
+/*int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line)
 {
 	int hashcode;
 	if(func_name != NULL)
@@ -230,7 +220,7 @@ int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_ty
 
 
 	return 1;
-}
+}*/
 
 void Hide(SymTable_T oSymTable, int scope)
 {
@@ -259,15 +249,15 @@ symbol Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 	{
 		while(parse!=NULL)
 		{
-			if(parse->var_name != NULL){
-				if(strcmp(parse->var_name,name) == 0 && parse->hiden == 0)
+			if(parse->name != NULL){
+				if(strcmp(parse->name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
-			else if(parse->func_name != NULL)
+			/*else if(parse->func_name != NULL)
 			{
 				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
 					return parse;
-			}
+			}*/
 			parse=parse->next;
 		}
 	}
@@ -275,15 +265,15 @@ symbol Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 	{
 		while(parse!=NULL)
 		{
-			if(parse->var_name!=NULL && parse->scope == scope){
-				if((strcmp(parse->var_name,name) == 0) && parse->hiden == 0)
+			if(parse->name!=NULL && parse->scope == scope){
+				if((strcmp(parse->name,name) == 0) && parse->hiden == 0)
 					return parse;
 			}
-			else if(parse->func_name!=NULL  && parse->scope == scope)
+			/*else if(parse->func_name!=NULL  && parse->scope == scope)
 			{
 				if((strcmp(parse->func_name,name) == 0) && parse->hiden == 0)
 					return parse;
-			}
+			}*/
 			parse=parse->next;
 		}
 	}
@@ -302,26 +292,22 @@ void Print_Hash(SymTable_T oSymTable)
 		{
 			if(parse->line != 0){
 				printf("Bucket : %d\n",i );
-				if(parse->var_name == NULL)
+				if(parse->type != var_s)
 				{
-					if(parse->func_type != NULL && strcmp(parse->func_type,"Library Function") != 0){
-						if(parse->func_type != NULL){
-							printf(" Function -->");
-							printf(" | Line = %d ",parse->line);
-							printf(" | Name = %s ", parse->func_name);
-							Print_args(parse);
-							printf(" | Type = %s ", parse->func_type);
-							printf(" | Scope = %d ", parse->scope);
-							printf(" | Hidden = %d |\n",parse->hiden);
-						}
+					if(parse->type != libraryfunc_s){
+						printf(" Function -->");
+						printf(" | Line = %d ",parse->line);
+						printf(" | Name = %s ", parse->name);
+						Print_args(parse);
+						printf(" | Scope = %d ", parse->scope);
+						printf(" | Hidden = %d |\n",parse->hiden);
 					}
 				}
-				else if(parse->var_name != NULL && parse->func_name == NULL)
+				else if(parse->type == var_s)
 				{
 					printf(" Variable -->");
 					printf(" | Line = %d ",parse->line);
-					printf(" | Name = %s ", parse->var_name);
-					printf(" | Type = %s ", parse->var_type);
+					printf(" | Name = %s ", parse->name);
 					printf(" | Scope = %d ", parse->scope);
 					printf(" | Hidden = %d |\n",parse->hiden);
 				}

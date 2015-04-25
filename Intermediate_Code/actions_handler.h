@@ -32,10 +32,10 @@ void Handle_expr_term(int lineNo);
 void Handle_term_l_parenthesis_expr_r_parenthesis(int lineNo);
 void Handle_term_uminus_expr(int lineNo);
 void Handle_term_not_expr(int lineNo);
-void Handle_term_plus_plus_lvalue(int lineNo);
-void Handle_term_lvalue_plus_plus(int lineNo);
-void Handle_term_minus_minus_lvalue(int lineNo);
-void Handle_term_lvalue_minus_minus(int lineNo);
+int Handle_term_plus_plus_lvalue(int lineNo, char* id_val);
+int Handle_term_lvalue_plus_plus(int lineNo, char* id_val);
+int Handle_term_minus_minus_lvalue(int lineNo, char* id_val);
+int Handle_term_lvalue_minus_minus(int lineNo, char* id_val);
 void Handle_term_primary(int lineNo);
 
 int Handle_assignexpr_lvalue_assign_expr(int lineNo, int state);

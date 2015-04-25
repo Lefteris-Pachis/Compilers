@@ -11,6 +11,7 @@
 	int count_id = 0;
 	int prev_id_state = 0;
 	int error = 0;
+	char* id_val;
 	char* funcname = NULL;
 	
 	extern int yylineno;
@@ -24,7 +25,7 @@
 	int intVal;
 	double realVal;
 	char *strVal;
-	struct Node *exprNode;
+	struct symbol *exprNode;
 }
 
 %start program
@@ -94,10 +95,10 @@ expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
 term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
 		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
 		| NOT expr 									{ Handle_term_not_expr(yylineno); }
-		| PLUS_PLUS lvalue 							{ Handle_term_plus_plus_lvalue(yylineno); }
-		| lvalue PLUS_PLUS							{ Handle_term_lvalue_plus_plus(yylineno); }
-		| MINUS_MINUS lvalue 						{ Handle_term_minus_minus_lvalue(yylineno); }
-		| lvalue MINUS_MINUS 						{ Handle_term_lvalue_minus_minus(yylineno); }
+		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
+		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
+		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
+		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| primary 									{ Handle_term_primary(yylineno); }
 		;
 
@@ -122,12 +123,15 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(count_id == 1) { prev_id_state = state; } 
  														if(state < -1) { tmp_state = state; } else { tmp_state = 0; } 
  														if(state == -1) { error = 1; }
+ 														id_val = strdup($1);
  													}
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
+														id_val = strdup($2);
 													}
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
+														id_val = strdup($2);
 													}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
@@ -173,8 +177,9 @@ indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
 indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
 				;
 
-block: 		L_BRACE {scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
+block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
 																Handle_block_l_brace_block_1_r_brace(yylineno); 
+																ExitScopeSpace();
 															}
 			;
 
@@ -188,14 +193,14 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 							funcname = Create_Function_Id(); 
 							state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno); 
 							if(state == -1) { error = 1; }
-						} L_PARENTHESIS { scope_count++; } idlist R_PARENTHESIS { scope_count--; } block { function_counter--; }
+						} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
 			| FUNCTION ID 	{	if(function_counter < scope_count)
 									function_counter = scope_count;
 								function_counter++; 
 								funcname = $2; 
 								state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno); 
 								if(state == -1) { error = 1; }
-							} L_PARENTHESIS { scope_count++; } idlist R_PARENTHESIS { scope_count--; } block { function_counter--; }
+							} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
 			;
 
 const:	INTEGER 	{ Handle_const_integer(yylineno); }

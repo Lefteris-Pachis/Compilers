@@ -63,7 +63,7 @@ int 			temp_counter = 0;
 unsigned		programVarOffset = 0;
 unsigned 		functionLocalOffset = 0;
 unsigned 		formalArgOffset = 0;
-unsigned 		scopeSpaceCounter = 0;
+unsigned 		scopeSpaceCounter = 1;
 
 #define EXPAND_SIZE	1024
 #define CURR_SIZE	(total*sizeof(quad))

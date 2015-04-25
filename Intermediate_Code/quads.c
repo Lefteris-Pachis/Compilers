@@ -57,7 +57,7 @@ symbol new_temp(){
 	char* name = new_temp_name();
 	symbol sym = Lookup(mytable,name,scope_count);
 	if(sym == NULL){
-		Insert_Var(mytable,name,"TEMP",scope_count,yylineno);
+		Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
 		return sym;
 	}else
 		return sym;
