@@ -1,8 +1,12 @@
 #ifndef QUADS_H
 #define QUADS_H
 
-#include "symtable.h"
 #include <assert.h>
+#include "symtable.h"
+
+#define EXPAND_SIZE	1024
+#define CURR_SIZE	(total*sizeof(quad))
+#define NEW_SIZE	(EXPAND_SIZE*sizeof(quad)+CURR_SIZE)
 
 typedef enum iopcode { 
 	assign,			add,			sub,
@@ -12,7 +16,7 @@ typedef enum iopcode {
 	if_lesseq,		if_greatereq,	if_less,
 	if_greater,		call, 			param,
 	ret,			getretval,		funcstart,
-	funcend,		tablecreate,	
+	funcend,		tablecreate,	jump,
 	tablegetelem,	tablesetelem
 }iopcode;
 
@@ -28,7 +32,8 @@ typedef enum expr_t {
 		assignexpr_e,
 		newtable_e,
 		
-		constnum_e,
+		constint_e,
+		constdouble_e,
 		constbool_e,
 		conststring_e,
 		
@@ -40,7 +45,8 @@ struct expr {
 	expr_t				type;
 	symbol	 			sym;
 	expr* 				index;
-	double 				numConst;
+	int 				intConst;
+	double 				doubleConst;
 	char*				strConst;
 	unsigned char 		boolConst;
 	expr*				next;
@@ -56,18 +62,9 @@ typedef struct quad {
 }quad;
 
 /*GLOBAL VARIABLES*/
-quad*			quads = (quad*) 0;
-unsigned		total = 0;
-unsigned int 	currQuad = 0;
-int 			temp_counter = 0; 
-unsigned		programVarOffset = 0;
-unsigned 		functionLocalOffset = 0;
-unsigned 		formalArgOffset = 0;
-unsigned 		scopeSpaceCounter = 1;
 
-#define EXPAND_SIZE	1024
-#define CURR_SIZE	(total*sizeof(quad))
-#define NEW_SIZE	(EXPAND_SIZE*sizeof(quad)+CURR_SIZE)
+
+
 
 /*QUADS FUNCTIONS*/
 void expand(void);
@@ -92,10 +89,13 @@ void IncCurrScopeOffset(void);
 expr* lvalue_expr(symbol sym);
 expr* newexpr(expr_t t);
 expr* newexpr_conststring(char* s);
-expr* newexpr_constnum(double num);
+expr* newexpr_constint(int num);
+expr* newexpr_constdouble(double num);
 expr* newexpr_constbool(unsigned char x);
 expr* emit_iftableitem(expr* e);
 void checkuminus(expr* e);
 unsigned int istempexpr(expr* e);
 
+void printquads();
+static char *print_expr(expr * expression);
 #endif

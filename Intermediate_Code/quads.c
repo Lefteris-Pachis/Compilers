@@ -1,8 +1,18 @@
 #include "quads.h"
 
 #include <stdio.h>
+
 extern int scope_count;
 extern int yylineno;
+
+quad*			quads = (quad*) 0;
+unsigned		total = 0;
+unsigned int 	currQuad = 0;
+int 			temp_counter = 0; 
+unsigned		programVarOffset = 0;
+unsigned 		functionLocalOffset = 0;
+unsigned 		formalArgOffset = 0;
+unsigned 		scopeSpaceCounter = 1;
 
 /*QUADS FUNCTIONS*/
 void expand(void){
@@ -25,6 +35,15 @@ void emit(iopcode op, expr* arg1, expr* arg2, expr* result){
 	p->result 		= result;
 	//p->label 		= label;
 	//p->line 		= line;
+	if(arg1->sym )
+		printf(" %s\n",arg1->sym->name);
+	if(arg2 != NULL)
+	{
+		
+			printf(" %d\n",arg2->intConst);
+	}
+	if(result->sym )
+		printf(" %s\n",result->sym->name);
 }
 
 expr* emit_iftableitem(expr* e){
@@ -55,12 +74,13 @@ void reset_temp(){
 
 symbol new_temp(){
 	char* name = new_temp_name();
-	symbol sym = Lookup(mytable,name,scope_count);
-	if(sym == NULL){
+	//symbol sym = Lookup(mytable,name,scope_count);
+	//if(sym == NULL){
 		Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
+		symbol sym = Lookup(mytable,name,scope_count);
 		return sym;
-	}else
-		return sym;
+	//}else
+		//return sym;
 }
 
 unsigned int istempname(char* s){
@@ -135,9 +155,15 @@ expr* newexpr_conststring(char* s){
 	return e;
 }
 
-expr* newexpr_constnum(double num){
+expr* newexpr_constint(int num){
 	expr* e = (expr*)malloc(sizeof(expr));
-	e->numConst = num;
+	e->intConst = num;
+	return e;
+}
+
+expr* newexpr_constdouble(double num){
+	expr* e = (expr*)malloc(sizeof(expr));
+	e->doubleConst = num;
 	return e;
 }
 
@@ -163,3 +189,130 @@ unsigned int istempexpr(expr* e){
 			e->sym->type == var_s &&
 			istempname(e->sym->name);
 }
+
+/* void printquads(void){
+   FILE *icode_export ;
+   int i ;
+   iopcode op;
+   char *table_op[26] = {"ASSIGN","ADD","SUB","MUL","DIV","MOD","UMINUS","AND","OR","NOT","IF_EQ","IF_NOTEQ",
+      "IF_LESSEQ","IF_GREATEREQ","IF_LESS","IF_GREATER","CALL",
+      "PARAM","RETURN","GETRETVAL","FUNCSTART","FUNCEND","JUMP","TABLECREATE","TABLEGETELEM",
+      "TABLESETELEM"};   
+   
+   if ((icode_export = fopen("icode.txt","w"))==NULL){
+      icode_export = stderr;   
+   }
+   
+   
+   for(i=0; i<currQuad; i++){
+      op = (quads[i]).op;
+      fprintf(icode_export,"%3u: %s\t ",i,table_op[op]);
+      if ((op != tablecreate && op != tablesetelem) && op !=tablegetelem ){
+      		fprintf(icode_export,"\t");
+      }
+      fflush(icode_export);
+      
+      if(
+	(op==add)  		||
+	(op==and)  		||
+	(op==or)  		||
+	(op==sub)  		||
+	(op==mul)  		||
+	(op==divv)  		||
+	(op==mod)  		||
+	(op==tablegetelem)  	||
+	(op==tablesetelem))
+	{
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].arg1));
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].arg2));
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].result));
+      }
+      else if(
+	(op==if_greater)	|| 
+	(op==if_greatereq) 	||
+	(op==if_less) 		||
+	(op==if_lesseq) 	||
+	(op==if_noteq) 	||    
+	(op==if_eq))
+	{
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].arg1));
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].arg2));
+	 fprintf(icode_export,"%d ", quads[i].label);
+     	}
+	
+      else if ((op==not) 	|| 
+	(op==uminus)		||
+	(op==assign))
+	{
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].arg1));
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].result));
+      }
+      else if(op==jump){
+	 fprintf(icode_export,"%d ", quads[i].label);	 
+      } 
+      else if((op==call)	||
+	(op==param) 		||
+	(op==getretval) 	|| 
+	(op==funcstart) 	|| 
+	(op==funcend) 		|| 
+	(op==tablecreate))
+	{	
+	 fprintf(icode_export,"%s\t ", print_expr(quads[i].result));
+      }
+      else{
+	 if(quads[i].result!= NULL){
+	    fprintf(icode_export,"%s\t ", print_expr(quads[i].result));
+	 }
+      }
+      fprintf(icode_export,"\n");
+   }
+   fclose(icode_export);
+   return;
+}
+
+static char *print_expr(expr * expression){
+   if (!expression) return " ";
+   expr_t type = expression->type;
+   char *tmp;
+   tmp=malloc(1000*sizeof(char));
+
+   
+   if (type==var_e){
+      return (expression->sym)->name;
+   }else if(type==tableitem_e){
+      return (expression->sym)->name;
+   }else if(type==libraryfunc_e){
+      return (expression->sym)->name;
+   }else if(type==arithexpr_e){
+      return (expression->sym)->name;
+   }else if(type==constint_e){
+     sprintf(tmp, "%d", expression->intConst);
+     return tmp;
+   }else if(type==constdouble_e){
+      sprintf(tmp, "%lf", expression->doubleConst);
+      return tmp;
+   }else if(type==constbool_e){
+            if (expression->boolConst=='0')return "FALSE";
+            else return "TRUE";
+   }else if(type==conststring_e){
+           char *tmp = malloc(strlen(expression->strConst)+2);
+           tmp[0]= '\"';
+	   tmp = strcat(tmp,expression->strConst);
+	   tmp[strlen(tmp)] = '\"';
+	   return tmp;
+           // return expression->strConst;
+   }else if(type==newtable_e){
+                  return (expression->sym)->name;
+   }else if(type==nil_e){
+      return "NIL";
+   }else if(type==programfunc_e){
+      return (expression->sym)->name;
+   }else if(type==boolexpr_e){
+      return (expression->sym)->name;
+   }else if(type==assignexpr_e){
+      return (expression->sym)->name;
+   }else{
+	printf("RESULT:%d\n", type); 
+      assert(0);
+   }
+}*/

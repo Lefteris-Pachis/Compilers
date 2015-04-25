@@ -2,6 +2,7 @@
 	#include <stdio.h>
 	#include "actions_handler.h"
 	#include "symtable.h"
+
 	int yyerror(const char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
@@ -25,7 +26,7 @@
 	int intVal;
 	double realVal;
 	char *strVal;
-	struct symbol *exprNode;
+	struct expr *exprNode;
 }
 
 %start program
@@ -38,11 +39,12 @@
 %token PLUS MINUS MUL DIV MOD PLUS_PLUS MINUS_MINUS ASSIGN EQ NOT_EQ LESS_THAN GREATER_THAN LESS_EQ GREATER_EQ
 %token IF ELSE AND NOT OR LOCAL TRUE FALSE WHILE FOR FUNCTION RETURN BREAK CONTINUE NIL
 
-%type <intVal> expr
+%type <exprNode> expr
 %type <strVal> idlist
 %type <strVal> idlist_1
 %type <strVal> funcdef
 %type <exprNode> lvalue
+%type <exprNode> const
 
 %right		ASSIGN
 %left		OR
@@ -76,19 +78,23 @@ stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
 		;
 
 expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
-		| expr PLUS expr 							{ Handle_expr_expr_plus_expr($1,$3,yylineno); }
-		| expr MINUS expr 							{ Handle_expr_expr_minus_expr($1,$3,yylineno); }
-		| expr MUL expr 							{ Handle_expr_expr_mul_expr($1,$3,yylineno); }
-		| expr DIV expr 							{ Handle_expr_expr_div_expr($1,$3,yylineno); }
-		| expr MOD expr 							{ Handle_expr_expr_mod_expr($1,$3,yylineno); }
-		| expr EQ expr 								{ Handle_expr_expr_eq_expr($1,$3,yylineno); }
-		| expr NOT_EQ expr  						{ Handle_expr_expr_not_eq_expr($1,$3,yylineno); }
-		| expr LESS_THAN expr  						{ Handle_expr_expr_less_than_expr($1,$3,yylineno); }
-		| expr GREATER_THAN expr  					{ Handle_expr_expr_greater_than_expr($1,$3,yylineno); }
-		| expr LESS_EQ expr 						{ Handle_expr_expr_less_eq_expr($1,$3,yylineno); }
-		| expr GREATER_EQ expr 						{ Handle_expr_expr_greater_eq_expr($1,$3,yylineno); }
-		| expr AND expr  							{ Handle_expr_expr_and_expr($1,$3,yylineno); }
-		| expr OR expr 								{ Handle_expr_expr_or_expr($1,$3,yylineno); }
+		| expr PLUS expr 							{ 	Handle_expr_expr_plus_expr(yylineno);
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(add,$1,$3,$$);
+		 											}
+		| expr MINUS expr 							{ Handle_expr_expr_minus_expr(yylineno); }
+		| expr MUL expr 							{ Handle_expr_expr_mul_expr(yylineno); }
+		| expr DIV expr 							{ Handle_expr_expr_div_expr(yylineno); }
+		| expr MOD expr 							{ Handle_expr_expr_mod_expr(yylineno); }
+		| expr EQ expr 								{ Handle_expr_expr_eq_expr(yylineno); }
+		| expr NOT_EQ expr  						{ Handle_expr_expr_not_eq_expr(yylineno); }
+		| expr LESS_THAN expr  						{ Handle_expr_expr_less_than_expr(yylineno); }
+		| expr GREATER_THAN expr  					{ Handle_expr_expr_greater_than_expr(yylineno); }
+		| expr LESS_EQ expr 						{ Handle_expr_expr_less_eq_expr(yylineno); }
+		| expr GREATER_EQ expr 						{ Handle_expr_expr_greater_eq_expr(yylineno); }
+		| expr AND expr  							{ Handle_expr_expr_and_expr(yylineno); }
+		| expr OR expr 								{ Handle_expr_expr_or_expr(yylineno); }
 		| term 										{ Handle_expr_term(yylineno); }
 		;
 
@@ -108,6 +114,7 @@ assignexpr:	lvalue ASSIGN expr 						{ 	if(count_id > 1)
 														count_id = 0; 
 														state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
 														if(state == -1) { error = 1; } 
+														emit(assign,$3,NULL,$1);
 													}
 			;	
 
@@ -124,14 +131,22 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state < -1) { tmp_state = state; } else { tmp_state = 0; } 
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
+ 														$$ = newexpr(var_e);
+ 														$$->sym = Lookup(mytable,id_val,scope_count);
+ 														if($$->sym)
+ 															printf("%s\n",$$->sym->name);
  													}
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
+														$$ = newexpr(var_e);
+ 														$$->sym = Lookup(mytable,id_val,scope_count);
 													}
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
+														$$ = newexpr(var_e);
+ 														$$->sym = Lookup(mytable,id_val,scope_count);
 													}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
@@ -203,12 +218,29 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 							} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
 			;
 
-const:	INTEGER 	{ Handle_const_integer(yylineno); }
-		| DOUBLE 	{ Handle_const_double(yylineno); }
-		| STRING 	{ Handle_const_string(yylineno); }
-		| NIL 		{ Handle_const_nil(yylineno); }
-		| TRUE 		{ Handle_const_true(yylineno); }
-		| FALSE 	{ Handle_const_false(yylineno); }
+const:	INTEGER 	{ 	Handle_const_integer(yylineno); 
+						$$ = newexpr(constint_e);
+						$$->intConst = $1; 
+					}
+		| DOUBLE 	{ 	Handle_const_double(yylineno);
+						$$ = newexpr(constdouble_e);
+						$$->doubleConst = $1; 	 
+					}
+		| STRING 	{ 	Handle_const_string(yylineno); 
+						$$ = newexpr(conststring_e);
+						$$->strConst = strdup($1); 
+					}
+		| NIL 		{ 	Handle_const_nil(yylineno);
+						$$ = newexpr(nil_e);
+		 			}
+		| TRUE 		{ 	Handle_const_true(yylineno);
+						$$ = newexpr(constbool_e);
+						$$->boolConst = 't';
+					}
+		| FALSE 	{ 	Handle_const_false(yylineno);
+						$$ = newexpr(constbool_e);
+						$$->boolConst = 'f';
+					}
 		;
 
 idlist: ID idlist_1 	{	state = Handle_idlist_id_idlist_1($1,funcname,scope_count,yylineno); 
@@ -261,5 +293,6 @@ int main(int argc, char** argv){
 		Print_Hash(mytable);
 	else
 		printf("Errors occured!\n");
+	//printquads();
 	return 0;
 }

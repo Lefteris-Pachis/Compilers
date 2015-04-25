@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include "quads.h"
 
 #ifndef _SYM_TABLE_H_
 #define _SYM_TABLE_H_

@@ -152,6 +152,7 @@ int Insert_to_Hash(SymTable_T oSymTable, const char *name, symbol_t type, unsign
 	put->hiden = 0;
 	put->next = NULL;
 	put->space = CurrScopeSpace();
+	put->offset = CurrScopeOffset();
 
 
 	if(oSymTable->hashtable[hashcode]->name==NULL)

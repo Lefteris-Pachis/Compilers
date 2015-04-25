@@ -1,4 +1,5 @@
 #include "actions_handler.h"
+#include "symtable.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -36,57 +37,44 @@ void Handle_stmt_semicolon(int lineNo){
 void Handle_expr_assignexpr(int lineNo){
 	printf("Line: %d \texpr: assignexpr\n", lineNo);
 }
-int Handle_expr_expr_plus_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr + expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return exp1 + exp2;
+void Handle_expr_expr_plus_expr(int lineNo){
+	printf("Line: %d \texpr: expr + expr \n", lineNo);
 }
-int Handle_expr_expr_minus_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr - expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return exp1 - exp2;
+void Handle_expr_expr_minus_expr(int lineNo){
+	printf("Line: %d \texpr: expr - expr \n", lineNo);
 }
-int Handle_expr_expr_mul_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr * expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return exp1 * exp2;
+void Handle_expr_expr_mul_expr(int lineNo){
+	printf("Line: %d \texpr: expr * expr \n", lineNo);
 }
-int Handle_expr_expr_div_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr / expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return exp1 / exp2;
+void Handle_expr_expr_div_expr(int lineNo){
+	printf("Line: %d \texpr: expr / expr \n", lineNo);
 }
-int Handle_expr_expr_mod_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr %% expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return exp1 % exp2;
+void Handle_expr_expr_mod_expr(int lineNo){
+	printf("Line: %d \texpr: expr %% expr \n", lineNo);
 }
-int Handle_expr_expr_greater_than_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr > expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 > exp2)?1:0;
+void Handle_expr_expr_greater_than_expr(int lineNo){
+	printf("Line: %d \texpr: expr > expr \n", lineNo);
 }
-int Handle_expr_expr_less_than_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr < expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 < exp2)?1:0;
+void Handle_expr_expr_less_than_expr(int lineNo){
+	printf("Line: %d \texpr: expr < expr \n", lineNo);
 }
-int Handle_expr_expr_greater_eq_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr >= expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 >= exp2)?1:0;
+void Handle_expr_expr_greater_eq_expr(int lineNo){
+	printf("Line: %d \texpr: expr >= expr \n", lineNo);
 }
-int Handle_expr_expr_less_eq_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr <= expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 <= exp2)?1:0;
+void Handle_expr_expr_less_eq_expr(int lineNo){
+	printf("Line: %d \texpr: expr <= expr \n", lineNo);
 }
-int Handle_expr_expr_eq_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr == expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 == exp2)?1:0;
+void Handle_expr_expr_eq_expr(int lineNo){
+	printf("Line: %d \texpr: expr == expr \n", lineNo);
 }
-int Handle_expr_expr_not_eq_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr != expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 != exp2)?1:0;
+void Handle_expr_expr_not_eq_expr(int lineNo){
+	printf("Line: %d \texpr: expr != expr \n", lineNo);
 }
-int Handle_expr_expr_and_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr and expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 && exp2)?1:0;
+void Handle_expr_expr_and_expr(int lineNo){
+	printf("Line: %d \texpr: expr and expr \n", lineNo);
 }
-int Handle_expr_expr_or_expr(int exp1,int exp2,int lineNo){
-	printf("Line: %d \texpr: expr or expr (Val1:%d , Val2:%d)\n", lineNo, exp1, exp2);
-	return (exp1 || exp2)?1:0;
+void Handle_expr_expr_or_expr(int lineNo){
+	printf("Line: %d \texpr: expr or expr \n", lineNo);
 }
 void Handle_expr_term(int lineNo){
 	printf("Line: %d \texpr: term\n", lineNo);
@@ -231,8 +219,10 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 		i--;
 	}
 
-	if(found == 0 && is_lib_func == 0 && is_program_func == 0 && is_global_var == 0)
+	if(found == 0 && is_lib_func == 0 && is_program_func == 0 && is_global_var == 0){
 		Insert_to_Hash(mytable,name,var_s,scope,lineNo);
+		IncCurrScopeOffset();
+	}
 	if(is_lib_func == 1)
 		return -2;
 	else if(is_program_func == 1)
@@ -245,8 +235,10 @@ int Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
 	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp == NULL){
-		if(scope > 0)
+		if(scope > 0){
 			Insert_to_Hash(mytable, name, var_s , scope, lineNo);
+			IncCurrScopeOffset();
+		}
 	}
 	tmp = Lookup(mytable,name,0);
 	if(tmp != NULL && tmp->type == libraryfunc_s && scope > 0){
