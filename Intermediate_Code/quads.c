@@ -202,7 +202,7 @@ void Print_Quads(void){
     icode = fopen("icode.txt","w");
     for(i=0; i<currQuad; i++){
     	op = (quads[i]).op;
-    	fprintf(icode,"%d: %s\t ",i,table_op[op]);
+    	fprintf(icode,"%d: %s\t ",i+1,table_op[op]);
     	if((op==add) || (op==and) || (op==or) || (op==sub) || (op==mul) || (op==divv) || (op==mod) || (op==tablegetelem) || (op==tablesetelem)){
 			fprintf(icode,"%s\t ", print_expr(quads[i].arg1));
 			fprintf(icode,"%s\t ", print_expr(quads[i].arg2));
