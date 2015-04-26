@@ -35,16 +35,24 @@
 %token <strVal> STRING
 %token <strVal> CHAR
 %token <strVal> ID
-%token L_BRACE R_BRACE L_PARENTHESIS R_PARENTHESIS L_BRACKET R_BRACKET SEMICOLON COMMA COLON D_COLON DOT D_DOT
-%token PLUS MINUS MUL DIV MOD PLUS_PLUS MINUS_MINUS ASSIGN EQ NOT_EQ LESS_THAN GREATER_THAN LESS_EQ GREATER_EQ
-%token IF ELSE AND NOT OR LOCAL TRUE FALSE WHILE FOR FUNCTION RETURN BREAK CONTINUE NIL
+%token <strVal> L_BRACE R_BRACE L_PARENTHESIS R_PARENTHESIS L_BRACKET R_BRACKET SEMICOLON COMMA COLON D_COLON DOT D_DOT
+%token <strVal> PLUS MINUS MUL DIV MOD PLUS_PLUS MINUS_MINUS ASSIGN EQ NOT_EQ LESS_THAN GREATER_THAN LESS_EQ GREATER_EQ
+%token <strVal> IF ELSE AND NOT OR LOCAL TRUE FALSE WHILE FOR FUNCTION RETURN BREAK CONTINUE NIL
 
-%type <exprNode> expr
+
 %type <strVal> idlist
 %type <strVal> idlist_1
 %type <strVal> funcdef
+
+%type <exprNode> expr
 %type <exprNode> lvalue
 %type <exprNode> const
+%type <exprNode> term
+%type <exprNode> member		/* tableitem */
+%type <exprNode> primary
+%type <exprNode> assignexpr
+%type <exprNode> call
+%type <exprNode> objectdef	/* tablemake */
 
 %right		ASSIGN
 %left		OR
@@ -78,83 +86,30 @@ stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
 		;
 
 expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
-		| expr PLUS expr 							{ 	Handle_expr_expr_plus_expr(yylineno);
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														emit(add,$1,$3,$$);
-		 											}
-		| expr MINUS expr 							{ 	Handle_expr_expr_minus_expr(yylineno);
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														emit(sub,$1,$3,$$);
-													}
-		| expr MUL expr 							{ 	Handle_expr_expr_mul_expr(yylineno);
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														
-														emit(mul,$1,$3,$$);
-		 											}
-		| expr DIV expr 							{ 	Handle_expr_expr_div_expr(yylineno);
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														emit(divv,$1,$3,$$);
-													}
-		| expr MOD expr 							{ 	Handle_expr_expr_mod_expr(yylineno); 
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														emit(mod,$1,$3,$$);
-													}
-		| expr EQ expr 								{ 	Handle_expr_expr_eq_expr(yylineno);
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_eq,$1,$3,$$); 
-													}
-		| expr NOT_EQ expr  						{ 	Handle_expr_expr_not_eq_expr(yylineno); 
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_noteq,$1,$3,$$); 
-													}
-		| expr LESS_THAN expr  						{ 	Handle_expr_expr_less_than_expr(yylineno); 
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_less,$1,$3,$$); 
-													}
-		| expr GREATER_THAN expr  					{ 	Handle_expr_expr_greater_than_expr(yylineno); 
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_greater,$1,$3,$$); 
-													}
-		| expr LESS_EQ expr 						{ 	Handle_expr_expr_less_eq_expr(yylineno); 
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_lesseq,$1,$3,$$); 
-													}
-		| expr GREATER_EQ expr 						{ 	Handle_expr_expr_greater_eq_expr(yylineno); 
-														//$$ = newexpr(boolexpr_e);
-														//$$->sym = new_temp();
-														//emit(if_greatereq,$1,$3,$$); 
-													}
-		| expr AND expr  							{ 	Handle_expr_expr_and_expr(yylineno); 
-														//$$ = newexpr(arithexpr_e);
-														//$$->sym = new_temp();
-														//emit(and,$1,$3,$$); 
-													}
-		| expr OR expr 								{ 	Handle_expr_expr_or_expr(yylineno); 
-														//$$ = newexpr(arithexpr_e);
-														//$$->sym = new_temp();
-														//emit(or,$1,$3,$$); 
-													}
+		| expr PLUS expr 							{ $$ = Handle_expr_expr_plus_expr($1, $3, yylineno); }
+		| expr MINUS expr 							{ $$ = Handle_expr_expr_minus_expr($1, $3, yylineno); }
+		| expr MUL expr 							{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
+		| expr DIV expr 							{ $$ = Handle_expr_expr_div_expr($1, $3, yylineno); }
+		| expr MOD expr 							{ $$ = Handle_expr_expr_mod_expr($1, $3, yylineno); }
+		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); }
+		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); }
+		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); }
+		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); }
+		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); }
+		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); }
+		| expr AND expr  							{ $$ = Handle_expr_expr_and_expr($1, $3,yylineno); }
+		| expr OR expr 								{ $$ = Handle_expr_expr_or_expr($1, $3,yylineno); }
 		| term 										{ 	Handle_expr_term(yylineno); }
 		;
 
-term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
+term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
 		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
 		| NOT expr 									{ Handle_term_not_expr(yylineno); }
 		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
 		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
 		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
-		| primary 									{ Handle_term_primary(yylineno); }
+		| primary 									{ $$ = $1; Handle_term_primary(yylineno); }
 		;
 
 assignexpr:	lvalue ASSIGN expr 						{ 	if(count_id > 1)

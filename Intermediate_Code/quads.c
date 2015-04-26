@@ -37,15 +37,19 @@ void emit(iopcode op, expr* arg1, expr* arg2, expr* result){
 	p->label 	= currQuad;
 	p->line 	= yylineno;
 	total++;
-	/*if(arg1->sym )
-		printf(" %s\n",arg1->sym->name);
-	if(arg2 != NULL)
-	{
-		
-			printf(" %d\n",arg2->intConst);
-	}
-	if(result->sym )
-		printf(" %s\n",result->sym->name);*/
+}
+
+void emit_jump(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label){
+	if (currQuad == total) 
+		expand();
+	quad* p 	= quads + currQuad++;
+	p->op 		= op;
+	p->arg1 	= arg1;
+	p->arg2 	= arg2;
+	p->result 	= result;
+	p->label 	= label;
+	p->line 	= yylineno;
+	total++;
 }
 
 expr* emit_iftableitem(expr* e){
@@ -57,6 +61,10 @@ expr* emit_iftableitem(expr* e){
 		emit(tablegetelem,e,e->index,result);
 		return result;
 	}
+}
+
+unsigned next_quad_label(){
+	return currQuad+1;
 }
 
 /*TEMP VARIABLES FUNCTIONS*/
@@ -78,7 +86,11 @@ symbol new_temp(){
 	char* name = new_temp_name();
 	Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
 	symbol sym = Lookup(mytable,name,scope_count);
-	return sym;
+	if(sym){
+		printf("%s\n", sym->name);
+		return sym;
+	}else
+		return NULL;
 }
 
 unsigned int istempname(char* s){
@@ -264,7 +276,8 @@ static char *print_expr(expr * expression){
    	}else if(type==assignexpr_e){
     	return (expression->sym)->name;
    	}else{
-		printf("RESULT:%d\n", type); 
+		printf("RESULT:%d\n", type);
+		printf("%d\n", expression->type); 
     	assert(0);
    	}
 }

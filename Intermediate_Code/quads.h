@@ -69,6 +69,8 @@ typedef struct quad {
 /*QUADS FUNCTIONS*/
 void expand(void);
 void emit(iopcode op, expr* arg1, expr* arg2, expr* result);
+void emit_jump(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label);
+unsigned next_quad_label();
 
 /*TEMP VARIABLES FUNCTIONS*/
 char* new_temp_name();

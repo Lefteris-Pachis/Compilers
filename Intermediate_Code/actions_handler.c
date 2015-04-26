@@ -37,44 +37,189 @@ void Handle_stmt_semicolon(int lineNo){
 void Handle_expr_assignexpr(int lineNo){
 	printf("Line: %d \texpr: assignexpr\n", lineNo);
 }
-void Handle_expr_expr_plus_expr(int lineNo){
+expr* Handle_expr_expr_plus_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr + expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) || (arg1->type == tableitem_e) || (arg1->type == arithexpr_e) || (arg1->type == constdouble_e) || (arg1->type == constint_e)) && ((arg2->type == var_e) || (arg2->type == tableitem_e) || (arg2->type == arithexpr_e) || (arg1->type == var_e) && (arg2->type == constdouble_e) || (arg1->type == var_e) && (arg2->type == constint_e))){
+		e = newexpr(arithexpr_e);
+		e->sym = new_temp();
+		emit(add,arg1,arg2,e);
+	}else if((arg1->type == constdouble_e) && (arg2->type == constdouble_e)){
+		e = newexpr(constdouble_e);
+		e->sym = new_temp();
+		emit(add, arg1, arg2, e);
+	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
+		e = newexpr(constint_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}
+	return e;
 }
-void Handle_expr_expr_minus_expr(int lineNo){
+expr* Handle_expr_expr_minus_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr - expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) || (arg1->type == tableitem_e) || (arg1->type == arithexpr_e) || (arg1->type == constdouble_e) || (arg1->type == constint_e)) && ((arg2->type == var_e) || (arg2->type == tableitem_e) || (arg2->type == arithexpr_e) || (arg1->type == var_e) && (arg2->type == constdouble_e) || (arg1->type == var_e) && (arg2->type == constint_e))){
+		e = newexpr(arithexpr_e);
+		e->sym = new_temp();
+		emit(sub,arg1,arg2,e);
+	}else if((arg1->type == constdouble_e) && (arg2->type == constdouble_e)){
+		e = newexpr(constdouble_e);
+		e->sym = new_temp();
+		emit(sub, arg1, arg2, e);
+	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
+		e = newexpr(constint_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}
+	return e;
 }
-void Handle_expr_expr_mul_expr(int lineNo){
+expr* Handle_expr_expr_mul_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr * expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) || (arg1->type == tableitem_e) || (arg1->type == arithexpr_e) || (arg1->type == constdouble_e) || (arg1->type == constint_e)) && ((arg2->type == var_e) || (arg2->type == tableitem_e) || (arg2->type == arithexpr_e) || (arg1->type == var_e) && (arg2->type == constdouble_e) || (arg1->type == var_e) && (arg2->type == constint_e))){
+		e = newexpr(arithexpr_e);
+		e->sym = new_temp();
+		emit(mul,arg1,arg2,e);
+	}else if((arg1->type == constdouble_e) && (arg2->type == constdouble_e)){
+		e = newexpr(constdouble_e);
+		e->sym = new_temp();
+		emit(mul, arg1, arg2, e);
+	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
+		e = newexpr(constint_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}
+	return e;
 }
-void Handle_expr_expr_div_expr(int lineNo){
+expr* Handle_expr_expr_div_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr / expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) || (arg1->type == tableitem_e) || (arg1->type == arithexpr_e) || (arg1->type == constdouble_e) || (arg1->type == constint_e)) && ((arg2->type == var_e) || (arg2->type == tableitem_e) || (arg2->type == arithexpr_e) || (arg1->type == var_e) && (arg2->type == constdouble_e) || (arg1->type == var_e) && (arg2->type == constint_e))){
+		e = newexpr(arithexpr_e);
+		e->sym = new_temp();
+		emit(divv,arg1,arg2,e);
+	}else if((arg1->type == constdouble_e) && (arg2->type == constdouble_e)){
+		e = newexpr(constdouble_e);
+		e->sym = new_temp();
+		emit(divv, arg1, arg2, e);
+	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
+		e = newexpr(constint_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}
+	return e;
 }
-void Handle_expr_expr_mod_expr(int lineNo){
+expr* Handle_expr_expr_mod_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr %% expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) || (arg1->type == tableitem_e) || (arg1->type == arithexpr_e) || (arg1->type == constdouble_e) || (arg1->type == constint_e)) && ((arg2->type == var_e) || (arg2->type == tableitem_e) || (arg2->type == arithexpr_e) || (arg1->type == var_e) && (arg2->type == constdouble_e) || (arg1->type == var_e) && (arg2->type == constint_e))){
+		e = newexpr(arithexpr_e);
+		e->sym = new_temp();
+		emit(mod,arg1,arg2,e);
+	}else if((arg1->type == constdouble_e) && (arg2->type == constdouble_e)){
+		e = newexpr(constdouble_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
+		e = newexpr(constint_e);
+		e->sym = new_temp();
+		emit(mod, arg1, arg2, e);
+	}
+	return e;
 }
-void Handle_expr_expr_greater_than_expr(int lineNo){
+expr* Handle_expr_expr_greater_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr > expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_greater, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_less_than_expr(int lineNo){
+expr* Handle_expr_expr_less_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr < expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_less, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_greater_eq_expr(int lineNo){
+expr* Handle_expr_expr_greater_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr >= expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_greatereq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_less_eq_expr(int lineNo){
+expr* Handle_expr_expr_less_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr <= expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_lesseq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_eq_expr(int lineNo){
+expr* Handle_expr_expr_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr == expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_eq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_not_eq_expr(int lineNo){
+expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr != expr \n", lineNo);
+	expr* e = NULL;
+	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit_jump(if_noteq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+	}
+	return e;
 }
-void Handle_expr_expr_and_expr(int lineNo){
+expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr and expr \n", lineNo);
+	expr* e = NULL;
+	e = newexpr(boolexpr_e);
+	e->sym = new_temp();
+	emit(and, arg1, arg2, e);
+	return e;
 }
-void Handle_expr_expr_or_expr(int lineNo){
+expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr or expr \n", lineNo);
+	expr* e = NULL;
+	e = newexpr(boolexpr_e);
+	e->sym = new_temp();
+	emit(or, arg1, arg2, e);
+	return e;
 }
 void Handle_expr_term(int lineNo){
 	printf("Line: %d \texpr: term\n", lineNo);
