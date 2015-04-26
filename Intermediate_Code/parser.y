@@ -83,19 +83,67 @@ expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
 														$$->sym = new_temp();
 														emit(add,$1,$3,$$);
 		 											}
-		| expr MINUS expr 							{ Handle_expr_expr_minus_expr(yylineno); }
-		| expr MUL expr 							{ Handle_expr_expr_mul_expr(yylineno); }
-		| expr DIV expr 							{ Handle_expr_expr_div_expr(yylineno); }
-		| expr MOD expr 							{ Handle_expr_expr_mod_expr(yylineno); }
-		| expr EQ expr 								{ Handle_expr_expr_eq_expr(yylineno); }
-		| expr NOT_EQ expr  						{ Handle_expr_expr_not_eq_expr(yylineno); }
-		| expr LESS_THAN expr  						{ Handle_expr_expr_less_than_expr(yylineno); }
-		| expr GREATER_THAN expr  					{ Handle_expr_expr_greater_than_expr(yylineno); }
-		| expr LESS_EQ expr 						{ Handle_expr_expr_less_eq_expr(yylineno); }
-		| expr GREATER_EQ expr 						{ Handle_expr_expr_greater_eq_expr(yylineno); }
-		| expr AND expr  							{ Handle_expr_expr_and_expr(yylineno); }
-		| expr OR expr 								{ Handle_expr_expr_or_expr(yylineno); }
-		| term 										{ Handle_expr_term(yylineno); }
+		| expr MINUS expr 							{ 	Handle_expr_expr_minus_expr(yylineno);
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(sub,$1,$3,$$);
+													}
+		| expr MUL expr 							{ 	Handle_expr_expr_mul_expr(yylineno);
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(mul,$1,$3,$$);
+		 											}
+		| expr DIV expr 							{ 	Handle_expr_expr_div_expr(yylineno);
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(divv,$1,$3,$$);
+													}
+		| expr MOD expr 							{ 	Handle_expr_expr_mod_expr(yylineno); 
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(mod,$1,$3,$$);
+													}
+		| expr EQ expr 								{ 	Handle_expr_expr_eq_expr(yylineno);
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_eq,$1,$3,$$); 
+													}
+		| expr NOT_EQ expr  						{ 	Handle_expr_expr_not_eq_expr(yylineno); 
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_noteq,$1,$3,$$); 
+													}
+		| expr LESS_THAN expr  						{ 	Handle_expr_expr_less_than_expr(yylineno); 
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_less,$1,$3,$$); 
+													}
+		| expr GREATER_THAN expr  					{ 	Handle_expr_expr_greater_than_expr(yylineno); 
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_greater,$1,$3,$$); 
+													}
+		| expr LESS_EQ expr 						{ 	Handle_expr_expr_less_eq_expr(yylineno); 
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_lesseq,$1,$3,$$); 
+													}
+		| expr GREATER_EQ expr 						{ 	Handle_expr_expr_greater_eq_expr(yylineno); 
+														//$$ = newexpr(boolexpr_e);
+														//$$->sym = new_temp();
+														//emit(if_greatereq,$1,$3,$$); 
+													}
+		| expr AND expr  							{ 	Handle_expr_expr_and_expr(yylineno); 
+														//$$ = newexpr(arithexpr_e);
+														//$$->sym = new_temp();
+														//emit(and,$1,$3,$$); 
+													}
+		| expr OR expr 								{ 	Handle_expr_expr_or_expr(yylineno); 
+														//$$ = newexpr(arithexpr_e);
+														//$$->sym = new_temp();
+														//emit(or,$1,$3,$$); 
+													}
+		| term 										{ 	Handle_expr_term(yylineno); }
 		;
 
 term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
