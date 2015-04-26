@@ -88,18 +88,19 @@ stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
 		| SEMICOLON 								{ Handle_stmt_semicolon(yylineno); }
 		;
 
-expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
+expr:	assignexpr									{ Handle_expr_assignexpr(yylineno);
+													$$=$1; }
 		| expr PLUS expr 							{ $$ = Handle_expr_expr_plus_expr($1, $3, yylineno); }
 		| expr MINUS expr 							{ $$ = Handle_expr_expr_minus_expr($1, $3, yylineno); }
 		| expr MUL expr 							{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
 		| expr DIV expr 							{ $$ = Handle_expr_expr_div_expr($1, $3, yylineno); }
 		| expr MOD expr 							{ $$ = Handle_expr_expr_mod_expr($1, $3, yylineno); }
-		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); }
-		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); }
-		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); }
-		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); }
-		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); }
-		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); }
+		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno);tmp =$$; }
+		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); tmp =$$;}
+		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno);tmp =$$;}
+		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); tmp =$$;}
+		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno);tmp =$$; }
+		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno);tmp =$$; }
 		| expr AND expr  							{ $$ = Handle_expr_expr_and_expr($1, $3,yylineno); }
 		| expr OR expr 								{ $$ = Handle_expr_expr_or_expr($1, $3,yylineno); }
 		| term 										{ 	Handle_expr_term(yylineno); }
@@ -144,7 +145,8 @@ primary:	lvalue 									{ Handle_primary_lvalue(yylineno);
 			| call 									{ Handle_primary_call(yylineno); }
 			| objectdef 							{ Handle_primary_objectdef(yylineno); }
 			| L_PARENTHESIS funcdef R_PARENTHESIS 	{ Handle_primary_l_parenthesis_funcdef_r_parenthesis(yylineno); }
-			| const 								{ Handle_primary_const(yylineno); }
+			| const 								{ Handle_primary_const(yylineno);
+														$$=$1;										 }
 			;
 
 lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1));
