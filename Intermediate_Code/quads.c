@@ -76,13 +76,9 @@ void reset_temp(){
 
 symbol new_temp(){
 	char* name = new_temp_name();
-	//symbol sym = Lookup(mytable,name,scope_count);
-	//if(sym == NULL){
-		Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
-		symbol sym = Lookup(mytable,name,scope_count);
-		return sym;
-	//}else
-		//return sym;
+	Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
+	symbol sym = Lookup(mytable,name,scope_count);
+	return sym;
 }
 
 unsigned int istempname(char* s){

@@ -91,6 +91,7 @@ expr:	assignexpr									{ Handle_expr_assignexpr(yylineno); }
 		| expr MUL expr 							{ 	Handle_expr_expr_mul_expr(yylineno);
 														$$ = newexpr(arithexpr_e);
 														$$->sym = new_temp();
+														
 														emit(mul,$1,$3,$$);
 		 											}
 		| expr DIV expr 							{ 	Handle_expr_expr_div_expr(yylineno);
@@ -180,7 +181,11 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
  														$$ = newexpr(var_e);
- 														$$->sym = Lookup(mytable,id_val,scope_count);
+ 														int i = scope_count;
+ 														while(!$$->sym){
+ 															$$->sym = Lookup(mytable,id_val,i);
+ 															i--;
+ 														}
  													}
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
