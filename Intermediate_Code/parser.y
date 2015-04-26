@@ -191,17 +191,13 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
 														$$ = newexpr(var_e);
-														int i = scope_count;
- 														while(!$$->sym){
- 															$$->sym = Lookup(mytable,id_val,scope_count);
- 															i--;
- 														}
+ 														$$->sym = Lookup(mytable,id_val,scope_count);
 													}
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
 														$$ = newexpr(var_e);
- 														$$->sym = Lookup(mytable,id_val,0);
+ 														$$->sym = Lookup(mytable,id_val,scope_count);
 													}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;

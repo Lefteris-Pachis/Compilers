@@ -311,6 +311,7 @@ void Print_Hash(SymTable_T oSymTable)
 					printf(" | Name = %s ", parse->name);
 					printf(" | Scope = %d ", parse->scope);
 					printf(" | Hidden = %d |\n",parse->hiden);
+					printf(" | Offset = %d |\n",parse->offset);
 				}
 			}
 			parse = parse->next;
