@@ -96,6 +96,6 @@ expr* emit_iftableitem(expr* e);
 void checkuminus(expr* e);
 unsigned int istempexpr(expr* e);
 
-void printquads();
+void Print_Quads(void);
 static char *print_expr(expr * expression);
 #endif

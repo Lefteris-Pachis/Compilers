@@ -133,8 +133,6 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														id_val = strdup($1);
  														$$ = newexpr(var_e);
  														$$->sym = Lookup(mytable,id_val,scope_count);
- 														if($$->sym)
- 															printf("%s\n",$$->sym->name);
  													}
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
@@ -293,6 +291,6 @@ int main(int argc, char** argv){
 		Print_Hash(mytable);
 	else
 		printf("Errors occured!\n");
-	//printquads();
+	Print_Quads();
 	return 0;
 }
