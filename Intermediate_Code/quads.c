@@ -152,25 +152,25 @@ expr* newexpr(expr_t t){
 }
 
 expr* newexpr_conststring(char* s){
-	expr* e = (expr*)malloc(sizeof(expr));
+	expr* e = newexpr(conststring_e);
 	e->strConst = strdup(s);
 	return e;
 }
 
 expr* newexpr_constint(int num){
-	expr* e = (expr*)malloc(sizeof(expr));
+	expr* e = newexpr(constint_e);
 	e->intConst = num;
 	return e;
 }
 
 expr* newexpr_constdouble(double num){
-	expr* e = (expr*)malloc(sizeof(expr));
+	expr* e = newexpr(constdouble_e);
 	e->doubleConst = num;
 	return e;
 }
 
 expr* newexpr_constbool(unsigned char x){
-	expr* e = (expr*)malloc(sizeof(expr));
+	expr* e = newexpr(constbool_e);
 	e->boolConst = x;
 	return e;
 }

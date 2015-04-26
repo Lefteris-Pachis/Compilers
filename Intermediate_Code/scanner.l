@@ -34,7 +34,7 @@ comment1	"//".*
 					nt=0;
 					get=realloc(get,size+4);
 					*get_ptr++='\0';
-					yylval.strVal = strdup(yytext);
+					yylval.strVal = strdup(get);
 					return STRING;
 				}else if(c=='\\'){
 					c=input();
@@ -189,7 +189,7 @@ comment1	"//".*
 "_"					{ printf("undefined character %s in line %d\n",yytext,yylineno); }
 {id}				{ yylval.strVal = strdup(yytext); return ID; }
 {integer} 			{ yylval.intVal = atoi(yytext); return INTEGER; }
-{double} 			{ yylval.intVal = atof(yytext); return DOUBLE; }
+{double} 			{ yylval.realVal = atof(yytext); return DOUBLE; }
 {character} 		{ yylval.strVal = strdup(yytext); return CHAR; }
 {comment1} 			{}
 {space}				{}

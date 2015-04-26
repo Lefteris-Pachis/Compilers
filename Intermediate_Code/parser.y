@@ -217,27 +217,22 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 			;
 
 const:	INTEGER 	{ 	Handle_const_integer(yylineno); 
-						$$ = newexpr(constint_e);
-						$$->intConst = $1; 
+						$$ = newexpr_constint($1);
 					}
 		| DOUBLE 	{ 	Handle_const_double(yylineno);
-						$$ = newexpr(constdouble_e);
-						$$->doubleConst = $1; 	 
+						$$ = newexpr_constdouble($1);
 					}
 		| STRING 	{ 	Handle_const_string(yylineno); 
-						$$ = newexpr(conststring_e);
-						$$->strConst = strdup($1); 
+						$$ = newexpr_conststring($1);
 					}
 		| NIL 		{ 	Handle_const_nil(yylineno);
 						$$ = newexpr(nil_e);
 		 			}
 		| TRUE 		{ 	Handle_const_true(yylineno);
-						$$ = newexpr(constbool_e);
-						$$->boolConst = 't';
+						$$ = newexpr_constbool('1');
 					}
 		| FALSE 	{ 	Handle_const_false(yylineno);
-						$$ = newexpr(constbool_e);
-						$$->boolConst = 'f';
+						$$ = newexpr_constbool('0');
 					}
 		;
 
