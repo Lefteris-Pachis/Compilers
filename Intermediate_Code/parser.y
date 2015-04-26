@@ -12,8 +12,10 @@
 	int count_id = 0;
 	int prev_id_state = 0;
 	int error = 0;
+	int flag_emit=0;
 	char* id_val;
 	char* funcname = NULL;
+	expr* tmp;
 	
 	extern int yylineno;
 	extern char* yytext;
@@ -40,11 +42,14 @@
 %token IF ELSE AND NOT OR LOCAL TRUE FALSE WHILE FOR FUNCTION RETURN BREAK CONTINUE NIL
 
 %type <exprNode> expr
-%type <strVal> idlist
-%type <strVal> idlist_1
-%type <strVal> funcdef
 %type <exprNode> lvalue
 %type <exprNode> const
+%type <exprNode> term
+%type <exprNode> member		/* tableitem */
+%type <exprNode> primary
+%type <exprNode> assignexpr
+%type <exprNode> call
+%type <exprNode> objectdef	/* tablemake */
 
 %right		ASSIGN
 %left		OR
@@ -157,17 +162,32 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ Handle_term_l_parenthesis_expr_r_pa
 		| primary 									{ Handle_term_primary(yylineno); }
 		;
 
-assignexpr:	lvalue ASSIGN expr 						{ 	if(count_id > 1)
-															if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
-																tmp_state = 0;
-														count_id = 0; 
-														state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
-														if(state == -1) { error = 1; } 
-														emit(assign,$3,NULL,$1);
-													}
+
+assignexpr:	lvalue ASSIGN expr 						{ 	
+
+														if(($1->type)==tableitem_e){
+															emit(tablesetelem,$1->index,$1,$3);
+															flag_emit=1;
+														}
+														else{
+															if(count_id > 1)
+																if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
+																	tmp_state = 0;
+															count_id = 0; 
+															state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
+															if(state == -1) { error = 1; } 
+															emit(assign,tmp,NULL,$1);
+														}
+												}
 			;	
 
-primary:	lvalue 									{ Handle_primary_lvalue(yylineno); }
+primary:	lvalue 									{ Handle_primary_lvalue(yylineno); 
+														if(flag_emit!=1){
+															 tmp=emit_iftableitem($1);
+														}
+														
+
+													}
 			| call 									{ Handle_primary_call(yylineno); }
 			| objectdef 							{ Handle_primary_objectdef(yylineno); }
 			| L_PARENTHESIS funcdef R_PARENTHESIS 	{ Handle_primary_l_parenthesis_funcdef_r_parenthesis(yylineno); }
@@ -202,8 +222,23 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
 
-member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno); }
-			| lvalue L_BRACKET expr R_BRACKET 		{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); }
+member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno);
+
+															expr* tmp=emit_iftableitem($1);
+															$$ =newexpr(tableitem_e);
+															$$->sym=tmp->sym;
+															
+															$$->index=newexpr_conststring($3);
+													 }
+
+			| lvalue L_BRACKET expr R_BRACKET 		{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); 
+
+															expr* tmp=emit_iftableitem($1);
+															$$ =newexpr(tableitem_e);
+															$$->sym=tmp->sym;
+															$$->index=$3;
+
+													}
 			| call DOT ID 							{ tmp_state = 0; Handle_member_call_dot_id(yylineno); }
 			| call L_BRACKET expr R_BRACKET 		{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
