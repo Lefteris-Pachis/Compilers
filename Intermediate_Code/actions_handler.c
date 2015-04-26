@@ -105,7 +105,7 @@ expr* Handle_expr_expr_div_expr(expr* arg1,expr* arg2,int lineNo){
 	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
 		e = newexpr(constint_e);
 		e->sym = new_temp();
-		emit(mod, arg1, arg2, e);
+		emit(divv, arg1, arg2, e);
 	}
 	return e;
 }
