@@ -51,7 +51,7 @@ expr* Handle_expr_expr_plus_expr(expr* arg1,expr* arg2,int lineNo){
 	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
 		e = newexpr(constint_e);
 		e->sym = new_temp();
-		emit(mod, arg1, arg2, e);
+		emit(add, arg1, arg2, e);
 	}
 	return e;
 }
@@ -69,7 +69,7 @@ expr* Handle_expr_expr_minus_expr(expr* arg1,expr* arg2,int lineNo){
 	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
 		e = newexpr(constint_e);
 		e->sym = new_temp();
-		emit(mod, arg1, arg2, e);
+		emit(sub, arg1, arg2, e);
 	}
 	return e;
 }
@@ -87,7 +87,7 @@ expr* Handle_expr_expr_mul_expr(expr* arg1,expr* arg2,int lineNo){
 	}else if((arg1->type == constint_e) && (arg2->type == constint_e)){
 		e = newexpr(constint_e);
 		e->sym = new_temp();
-		emit(mod, arg1, arg2, e);
+		emit(mul, arg1, arg2, e);
 	}
 	return e;
 }
