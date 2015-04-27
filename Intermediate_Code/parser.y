@@ -132,10 +132,18 @@ assignexpr:	lvalue ASSIGN expr 						{
 
 														}
 														else{ 
+															if(istempname(tmp->sym->name)){
+
+																emit(assign,$1,(expr*)0,tmp);
+
+
+															}
+															else{
 															$$=newexpr(assignexpr_e);
 															$$->sym=new_temp();
 
 															emit(assign,$1,(expr*)0,$$);
+															}
 														}
 												}
 			;	
