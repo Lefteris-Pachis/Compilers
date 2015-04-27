@@ -120,7 +120,7 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_
 assignexpr:	lvalue ASSIGN expr 						{ 	
 
 														if(($1->type)==tableitem_e){
-															emit(tablesetelem,$1->index,$1,$3);
+															emit(tablesetelem,$1,$1->index,$3);
 															flag_emit=1;
 														}
 														else{
