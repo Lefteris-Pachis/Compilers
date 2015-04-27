@@ -61,6 +61,17 @@ typedef struct quad {
 	unsigned	line;
 }quad;
 
+typedef struct label_list{
+	unsigned label;
+	struct label_list *next;
+}label_list;
+
+typedef struct statement{
+	label_list *break_list;
+	label_list *cont_list;
+	struct statement *next;
+}statement;
+
 /*GLOBAL VARIABLES*/
 
 
@@ -99,6 +110,8 @@ expr* newexpr_constbool(unsigned char x);
 expr* emit_iftableitem(expr* e);
 void checkuminus(expr* e);
 unsigned int istempexpr(expr* e);
+
+label_list* label_list_insert(label_list* head,unsigned label);
 
 void Print_Quads(void);
 static char *print_expr(expr * expression);

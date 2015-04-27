@@ -296,3 +296,19 @@ static char *print_expr(expr * expression){
     	assert(0);
    	}
 }
+
+label_list* label_list_insert(label_list* head,unsigned label){
+	label_list *temp;
+	temp=(label_list *)malloc(sizeof(label_list));
+	temp->label=label;
+	if (head== NULL){
+		head=temp;
+		head->next=NULL;
+		return head;
+	}
+	else{
+		temp->next=head;
+		head=temp;
+		return head;
+	}
+}

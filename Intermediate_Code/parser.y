@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include "actions_handler.h"
 	#include "symtable.h"
-
+	#include "quads.h"
 	int yyerror(const char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
@@ -12,7 +12,8 @@
 	int count_id = 0;
 	int prev_id_state = 0;
 	int error = 0;
-	int flag_emit=0;
+	int flag_emit = 0;
+	int loopcounter = 0;
 	char* id_val;
 	char* funcname = NULL;
 	expr* tmp;
@@ -30,6 +31,7 @@
 	char *strVal;
 	struct expr *exprNode;
 	unsigned uVal;
+	struct statement *stmtVal;
 }
 
 %start program
@@ -68,6 +70,9 @@
 %type <uVal> M
 %type <uVal> forprefix
 
+%type <stmtVal> stmt
+%type <stmtVal> loopstmt
+
 
 %right		ASSIGN
 %left		OR
@@ -93,8 +98,8 @@ stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
 		| whilestmt									{ Handle_stmt_whilestmt(yylineno); }
 		| forstmt									{ Handle_stmt_forstmt(yylineno); }
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
-		| BREAK SEMICOLON 							{ Handle_stmt_break_semicolon(yylineno); }
-		| CONTINUE SEMICOLON 						{ Handle_stmt_continue_semicolon(yylineno); }
+		| BREAK SEMICOLON 							{ $$->break_list=label_list_insert($$->break_list,next_quad_label()); emit_jump(jump, 0, 0, 0, 0); Handle_stmt_break_semicolon(yylineno); }
+		| CONTINUE SEMICOLON 						{ $$->cont_list=label_list_insert($$->cont_list,next_quad_label()); emit_jump(jump, 0, 0, 0, 0); Handle_stmt_continue_semicolon(yylineno); }
 		| block										{ Handle_stmt_block(yylineno); }
 		| funcdef									{ Handle_stmt_funcdef(yylineno); }
 		| SEMICOLON 								{ Handle_stmt_semicolon(yylineno); }
@@ -340,13 +345,17 @@ ifstmt: 	ifprefix stmt 						{ Handle_ifstmt_ifprefix_stmt($1,yylineno); }
 		| 	ifprefix stmt elseprefix stmt 		{ Handle_ifstmt_ifprefix_stmt_elseprefix_stmt($1,$3,yylineno); }
 		;
 
+loopstart:	{ ++loopcounter; };
+loopend: 	{ --loopcounter; };
+loopstmt: 	loopstart stmt loopend 				{ $$ = $2; }
+
 whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 			;
 
 whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis($2,yylineno); }
 			;
 
-whilestmt:	whilestart whilecond stmt 			{ Handle_whilestmt_whilestart_whilecond_stmt($1,$2,yylineno); }
+whilestmt:	whilestart whilecond loopstmt 		{ Handle_whilestmt_whilestart_whilecond_stmt($1,$2,yylineno); }
 
 /*whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS stmt 	{ Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
 			;*/
@@ -358,7 +367,7 @@ M:			{ $$ = next_quad_label(); };
 forprefix:	FOR L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{  }
 			;
 
-forstmt: 	forprefix N elist R_PARENTHESIS N stmt N 			{  }
+forstmt: 	forprefix N elist R_PARENTHESIS N loopstmt N 			{  }
 			;
 /*forstmt:	FOR L_PARENTHESIS elist SEMICOLON expr SEMICOLON elist R_PARENTHESIS stmt { Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(yylineno); }
 			;*/
