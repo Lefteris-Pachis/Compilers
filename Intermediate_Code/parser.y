@@ -29,6 +29,7 @@
 	int intVal;
 	double realVal;
 	char *strVal;
+	struct symbol *Symbol;
 	struct expr *exprNode;
 	unsigned uVal;
 	struct statement *stmtVal;
@@ -48,7 +49,7 @@
 
 %type <strVal> idlist
 %type <strVal> idlist_1
-%type <strVal> funcdef
+%type <Symbol> funcdef
 
 %type <exprNode> expr
 %type <exprNode> lvalue
@@ -289,9 +290,14 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 								function_counter = scope_count; 
 							function_counter++; 
-							funcname = Create_Function_Id(); 
+							funcname = Create_Function_Id(); 	
 							state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(funcname ,scope_count, yylineno); 
 							if(state == -1) { error = 1; }
+							$<Symbol>$=Lookup(mytable,funcname,scope_count);
+							$<Symbol>$->iaddress=next_quad_label();
+							emit(funcstart,lvalue_expr($<Symbol>$),0,0);
+
+
 						} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
 			| FUNCTION ID 	{	if(function_counter < scope_count)
 									function_counter = scope_count;
@@ -299,6 +305,8 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 								funcname = $2; 
 								state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(funcname, scope_count, yylineno); 
 								if(state == -1) { error = 1; }
+								$<Symbol>$=Lookup(mytable,funcname,scope_count);
+
 							} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
 			;
 
@@ -395,7 +403,6 @@ int main(int argc, char** argv){
 	else
 		yyin = stdin;
 	mytable = SymTable_new();
-
 	yyparse();
 	
 	if(error == 0)

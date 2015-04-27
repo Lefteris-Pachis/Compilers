@@ -20,6 +20,13 @@ typedef enum iopcode {
 	tablegetelem,	tablesetelem
 }iopcode;
 
+typedef struct S_Stack{
+	unsigned offset;
+	struct S_Stack *next;
+	struct S_Stack *previous;
+}Stack;
+
+
 typedef enum expr_t { 
 		var_e,
 		tableitem_e,
@@ -61,6 +68,7 @@ typedef struct quad {
 	unsigned	line;
 }quad;
 
+
 typedef struct label_list{
 	unsigned label;
 	struct label_list *next;
@@ -71,6 +79,13 @@ typedef struct statement{
 	label_list *cont_list;
 	struct statement *next;
 }statement;
+
+/*push sthn stoiva*/
+void push_to_stack(unsigned offset);
+
+/*pop apo stn stoiva*/
+unsigned pop_from_stack();
+
 
 /*GLOBAL VARIABLES*/
 

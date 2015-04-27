@@ -63,6 +63,40 @@ void emit_ret(iopcode op, expr* result){
 	total++;
 }
 
+Stack *Head;
+Stack *Tail;
+
+/*push sthn stoiva*/
+void push_to_stack(unsigned offset){
+
+	Stack *tmp=malloc(sizeof(Stack));
+	Stack *tmp1=Head;
+	Stack *prev;
+	tmp->offset=offset;
+	while(tmp1->next != NULL){
+		prev=tmp1;
+		tmp1=tmp1->next;
+	}
+	tmp1->next = tmp;
+	tmp1->previous=prev;
+	Tail=tmp;
+}
+
+
+/*pop apo stn stoiva*/
+unsigned pop_from_stack(){
+	Stack *tmp=Tail;
+	if(tmp==NULL){
+		return 0;
+
+	}
+	else{
+		Tail=Tail->previous;
+		return tmp->offset; //pop
+	}
+}
+
+
 expr* emit_iftableitem(expr* e){
 	if(e->type != tableitem_e)
 		return e;
