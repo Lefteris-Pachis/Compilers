@@ -103,7 +103,7 @@ expr:	assignexpr									{ Handle_expr_assignexpr(yylineno);
 		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno);tmp =$$; }
 		| expr AND expr  							{ $$ = Handle_expr_expr_and_expr($1, $3,yylineno); }
 		| expr OR expr 								{ $$ = Handle_expr_expr_or_expr($1, $3,yylineno); }
-		| term 										{ 	Handle_expr_term(yylineno); }
+		| term 										{ $$=$1;	Handle_expr_term(yylineno); }
 		;
 
 term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
@@ -126,36 +126,41 @@ assignexpr:	lvalue ASSIGN expr 						{
 														if(state == -1) { error = 1; }
 														if(($1->type)==tableitem_e){
 															emit(tablesetelem,$1,$1->index,$3);
-															/*if(flag_emit!=1){
 																$$=emit_iftableitem($1);
 																$$->type=assignexpr_e;
-																flag_emit=0;
-															}*/
+
+															
 
 														}
 														else{ 
-															if(istempname(tmp->sym->name)){
+															if((tmp)!=NULL){
+																if(istempname(tmp->sym->name)){
 
-																emit(assign,$1,(expr*)0,tmp);
+																	emit(assign,tmp,(expr*)0,$1);
+																	
 
-
+																}
+															
+																else{
+																	emit(assign,$3,(expr*)0,$1);	
+																	$$=newexpr(assignexpr_e);
+																	$$->sym=new_temp();
+															
+																	emit(assign,$1,(expr*)0,$$);
+																}
 															}
 															else{
-																/*
-															$$=newexpr(assignexpr_e);
-															$$->sym=new_temp();
-															*/
-															emit(assign,$1,(expr*)0,$$);
+																emit(assign,$3,(expr*)0,$$);
 															}
+
 														}
-												}
+	}
 			;	
 
 primary:	lvalue 									{ Handle_primary_lvalue(yylineno); 
-															printf("----edwww--%s",$1->sym->name);
 															tmp=emit_iftableitem($1);
-															flag_emit=1;
-														
+
+
 
 													}
 			| call 									{ Handle_primary_call(yylineno); }
@@ -178,9 +183,11 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														}
  														$$ = lvalue_expr($$->sym);
  													}
-			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
+			| LOCAL ID 								{ 	
+														state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
+
  														$$->sym = Lookup(mytable,id_val,scope_count);
  														$$ = lvalue_expr($$->sym);
 													}
@@ -342,7 +349,7 @@ int main(int argc, char** argv){
 	yyparse();
 	
 	if(error == 0)
-		Print_Hash(mytable);
+ies		Print_Hash(mytable);
 	else
 		printf("Errors occured!\n");
 	Print_Quads();

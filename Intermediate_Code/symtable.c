@@ -242,7 +242,6 @@ void Hide(SymTable_T oSymTable, int scope)
 
 symbol Lookup(SymTable_T oSymTable, const char *name ,  int scope)
 {
-	
 	int hashcode=SymTable_hash(name);
 	symbol parse=oSymTable->hashtable[hashcode];
 
