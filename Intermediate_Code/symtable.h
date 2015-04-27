@@ -30,6 +30,7 @@ typedef struct symbol{
 	char*			name;
 	scopespace_t	space;
 	unsigned		offset;
+	unsigned        iaddress;
 	A_list args;
 
 	unsigned scope;
