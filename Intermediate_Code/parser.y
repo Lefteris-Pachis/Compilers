@@ -118,18 +118,17 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_
 
 
 assignexpr:	lvalue ASSIGN expr 						{ 	
-
+														if(count_id > 1)
+															if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
+																tmp_state = 0;
+														count_id = 0; 
+														state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
+														if(state == -1) { error = 1; }
 														if(($1->type)==tableitem_e){
 															emit(tablesetelem,$1,$1->index,$3);
 															flag_emit=1;
 														}
-														else{
-															if(count_id > 1)
-																if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
-																	tmp_state = 0;
-															count_id = 0; 
-															state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
-															if(state == -1) { error = 1; } 
+														else{ 
 															emit(assign,tmp,NULL,$1);
 														}
 												}
