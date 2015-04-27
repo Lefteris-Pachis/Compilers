@@ -380,7 +380,7 @@ int Handle_lvalue_local_id(char* name, int scope, int lineNo){
 	printf("Line: %d \tlvalue: local id\n", lineNo);
 	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp == NULL){
-		if(scope > 0){
+		if(scope >= 0){
 			Insert_to_Hash(mytable, name, var_s , scope, lineNo);
 			IncCurrScopeOffset();
 		}
@@ -543,24 +543,66 @@ void Handle_idlist_1_comma_idlist(int lineNo){
 	printf("Line: %d \tidlist_1: ,idlist\n", lineNo);
 }
 
-void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
+/*void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
 	printf("Line: %d \tifstmt: if (expr) stmt\n", lineNo);
 }
 void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(int lineNo){
 	printf("Line: %d \tifstmt: if (expr) stmt else stmt\n", lineNo);
+}*/
+void Handle_ifstmt_ifprefix_stmt(unsigned quadnum,int lineNo){
+	printf("Line: %d \tifstmt: ifprefix stmt\n", lineNo);
+	patchlabel(quadnum,next_quad_label());
+}
+void Handle_ifstmt_ifprefix_stmt_elseprefix_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo){
+	printf("Line: %d \tifstmt: ifprefix stmt elseprefix stmt\n", lineNo);
+	patchlabel(quadnum1,quadnum2+1);
+	patchlabel(quadnum2,next_quad_label());
+}
+unsigned Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo){
+	printf("Line: %d \tifprefix: if (expr)\n", lineNo);
+	emit_jump(if_eq, newexpr_constbool('1'), expr, 0, next_quad_label()+2);
+	unsigned ret = next_quad_label();
+	emit_jump(jump, 0, 0, 0, 0);
+	return ret;
+}
+unsigned Handle_elseprefix_else(int lineNo){
+	printf("Line: %d \telseprefix: else\n", lineNo);
+	unsigned ret = next_quad_label();
+	emit_jump(jump, 0, 0, 0, 0);
+	return ret;
 }
 
-void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
+/*void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
 	printf("Line: %d \twhilestmt: while (expr) stmt\n", lineNo);
+}*/
+unsigned Handle_whilestart_while(int lineNo){
+	printf("Line: %d \twhilestart: while\n", lineNo);
+	return next_quad_label();
+}
+unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo){
+	printf("Line: %d \twhilecond: (expr)\n", lineNo);
+	emit_jump(if_eq,newexpr_constbool('1'),expr,0,next_quad_label()+2);
+	unsigned ret = next_quad_label();
+	emit_jump(jump, 0, 0, 0, 0);
+	return ret;
+}
+void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo){
+	printf("Line: %d \twhilestmt: whilestart whilecond stmt\n", lineNo);
+	emit_jump(jump, 0, 0, 0, quadnum1);
+	patchlabel(quadnum2,next_quad_label());
+	//patchlabel($stmt.breaklist,next_quad_label());
+	//patchlabel($stmt.contlist,quadnum1);
 }
 
 void Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(int lineNo){
 	printf("Line: %d \tforstmt: for (elist; expr; elist) stmt\n", lineNo);
 }
 
-void Handle_returnstmt_return_expr_semicolon(int lineNo){
+void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo){
 	printf("Line: %d \treturnstmt: return expr;\n", lineNo);
+	emit_ret(ret,expr);
 }
 void Handle_returnstmt_return_semicolon(int lineNo){
 	printf("Line: %d \treturnstmt: return;\n", lineNo);
+	emit_ret(ret,newexpr(nil_e));
 }

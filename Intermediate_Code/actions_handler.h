@@ -92,14 +92,21 @@ void Handle_const_false(int lineNo);
 int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lineNo);
 void Handle_idlist_1_comma_idlist(int lineNo);
 
-void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
-void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(int lineNo);
+//void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
+//void Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(int lineNo);
+void Handle_ifstmt_ifprefix_stmt(unsigned quadnum,int lineNo);
+void Handle_ifstmt_ifprefix_stmt_elseprefix_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo);
+unsigned Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo);
+unsigned Handle_elseprefix_else(int lineNo);
 
-void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
+//void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
+unsigned Handle_whilestart_while(int lineNo);
+unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo);
+void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo);
 
 void Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(int lineNo);
 
-void Handle_returnstmt_return_expr_semicolon(int lineNo);
+void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo);
 void Handle_returnstmt_return_semicolon(int lineNo);
 
 #endif

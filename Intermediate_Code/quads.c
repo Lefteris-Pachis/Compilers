@@ -52,6 +52,17 @@ void emit_jump(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label)
 	total++;
 }
 
+void emit_ret(iopcode op, expr* result){
+	if (currQuad == total) 
+		expand();
+	quad* p 	= quads + currQuad++;
+	p->op 		= op;
+	p->result 	= result;
+	p->label 	= currQuad;
+	p->line 	= yylineno;
+	total++;
+}
+
 expr* emit_iftableitem(expr* e){
 	if(e->type != tableitem_e)
 		return e;
@@ -65,6 +76,11 @@ expr* emit_iftableitem(expr* e){
 
 unsigned next_quad_label(){
 	return currQuad+1;
+}
+
+void patchlabel (unsigned quadnum, unsigned label){
+	assert(quadnum-1 < currQuad);
+	quads[quadnum-1].label = label;
 }
 
 /*TEMP VARIABLES FUNCTIONS*/

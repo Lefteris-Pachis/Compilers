@@ -29,6 +29,7 @@
 	double realVal;
 	char *strVal;
 	struct expr *exprNode;
+	unsigned uVal;
 }
 
 %start program
@@ -56,6 +57,17 @@
 %type <exprNode> assignexpr
 %type <exprNode> call
 %type <exprNode> objectdef	/* tablemake */
+
+%type <uVal> ifprefix
+%type <uVal> elseprefix
+
+%type <uVal> whilestart
+%type <uVal> whilecond
+
+%type <uVal> N
+%type <uVal> M
+%type <uVal> forprefix
+
 
 %right		ASSIGN
 %left		OR
@@ -178,14 +190,18 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
+														$$ = malloc(sizeof(expr*));
  														$$->sym = Lookup(mytable,id_val,scope_count);
- 														$$ = lvalue_expr($$->sym);
+ 														if($$->sym)
+ 															$$ = lvalue_expr($$->sym);
 													}
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
+														$$ = malloc(sizeof(expr*));
  														$$->sym = Lookup(mytable,id_val,0);
- 														$$ = lvalue_expr($$->sym);
+ 														if($$->sym)
+ 															$$ = lvalue_expr($$->sym);
 													}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
@@ -302,17 +318,43 @@ idlist_1: 	COMMA idlist 	{ Handle_idlist_1_comma_idlist(yylineno); }
 			| 				{  }
 			;
 
-ifstmt:	IF L_PARENTHESIS expr R_PARENTHESIS stmt 			{ Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
-		|IF L_PARENTHESIS expr R_PARENTHESIS stmt ELSE stmt { Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(yylineno); }
+//ifstmt:	IF L_PARENTHESIS expr R_PARENTHESIS stmt 			{ Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
+//		|IF L_PARENTHESIS expr R_PARENTHESIS stmt ELSE stmt { Handle_ifstmt_if_l_parenthesis_expr_r_parenthesis_stmt_else_stmt(yylineno); }
+//		;
+ifprefix: 	IF L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis($3,yylineno); }
+			;
+
+elseprefix: ELSE 									{ $$ = Handle_elseprefix_else(yylineno); }
+			;
+
+ifstmt: 	ifprefix stmt 						{ Handle_ifstmt_ifprefix_stmt($1,yylineno); }
+		| 	ifprefix stmt elseprefix stmt 		{ Handle_ifstmt_ifprefix_stmt_elseprefix_stmt($1,$3,yylineno); }
 		;
 
-whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS stmt 	{ Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
+whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 			;
 
-forstmt:	FOR L_PARENTHESIS elist SEMICOLON expr SEMICOLON elist R_PARENTHESIS stmt { Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(yylineno); }
+whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis($2,yylineno); }
 			;
 
-returnstmt:	RETURN expr SEMICOLON 	{ Handle_returnstmt_return_expr_semicolon(yylineno); }
+whilestmt:	whilestart whilecond stmt 			{ Handle_whilestmt_whilestart_whilecond_stmt($1,$2,yylineno); }
+
+/*whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS stmt 	{ Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
+			;*/
+
+
+N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };
+M:			{ $$ = next_quad_label(); };
+
+forprefix:	FOR L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{  }
+			;
+
+forstmt: 	forprefix N elist R_PARENTHESIS N stmt N 			{  }
+			;
+/*forstmt:	FOR L_PARENTHESIS elist SEMICOLON expr SEMICOLON elist R_PARENTHESIS stmt { Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(yylineno); }
+			;*/
+
+returnstmt:	RETURN expr SEMICOLON 	{ Handle_returnstmt_return_expr_semicolon($2,yylineno); }
 			|RETURN SEMICOLON 		{ Handle_returnstmt_return_semicolon(yylineno); }
 			;
 

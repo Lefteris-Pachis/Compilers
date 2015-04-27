@@ -70,7 +70,9 @@ typedef struct quad {
 void expand(void);
 void emit(iopcode op, expr* arg1, expr* arg2, expr* result);
 void emit_jump(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned label);
+void emit_ret(iopcode op, expr* result);
 unsigned next_quad_label();
+void patchlabel (unsigned quadnum, unsigned label);
 
 /*TEMP VARIABLES FUNCTIONS*/
 char* new_temp_name();
