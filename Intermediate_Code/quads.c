@@ -86,10 +86,9 @@ symbol new_temp(){
 	char* name = new_temp_name();
 	Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
 	symbol sym = Lookup(mytable,name,scope_count);
-	if(sym){
-		printf("%s\n", sym->name);
+	if(sym)
 		return sym;
-	}else
+	else
 		return NULL;
 }
 

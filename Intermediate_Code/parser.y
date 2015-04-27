@@ -155,24 +155,24 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state < -1) { tmp_state = state; } else { tmp_state = 0; } 
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
- 														$$ = newexpr(var_e);
  														int i = scope_count;
  														while(!$$->sym){
  															$$->sym = Lookup(mytable,id_val,i);
  															i--;
  														}
+ 														$$ = lvalue_expr($$->sym);
  													}
 			| LOCAL ID 								{ 	state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
-														$$ = newexpr(var_e);
  														$$->sym = Lookup(mytable,id_val,scope_count);
+ 														$$ = lvalue_expr($$->sym);
 													}
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
-														$$ = newexpr(var_e);
- 														$$->sym = Lookup(mytable,id_val,scope_count);
+ 														$$->sym = Lookup(mytable,id_val,0);
+ 														$$ = lvalue_expr($$->sym);
 													}
 			| member 								{ Handle_lvalue_member(yylineno); }
 			;
