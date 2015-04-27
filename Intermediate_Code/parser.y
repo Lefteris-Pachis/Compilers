@@ -127,9 +127,15 @@ assignexpr:	lvalue ASSIGN expr 						{
 														if(($1->type)==tableitem_e){
 															emit(tablesetelem,$1,$1->index,$3);
 															flag_emit=1;
+															$$=emit_iftableitem($1);
+															$$->type=assignexpr_e;
+
 														}
 														else{ 
-															emit(assign,tmp,NULL,$1);
+															$$=newexpr(assignexpr_e);
+															$$->sym=new_temp();
+
+															emit(assign,$1,(expr*)0,$$);
 														}
 												}
 			;	
