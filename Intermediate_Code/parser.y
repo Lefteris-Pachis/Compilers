@@ -126,9 +126,11 @@ assignexpr:	lvalue ASSIGN expr 						{
 														if(state == -1) { error = 1; }
 														if(($1->type)==tableitem_e){
 															emit(tablesetelem,$1,$1->index,$3);
-															flag_emit=1;
-															$$=emit_iftableitem($1);
-															$$->type=assignexpr_e;
+															/*if(flag_emit!=1){
+																$$=emit_iftableitem($1);
+																$$->type=assignexpr_e;
+																flag_emit=0;
+															}*/
 
 														}
 														else{ 
@@ -139,9 +141,10 @@ assignexpr:	lvalue ASSIGN expr 						{
 
 															}
 															else{
+																/*
 															$$=newexpr(assignexpr_e);
 															$$->sym=new_temp();
-
+															*/
 															emit(assign,$1,(expr*)0,$$);
 															}
 														}
@@ -149,9 +152,9 @@ assignexpr:	lvalue ASSIGN expr 						{
 			;	
 
 primary:	lvalue 									{ Handle_primary_lvalue(yylineno); 
-														if(flag_emit!=1){
-															 tmp=emit_iftableitem($1);
-														}
+															printf("----edwww--%s",$1->sym->name);
+															tmp=emit_iftableitem($1);
+															flag_emit=1;
 														
 
 													}
