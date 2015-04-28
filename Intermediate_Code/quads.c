@@ -434,6 +434,7 @@ label_list* merge(label_list* list1, label_list* list2) {
     list2->next = merge(list2->next, list1);
     return list2;
   }
+}
 
 /* call functions */
 
