@@ -476,6 +476,7 @@ void Handle_block_1_stmt_block_1(int lineNo){
 
 int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
+	
 	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->type == programfunc_s){
@@ -530,6 +531,7 @@ int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lin
 	tmp = Lookup(mytable,functionName, scope - 1);
 	if(tmp != NULL)
 		tmp->args = Insert_args(tmp, name);
+	
 	tmp = Lookup(mytable,name, scope);
 	if(tmp != NULL){
 		printf("Error at line: %d name of formal argumet is already declared\n",lineNo);
