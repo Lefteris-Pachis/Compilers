@@ -102,7 +102,7 @@ unsigned Handle_elseprefix_else(int lineNo);
 //void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo);
 unsigned Handle_whilestart_while(int lineNo);
 unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo);
-void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo);
+void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,int lineNo);
 
 void Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(int lineNo);
 

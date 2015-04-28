@@ -14,9 +14,11 @@
 	int error = 0;
 	int flag_emit = 0;
 	int loopcounter = 0;
+	int assign_counter = 0;
 	char* id_val;
 	char* funcname = NULL;
 	expr* tmp;
+	label_list* break_list;
 	
 	extern int yylineno;
 	extern char* yytext;
@@ -72,7 +74,11 @@
 %type <uVal> forprefix
 
 %type <stmtVal> stmt
+%type <stmtVal> stmts
 %type <stmtVal> loopstmt
+%type <stmtVal> whilestmt
+%type <stmtVal> break
+%type <stmtVal> continue
 
 
 %right		ASSIGN
@@ -89,25 +95,55 @@
 %left 		ELSE
 %%
 
-program:	stmt program
+program:	stmts program
 		|/* empty */
 		;
 
+stmts: 	stmt {$$ = $1;}
+		| stmts stmt 		{
+								//printf("WTF\n"); 
+								//$$->break_list = merge($1->break_list,$2->break_list);
+								//$$->cont_list = merge($1->cont_list,$2->cont_list);
+						 	};
 
-stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); }
+
+break: 		BREAK SEMICOLON 						{ 	
+														if(loopcounter > 0){
+															//$$->break_list=new_label_list(break_list,next_quad_label());
+															//printf("sssssssss%d\n",$$->break_list->label);
+															//emit_jump(jump, 0, 0, 0, 0); 
+															Handle_stmt_break_semicolon(yylineno);
+														}else{
+															printf("Error at line: %d break is not in a loop\n",yylineno);
+															error = 1;
+														} 
+													};
+continue:	CONTINUE SEMICOLON 						{ 	
+														if(loopcounter > 0){
+														//$$->cont_list=new_label_list($$->cont_list,next_quad_label()); 
+														//emit_jump(jump, 0, 0, 0, 0); 
+														//Handle_stmt_continue_semicolon(yylineno); 
+														}else{
+															printf("Error at line: %d continue is not in a loop\n",yylineno);
+															error = 1;
+														}
+													};
+
+stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;}
 		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
 		| whilestmt									{ Handle_stmt_whilestmt(yylineno); }
 		| forstmt									{ Handle_stmt_forstmt(yylineno); }
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
-		| BREAK SEMICOLON 							{ $$->break_list=label_list_insert($$->break_list,next_quad_label()); emit_jump(jump, 0, 0, 0, 0); Handle_stmt_break_semicolon(yylineno); }
-		| CONTINUE SEMICOLON 						{ $$->cont_list=label_list_insert($$->cont_list,next_quad_label()); emit_jump(jump, 0, 0, 0, 0); Handle_stmt_continue_semicolon(yylineno); }
+		| break 									{$$ = $1;}
+		| continue 									{$$ = $1;}
 		| block										{ Handle_stmt_block(yylineno); }
 		| funcdef									{ Handle_stmt_funcdef(yylineno); }
 		| SEMICOLON 								{ Handle_stmt_semicolon(yylineno); }
 		;
 
 expr:	assignexpr									{ Handle_expr_assignexpr(yylineno);
-													$$=$1; }
+													$$=$1;
+													 }
 		| expr PLUS expr 							{ $$ = Handle_expr_expr_plus_expr($1, $3, yylineno); }
 		| expr MINUS expr 							{ $$ = Handle_expr_expr_minus_expr($1, $3, yylineno); }
 		| expr MUL expr 							{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
@@ -128,7 +164,7 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_
 		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
 		| NOT expr 									{ Handle_term_not_expr(yylineno); }
 		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
-		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
+		| lvalue PLUS_PLUS							{ $$ = $1; state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
 		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| primary 									{ $$ = $1; Handle_term_primary(yylineno); }
@@ -136,6 +172,7 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_
 
 
 assignexpr:	lvalue ASSIGN expr 						{ 	
+														assign_counter++;
 														if(count_id > 1)
 															if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
 																tmp_state = 0;
@@ -160,11 +197,15 @@ assignexpr:	lvalue ASSIGN expr 						{
 																}
 															
 																else{
+																
 																	emit(assign,$3,(expr*)0,$1);	
-																	$$=newexpr(assignexpr_e);
-																	$$->sym=new_temp();
-															
-																	emit(assign,$1,(expr*)0,$$);
+																	
+																	if(assign_counter > 1){
+																		$$=newexpr(assignexpr_e);
+																		$$->sym=new_temp();
+																		
+																		emit(assign,$1,(expr*)0,$$);
+																	}
 																}
 															}
 															else{
@@ -195,6 +236,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
  														int i = scope_count;
+ 														$$ = malloc(sizeof(expr*));
  														while(!$$->sym){
  															$$->sym = Lookup(mytable,id_val,i);
  															i--;
@@ -363,7 +405,7 @@ whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis($2,yylineno); }
 			;
 
-whilestmt:	whilestart whilecond loopstmt 		{ Handle_whilestmt_whilestart_whilecond_stmt($1,$2,yylineno); }
+whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,yylineno); }
 
 /*whilestmt:	WHILE L_PARENTHESIS expr R_PARENTHESIS stmt 	{ Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(yylineno); }
 			;*/

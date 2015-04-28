@@ -1,2 +1,9 @@
-x = p[a+b];
-y = q.a = x;
+while(x-y>z-w){
+	if(b){
+		break;
+	}else{
+		x = x-z;
+	}
+}
+x;
+y;

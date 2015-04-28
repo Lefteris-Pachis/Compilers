@@ -586,12 +586,16 @@ unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo
 	emit_jump(jump, 0, 0, 0, 0);
 	return ret;
 }
-void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo){
+void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,int lineNo){
 	printf("Line: %d \twhilestmt: whilestart whilecond stmt\n", lineNo);
 	emit_jump(jump, 0, 0, 0, quadnum1);
 	patchlabel(quadnum2,next_quad_label());
-	//patchlabel($stmt.breaklist,next_quad_label());
-	//patchlabel($stmt.contlist,quadnum1);
+	struct statement *tmp = stmt;
+	//while(tmp->break_list->label != 0){
+	//	patchlabel(tmp->break_list->label,next_quad_label());
+	//	patchlabel(tmp->cont_list->label,quadnum1);
+	//	tmp->break_list = tmp->break_list->next;
+	//}
 }
 
 void Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(int lineNo){

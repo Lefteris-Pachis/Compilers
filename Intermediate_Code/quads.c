@@ -14,6 +14,7 @@ unsigned 		functionLocalOffset = 0;
 unsigned 		formalArgOffset = 0;
 unsigned 		scopeSpaceCounter = 1;
 
+
 /*QUADS FUNCTIONS*/
 void expand(void){
 	assert(total == currQuad);
@@ -331,7 +332,7 @@ static char *print_expr(expr * expression){
    	}
 }
 
-label_list* label_list_insert(label_list* head,unsigned label){
+label_list* new_label_list(label_list* head,unsigned label){
 	label_list *temp;
 	temp=(label_list *)malloc(sizeof(label_list));
 	temp->label=label;
@@ -345,4 +346,17 @@ label_list* label_list_insert(label_list* head,unsigned label){
 		head=temp;
 		return head;
 	}
+}
+
+label_list* merge(label_list* list1, label_list* list2) {
+  if (list1 == NULL) return list2;
+  if (list2 == NULL) return list1;
+
+  if (list1->label < list2->label) {
+    list1->next = merge(list1->next, list2);
+    return list1;
+  } else {
+    list2->next = merge(list2->next, list1);
+    return list2;
+  }
 }
