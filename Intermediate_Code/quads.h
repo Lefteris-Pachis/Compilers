@@ -92,6 +92,7 @@ typedef struct statement{
 	struct statement *next;
 }statement;
 
+
 /*push sthn stoiva pou krataei ta offset*/
 void push_to_stack(scopespace_t offset);
 
@@ -104,6 +105,24 @@ scopespace_t pop_from_stack();
 /*pop apo stn stoiva gia onomata synarthsewn*/
 char* pop_from_fuction_names_stack();
 
+typedef struct elist_l{
+	expr*	 		arg;
+	struct elist_l* next;
+}elist_l;
+
+typedef struct calls{
+	elist_l* 		elist;
+	unsigned 		method;
+	char* 			name;
+}calls;
+
+
+expr* member_item(expr* lval, char* name);
+
+/*push sthn stoiva*/
+void push_to_stack(unsigned offset);
+
+
 /*pop apo stn stoiva*/
 scopespace_t pop_from_stack();
 
@@ -111,7 +130,19 @@ void resetformalargsoffset(void);
 
 void resetfuctionlocalsoffset(void);
 
+
 void restorecurrscopeoffset(unsigned n);
+
+/* CALL FUNCTIONS */
+
+expr* make_call(expr *lval, elist_l* elist);
+
+/* push sta elist args */
+void push_elist(expr* elist, elist_l* top);
+
+/* pop apo lista args */
+expr* pop_elist(elist_l* head);
+
 
 /*GLOBAL VARIABLES*/
 
