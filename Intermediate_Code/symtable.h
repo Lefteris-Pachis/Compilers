@@ -28,6 +28,7 @@ struct Args *tail;
 typedef struct symbol{
 	symbol_t 		type;
 	char*			name;
+	int 			totallocals;
 	scopespace_t	space;
 	unsigned		offset;
 	unsigned        iaddress;

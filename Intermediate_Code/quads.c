@@ -63,28 +63,81 @@ void emit_ret(iopcode op, expr* result){
 	total++;
 }
 
-Stack *Head;
-Stack *Tail;
+
 
 /*push sthn stoiva*/
-void push_to_stack(unsigned offset){
+void push_to_stack(scopespace_t offset){
 
 	Stack *tmp=malloc(sizeof(Stack));
 	Stack *tmp1=Head;
 	Stack *prev;
 	tmp->offset=offset;
-	while(tmp1->next != NULL){
-		prev=tmp1;
-		tmp1=tmp1->next;
+	if(Head!=NULL){
+		while((tmp1->next) != NULL){
+			prev=tmp1;
+			tmp1=tmp1->next;
+		}
+		prev->next = tmp;
+		tmp->previous=prev;
+		Tail=tmp;
+		return;
+
+
 	}
-	tmp1->next = tmp;
-	tmp1->previous=prev;
-	Tail=tmp;
+	if (prev==NULL){
+		tmp->previous=NULL;
+		tmp->next=NULL;
+		Head=tmp;
+		Tail=Head;
+		return;
+	}
+}
+
+/*push sthn stoiva pou krataei ta onomata twn synarthsewn*/
+void push_to_fuction_names_stack(char* name){
+	
+	func_name_stack *tmp=malloc(sizeof(func_name_stack));
+	func_name_stack *tmp1=Head_f;
+	func_name_stack *prev;
+	tmp->name=name;
+	if(Head_f!=NULL){
+		while((tmp1->next) != NULL){
+			prev=tmp1;
+			tmp1=tmp1->next;
+		}
+		prev->next = tmp;
+		tmp->previous=prev;
+		Tail_f=tmp;
+		return;
+
+
+	}
+	if (prev==NULL){
+		tmp->previous=NULL;
+		tmp->next=NULL;
+		Head_f=tmp;
+		Tail_f=Head_f;
+		return;
+	}
+}
+
+/*pop apo stn stoiva gia onomata synarthsewn*/
+char* pop_from_fuction_names_stack(){
+
+	func_name_stack *tmp=Tail_f;
+	if(tmp==NULL){
+		return NULL;
+
+	}
+	else{
+		Tail_f=Tail_f->previous;
+		return tmp->name; //pop
+	}
 }
 
 
 /*pop apo stn stoiva*/
-unsigned pop_from_stack(){
+scopespace_t pop_from_stack(){
 	Stack *tmp=Tail;
 	if(tmp==NULL){
 		return 0;
@@ -144,6 +197,27 @@ symbol new_temp(){
 
 unsigned int istempname(char* s){
 	return *s == '_';
+}
+
+void restorecurrscopeoffset(unsigned n){
+
+	switch(CurrScopeSpace()){
+		case programVar     :programVarOffset=n; break;
+		case functionLocal  :functionLocalOffset=n; break;
+		case formalArg      :formalArgOffset=n;break;
+		default				:assert(0);
+	}
+}
+
+void resetformalargsoffset(void){
+
+	formalArgOffset=0;
+
+}
+void resetfuctionlocalsoffset(void){
+
+	functionLocalOffset=0;
+
 }
 
 /*SCOPE SPACE FUNCTIONS*/

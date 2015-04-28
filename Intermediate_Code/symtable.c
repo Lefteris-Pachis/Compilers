@@ -7,7 +7,6 @@ int SymTable_hash(const char *str)
     int c;
     int sum=0;
     int hash;
-
     while (c = *str++)
     	sum = sum+c;
     hash = sum%BUCKETS;
@@ -240,8 +239,10 @@ void Hide(SymTable_T oSymTable, int scope)
 	}
 }
 
-symbol Lookup(SymTable_T oSymTable, const char *name ,  int scope)
-{
+symbol Lookup
+
+(SymTable_T oSymTable, const char *name ,  int scope)
+{	
 	int hashcode=SymTable_hash(name);
 	symbol parse=oSymTable->hashtable[hashcode];
 

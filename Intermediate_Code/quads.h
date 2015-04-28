@@ -26,6 +26,18 @@ typedef struct S_Stack{
 	struct S_Stack *previous;
 }Stack;
 
+/*struct gia na kratame sthn stoiva ta onomata twn nested functions*/
+typedef struct func_name{
+	char* name;
+	struct func_name *next;
+	struct func_name *previous;
+}func_name_stack;
+
+Stack *Head;
+Stack *Tail;
+func_name_stack *Head_f;
+func_name_stack	*Tail_f;
+
 
 typedef enum expr_t { 
 		var_e,
@@ -80,12 +92,26 @@ typedef struct statement{
 	struct statement *next;
 }statement;
 
-/*push sthn stoiva*/
-void push_to_stack(unsigned offset);
+/*push sthn stoiva pou krataei ta offset*/
+void push_to_stack(scopespace_t offset);
+
+/*push sthn stoiva pou krataei ta onomata twn synarthsewn*/
+void push_to_fuction_names_stack(char* name);
+
+/*pop apo stn stoiva gia offset*/
+scopespace_t pop_from_stack();
+
+/*pop apo stn stoiva gia onomata synarthsewn*/
+char* pop_from_fuction_names_stack();
 
 /*pop apo stn stoiva*/
-unsigned pop_from_stack();
+scopespace_t pop_from_stack();
 
+void resetformalargsoffset(void);
+
+void resetfuctionlocalsoffset(void);
+
+void restorecurrscopeoffset(unsigned n);
 
 /*GLOBAL VARIABLES*/
 

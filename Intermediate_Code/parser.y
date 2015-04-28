@@ -15,7 +15,7 @@
 	int flag_emit = 0;
 	int loopcounter = 0;
 	char* id_val;
-	char* funcname = NULL;
+	char* funcName = NULL;
 	expr* tmp;
 	
 	extern int yylineno;
@@ -49,6 +49,9 @@
 
 %type <strVal> idlist
 %type <strVal> idlist_1
+%type <strVal> funcname
+%type <intVal> funcbody
+%type <Symbol> funcprefix
 %type <Symbol> funcdef
 
 %type <exprNode> expr
@@ -194,6 +197,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state < -1) { tmp_state = state; } else { tmp_state = 0; } 
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
+ 														$$ = malloc(sizeof(expr*));
  														int i = scope_count;
  														while(!$$->sym){
  															$$->sym = Lookup(mytable,id_val,i);
@@ -287,7 +291,75 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			| 				{  }
 			;
 
-funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
+
+funcname:	ID{		$$=$1;						push_to_fuction_names_stack($$);	}		
+			| 	{$$=Create_Function_Id(); 		push_to_fuction_names_stack($$); 	}
+			;
+
+funcprefix: FUNCTION funcname {	
+								if(function_counter < scope_count)
+								function_counter = scope_count; 
+								function_counter++; 
+								funcName=$2;
+
+								if(istempname($2)){
+									state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block($2 ,scope_count, yylineno); 
+								}
+								else{
+
+									state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, scope_count, yylineno); 
+								}
+
+								if(state == -1) { error = 1; }
+								//printf("---------scope_count%d-------------",scope_count);
+								$<Symbol>$=Lookup(mytable,$2,scope_count);
+								$<Symbol>$->iaddress=next_quad_label();
+								struct expr * tmp1;
+								tmp1 = malloc(sizeof(expr*));
+								tmp1->sym=$<Symbol>$;	
+								emit(funcstart,lvalue_expr($<Symbol>$),0,tmp1);
+								push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
+								EnterScopeSpace();
+								resetformalargsoffset();
+											}								
+			;
+
+
+funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS {;EnterScopeSpace(); scope_count--;  resetfuctionlocalsoffset();}
+			;
+
+
+funcbody:  block { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
+			;
+
+funcdef:  funcprefix funcargs funcbody  {	
+											struct expr * tmp1;
+											char *tmp_name;
+											tmp1 = malloc(sizeof(expr*));
+											ExitScopeSpace();
+											$1->totallocals=$3;
+											unsigned old_offset=pop_from_stack();
+											printf("----Offset=%d",old_offset);
+											restorecurrscopeoffset(old_offset);
+											$$=$1;
+											tmp_name=pop_from_fuction_names_stack();
+											if(tmp_name!=NULL){
+												funcName=tmp_name;
+												printf("!!!!!! NAME !!!!!!!:   %s",funcName);
+											}
+											printf("!!!!!! NAME !!!!!!!:   %s",funcName);
+											struct symbol * tmp=Lookup(mytable,funcName,scope_count);
+											printf("Scope%d\t\n",scope_count);
+											if(tmp!=NULL){
+												printf("Onoma%s\t%d\n",tmp->name,scope_count);
+											}
+											tmp1->sym=tmp;
+											emit(funcend,lvalue_expr($1),0,tmp1);
+
+										}
+			;
+
+/*funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 								function_counter = scope_count; 
 							function_counter++; 
 							funcname = Create_Function_Id(); 	
@@ -296,9 +368,13 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 							$<Symbol>$=Lookup(mytable,funcname,scope_count);
 							$<Symbol>$->iaddress=next_quad_label();
 							emit(funcstart,lvalue_expr($<Symbol>$),0,0);
+							push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
+							EnterScopeSpace();
+							resetformalargsoffset();
 
 
-						} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
+
+						} L_PARENTHESIS { EnterScopeSpace(); scope_count++; resetfuctionlocalsoffset()} idlist R_PARENTHESIS { scope_count--; $$=Current_Scope_offset(); ExitScopeSpace();  } block { ExitScopeSpace(); function_counter--; }
 			| FUNCTION ID 	{	if(function_counter < scope_count)
 									function_counter = scope_count;
 								function_counter++; 
@@ -307,8 +383,8 @@ funcdef: 	FUNCTION 	{ 	if(function_counter < scope_count)
 								if(state == -1) { error = 1; }
 								$<Symbol>$=Lookup(mytable,funcname,scope_count);
 
-							} L_PARENTHESIS { EnterScopeSpace(); scope_count++; } idlist R_PARENTHESIS { scope_count--; ExitScopeSpace(); } block { function_counter--; }
-			;
+							} L_PARENTHESIS { EnterScopeSpace(); scope_count++; resetfuctionlocalsoffset()} idlist R_PARENTHESIS { scope_count--; $$=Current_Scope_offset(); ExitScopeSpace();  } block { function_counter--; }
+			;*/
 
 const:	INTEGER 	{ 	Handle_const_integer(yylineno); 
 						$$ = newexpr_constint($1);
@@ -330,13 +406,16 @@ const:	INTEGER 	{ 	Handle_const_integer(yylineno);
 					}
 		;
 
-idlist: ID idlist_1 	{	state = Handle_idlist_id_idlist_1($1,funcname,scope_count,yylineno); 
+idlist: ID idlist_1 	{	//printf("$$$333");
+							state = Handle_idlist_id_idlist_1($1,funcName,scope_count,yylineno); 
 							if(state == -1) { error = 1; }
+							//printf("$$$333_ENd");
+
 						}
 		|				{  }
 		;
 
-idlist_1: 	COMMA idlist 	{ Handle_idlist_1_comma_idlist(yylineno); }
+idlist_1: 	COMMA idlist 	{ ;Handle_idlist_1_comma_idlist(yylineno); }
 			| 				{  }
 			;
 
@@ -409,6 +488,6 @@ int main(int argc, char** argv){
 		Print_Hash(mytable);
 	else
 		printf("Errors occured!\n");
-	Print_Quads();
+	Print_Quads();	
 	return 0;
 }
