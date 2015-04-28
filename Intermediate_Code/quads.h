@@ -80,12 +80,35 @@ typedef struct statement{
 	struct statement *next;
 }statement;
 
+typedef struct elist_l{
+	expr*	 		arg;
+	struct elist_l* next;
+}elist_l;
+
+typedef struct calls{
+	elist_l* 		elist;
+	unsigned 		method;
+	char* 			name;
+}calls;
+
+
+expr* member_item(expr* lval, char* name);
+
 /*push sthn stoiva*/
 void push_to_stack(unsigned offset);
 
 /*pop apo stn stoiva*/
 unsigned pop_from_stack();
 
+/* CALL FUNCTIONS */
+
+expr* make_call(expr *lval, elist_l* elist);
+
+/* push sta elist args */
+void push_elist(expr* elist, elist_l* top);
+
+/* pop apo lista args */
+expr* pop_elist(elist_l* head);
 
 /*GLOBAL VARIABLES*/
 

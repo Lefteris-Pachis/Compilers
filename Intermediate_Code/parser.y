@@ -17,7 +17,8 @@
 	char* id_val;
 	char* funcname = NULL;
 	expr* tmp;
-	
+	elist_l* top;
+
 	extern int yylineno;
 	extern char* yytext;
 	extern FILE* yyin;
@@ -33,6 +34,8 @@
 	struct expr *exprNode;
 	unsigned uVal;
 	struct statement *stmtVal;
+	struct calls *CallsVar;
+	struct elist_l *ElistVar;
 }
 
 %start program
@@ -58,8 +61,6 @@
 %type <exprNode> member		/* tableitem */
 %type <exprNode> primary
 %type <exprNode> assignexpr
-%type <exprNode> call
-%type <exprNode> objectdef	/* tablemake */
 
 %type <uVal> ifprefix
 %type <uVal> elseprefix
@@ -74,6 +75,14 @@
 %type <stmtVal> stmt
 %type <stmtVal> loopstmt
 
+%type <exprNode> call
+
+%type <CallsVar> callsuffix
+%type <CallsVar> methodcall
+%type <CallsVar> normcall
+
+%type <ElistVar> elist
+%type <ElistVar> objectdef
 
 %right		ASSIGN
 %left		OR
@@ -128,9 +137,9 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_
 		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
 		| NOT expr 									{ Handle_term_not_expr(yylineno); }
 		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
-		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
+		| lvalue PLUS_PLUS							{ $$ = $1; state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
-		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
+		| lvalue MINUS_MINUS 						{ $$ = $1; state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
 		| primary 									{ $$ = $1; Handle_term_primary(yylineno); }
 		;
 
@@ -195,6 +204,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
  														int i = scope_count;
+ 														$$ = malloc(sizeof(expr*));
  														while(!$$->sym){
  															$$->sym = Lookup(mytable,id_val,i);
  															i--;
@@ -242,23 +252,54 @@ member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno);
 			| call L_BRACKET expr R_BRACKET 		{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
 
-call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno); }
-			| lvalue callsuffix 						{ Handle_call_lvalue_callsuffix(yylineno); }
-			| L_PARENTHESIS funcdef R_PARENTHESIS L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_parenthesis(yylineno); }
+call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno); 
+															$$ = make_call($1,$3);
+														}
+			| lvalue callsuffix 						{ Handle_call_lvalue_callsuffix(yylineno);
+															
+															if($2->method==1){
+																expr* self = $1;
+																symbol temp = $1->sym;																
+																symbol s = Lookup(mytable,temp->name,scope_count);
+																//lvalue = emit_iftableitem();
+															}
+															$$ = make_call($1,$2->elist);
+														}
+			| L_PARENTHESIS funcdef R_PARENTHESIS L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_parenthesis(yylineno); 
+																							expr* func = newexpr(programfunc_e);
+																							func->sym = $2;
+																							$$ = make_call(func,$5);
+																						}
 			;
 
-callsuffix: normcall 		{ Handle_callsuffix_normcall(yylineno); }
-			| methodcall 	{ Handle_callsuffix_methodcall(yylineno); }
+callsuffix: normcall 		{ Handle_callsuffix_normcall(yylineno); $$=$1; }
+			| methodcall 	{ Handle_callsuffix_methodcall(yylineno); $$=$1; }
 			;
 
-normcall: 	L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_normcall_l_parenthesis_elist_r_parenthesis(yylineno); }
+normcall: 	L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_normcall_l_parenthesis_elist_r_parenthesis(yylineno);
+ 														$$ = malloc(sizeof(calls));
+														$$->elist = $2;
+														$$->method = 0;
+														$$->name = NULL;
+													}
 			;
 
-methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(yylineno); }
+methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(yylineno); 
+															$$ = malloc(sizeof(calls));
+															$$->elist = $4;
+															$$->method = 1;
+															$$->name = strdup($2);
+														}
 			;
 
-elist: 		expr  				{ Handle_elist_expr(yylineno); }
-			| elist COMMA expr 	{ Handle_elist_elist_comma_expr(yylineno); }
+elist: 		expr  				{ 
+									Handle_elist_expr(yylineno); 
+									push_elist((expr*)$1,top);
+								}
+			| elist COMMA expr 	{ Handle_elist_elist_comma_expr(yylineno); 
+
+									push_elist((expr*)$3,top);
+								}
 			|
 			;
 

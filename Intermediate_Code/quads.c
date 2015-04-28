@@ -346,3 +346,68 @@ label_list* label_list_insert(label_list* head,unsigned label){
 		return head;
 	}
 }
+
+/* call functions */
+
+expr* make_call(expr *lval, elist_l* elist){
+
+	expr* result;
+	expr* tmp;
+	expr* func = emit_iftableitem(lval);
+	while((tmp=pop_elist(elist))!=NULL){
+		
+		emit(param,0,0,(expr*)tmp);
+	}
+	emit(call,0,0,func);
+	result = newexpr(var_e);
+	result->sym = new_temp();
+	emit(getretval,0,0,result);
+	return result;
+}
+
+/* push first argument */
+void push_elist(expr* elist,elist_l* top){
+
+	elist_l *tmp;
+	elist_l *node = malloc(sizeof(elist_l));
+
+	if(top == NULL){
+		node->arg = elist;
+		node->next = NULL;
+		top = node;
+	}
+
+	if(top != NULL){
+		tmp = top;
+		node->arg = elist;
+		node->next = NULL;
+		while(tmp->next!=NULL){
+			tmp = tmp->next;
+		}
+		tmp->next = node;
+	}
+}
+
+/* pop first argument */
+expr* pop_elist(elist_l* head){
+
+	elist_l *tmp;
+
+	if(head == NULL){
+		return NULL;
+	}
+	else if(head != NULL){
+		tmp = head;
+		head = head->next;
+		return tmp->arg;
+	}
+}
+
+expr* member_item(expr* lval, char* name){
+
+	lval = emit_iftableitem(lval);
+	expr* item = newexpr(tableitem_e);
+	item->sym = lval->sym;
+	item->index = newexpr_conststring(name);
+	return item;
+}
