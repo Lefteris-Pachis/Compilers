@@ -115,6 +115,7 @@ expr* emit_iftableitem(expr* e){
 	else{
 		expr* result = newexpr(var_e);
 		result->sym = new_temp();
+		printf("GGGGGGGGGGGGGGGGGGG\n");
 		emit(tablegetelem,e,e->index,result);
 		return result;
 	}

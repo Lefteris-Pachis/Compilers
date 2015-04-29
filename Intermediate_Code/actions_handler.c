@@ -287,7 +287,7 @@ void Handle_term_primary(int lineNo){
 }
 
 int Handle_assignexpr_lvalue_assign_expr(int lineNo, int state){
-	printf("Line: %d \tassignexpr: expr lvalue = expr\n", lineNo);
+	printf("Line: %d \tassignexpr: lvalue = expr\n", lineNo);
 	if(state == -2){
 		printf("Error at line: %d trying to assign to Library Function\n",lineNo );
 		return -1;

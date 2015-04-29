@@ -80,7 +80,6 @@
 %type <uVal> forprefix
 
 %type <stmtVal> stmt
-%type <stmtVal> stmts
 %type <stmtVal> loopstmt
 %type <stmtVal> whilestmt
 %type <stmtVal> break
@@ -109,16 +108,16 @@
 %left 		ELSE
 %%
 
-program:	stmts program
+program:	stmt program
 		|/* empty */
 		;
 
-stmts: 	stmt {$$ = $1;}
-		| stmts stmt 		{
+//stmts: 	stmt {$$ = $1;}
+//		| stmts stmt 		{
 								//printf("WTF\n"); 
 								//$$->break_list = merge($1->break_list,$2->break_list);
 								//$$->cont_list = merge($1->cont_list,$2->cont_list);
-						 	};
+//						 	};
 
 
 break: 		BREAK SEMICOLON 						{ 	
@@ -195,23 +194,20 @@ assignexpr:	lvalue ASSIGN expr 						{
 														if(state == -1) { error = 1; }
 														if(($1->type)==tableitem_e){
 															emit(tablesetelem,$1,$1->index,$3);
-																$$=emit_iftableitem($1);
-																$$->type=assignexpr_e;
-
-															
-
+															$$=emit_iftableitem($1);
+															$$->type=assignexpr_e;
 														}
 														else{ 
-															if((tmp)!=NULL){
-																if(istempname(tmp->sym->name)){
-
-																	emit(assign,tmp,(expr*)0,$1);
+															if(($1)!=NULL){
+																printf("ifffffffffff\n");
+																if(istempname($1->sym->name)){
+																	
+																	emit(assign,$1,(expr*)0,$1);
 																	
 
 																}
-															
-																else{
 																
+																else{
 																	emit(assign,$3,(expr*)0,$1);	
 																	
 																	if(assign_counter > 1){
@@ -223,6 +219,7 @@ assignexpr:	lvalue ASSIGN expr 						{
 																}
 															}
 															else{
+																printf("ELSEEEEEEEEEEEEe\n");
 																emit(assign,$3,(expr*)0,$$);
 															}
 
@@ -231,16 +228,20 @@ assignexpr:	lvalue ASSIGN expr 						{
 			;	
 
 primary:	lvalue 									{ Handle_primary_lvalue(yylineno); 
-															tmp=emit_iftableitem($1);
-
-
-
+															printf("NAME = %s\n",$1->sym->name);
+															$$=emit_iftableitem($1);
 													}
 			| call 									{ Handle_primary_call(yylineno); }
 			| objectdef 							{ Handle_primary_objectdef(yylineno); }
-			| L_PARENTHESIS funcdef R_PARENTHESIS 	{ Handle_primary_l_parenthesis_funcdef_r_parenthesis(yylineno); }
+			| L_PARENTHESIS funcdef R_PARENTHESIS 	{ 
+														$$ = newexpr(programfunc_e);
+														$$->sym = $2; 
+														//$$->type = programfunc_e;
+
+														Handle_primary_l_parenthesis_funcdef_r_parenthesis(yylineno); }
 			| const 								{ Handle_primary_const(yylineno);
-														$$=$1;										 }
+														$$=$1;										 
+													}
 			;
 
 lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,function_counter - (scope_count-1));
@@ -280,19 +281,18 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 
 member:		lvalue DOT ID 							{ Handle_member_lvalue_dot_id(yylineno);
 
-															expr* tmp=emit_iftableitem($1);
-															$$ =newexpr(tableitem_e);
-															$$->sym=tmp->sym;
-															
-															$$->index=newexpr_conststring($3);
+															$1 = emit_iftableitem($1);
+															$$ = newexpr(tableitem_e);
+															$$->sym = $1->sym;
+															$$->index = newexpr_conststring($3);
 													 }
 
 			| lvalue L_BRACKET expr R_BRACKET 		{ Handle_member_lvalue_l_bracket_expr_r_bracket(yylineno); 
 
-															expr* tmp=emit_iftableitem($1);
-															$$ =newexpr(tableitem_e);
-															$$->sym=tmp->sym;
-															$$->index=$3;
+															$1 = emit_iftableitem($1);
+															$$ = newexpr(tableitem_e);
+															$$->sym = $1->sym;
+															$$->index = $3;
 
 													}
 			| call DOT ID 							{ tmp_state = 0; Handle_member_call_dot_id(yylineno); }
@@ -382,7 +382,7 @@ funcname:	ID{		$$=$1;							}
 
 funcprefix: FUNCTION funcname {	
 								if(function_counter < scope_count)
-								function_counter = scope_count; 
+									function_counter = scope_count; 
 								function_counter++; 
 								funcName=$2;
 
@@ -420,6 +420,7 @@ funcdef:  funcprefix funcargs funcbody  {
 											printf("----Offset=%d",old_offset);
 											restorecurrscopeoffset(old_offset);
 											$$=$1;
+
 											emit(funcend,0,0,lvalue_expr($1));
 										}
 			;
