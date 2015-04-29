@@ -26,17 +26,9 @@ typedef struct S_Stack{
 	struct S_Stack *previous;
 }Stack;
 
-/*struct gia na kratame sthn stoiva ta onomata twn nested functions*/
-typedef struct func_name{
-	char* name;
-	struct func_name *next;
-	struct func_name *previous;
-}func_name_stack;
 
 Stack *Head;
 Stack *Tail;
-func_name_stack *Head_f;
-func_name_stack	*Tail_f;
 
 
 typedef enum expr_t { 

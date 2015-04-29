@@ -94,48 +94,6 @@ void push_to_stack(scopespace_t offset){
 	}
 }
 
-/*push sthn stoiva pou krataei ta onomata twn synarthsewn*/
-void push_to_fuction_names_stack(char* name){
-	
-	func_name_stack *tmp=malloc(sizeof(func_name_stack));
-	func_name_stack *tmp1=Head_f;
-	func_name_stack *prev;
-	tmp->name=name;
-	if(Head_f!=NULL){
-		while((tmp1->next) != NULL){
-			prev=tmp1;
-			tmp1=tmp1->next;
-		}
-		prev->next = tmp;
-		tmp->previous=prev;
-		Tail_f=tmp;
-		return;
-
-
-	}
-	if (prev==NULL){
-		tmp->previous=NULL;
-		tmp->next=NULL;
-		Head_f=tmp;
-		Tail_f=Head_f;
-		return;
-	}
-}
-
-/*pop apo stn stoiva gia onomata synarthsewn*/
-char* pop_from_fuction_names_stack(){
-
-	func_name_stack *tmp=Tail_f;
-	if(tmp==NULL){
-		return NULL;
-
-	}
-	else{
-		Tail_f=Tail_f->previous;
-		return tmp->name; //pop
-	}
-}
-
 
 /*pop apo stn stoiva*/
 scopespace_t pop_from_stack(){

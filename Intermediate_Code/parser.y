@@ -376,8 +376,8 @@ block_1: 	stmt block_1 	{ Handle_block_1_stmt_block_1(yylineno); }
 			;
 
 
-funcname:	ID{		$$=$1;						push_to_fuction_names_stack($$);	}		
-			| 	{$$=Create_Function_Id(); 		push_to_fuction_names_stack($$); 	}
+funcname:	ID{		$$=$1;							}		
+			| 	{$$=Create_Function_Id(); 		 	}
 			;
 
 funcprefix: FUNCTION funcname {	
@@ -397,15 +397,12 @@ funcprefix: FUNCTION funcname {
 								if(state == -1) { error = 1; }
 								//printf("---------scope_count%d-------------",scope_count);
 								$<Symbol>$=Lookup(mytable,$2,scope_count);
-								$<Symbol>$->iaddress=next_quad_label();
-								struct expr * tmp1;
-								tmp1 = malloc(sizeof(expr*));
-								tmp1->sym=$<Symbol>$;	
-								emit(funcstart,lvalue_expr($<Symbol>$),0,tmp1);
+								$<Symbol>$->iaddress=next_quad_label();	
+								emit(funcstart,0,0,lvalue_expr($<Symbol>$));
 								push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
 								EnterScopeSpace();
 								resetformalargsoffset();
-											}								
+								}								
 			;
 
 
@@ -417,29 +414,13 @@ funcbody:  block { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
 			;
 
 funcdef:  funcprefix funcargs funcbody  {	
-											struct expr * tmp1;
-											char *tmp_name;
-											tmp1 = malloc(sizeof(expr*));
 											ExitScopeSpace();
 											$1->totallocals=$3;
 											unsigned old_offset=pop_from_stack();
 											printf("----Offset=%d",old_offset);
 											restorecurrscopeoffset(old_offset);
 											$$=$1;
-											tmp_name=pop_from_fuction_names_stack();
-											if(tmp_name!=NULL){
-												funcName=tmp_name;
-												printf("!!!!!! NAME !!!!!!!:   %s",funcName);
-											}
-											printf("!!!!!! NAME !!!!!!!:   %s",funcName);
-											struct symbol * tmp=Lookup(mytable,funcName,scope_count);
-											printf("Scope%d\t\n",scope_count);
-											if(tmp!=NULL){
-												printf("Onoma%s\t%d\n",tmp->name,scope_count);
-											}
-											tmp1->sym=tmp;
-											emit(funcend,lvalue_expr($1),0,tmp1);
-
+											emit(funcend,0,0,lvalue_expr($1));
 										}
 			;
 
