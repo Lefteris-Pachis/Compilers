@@ -305,10 +305,10 @@ call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesi
 			| lvalue callsuffix 						{ Handle_call_lvalue_callsuffix(yylineno);
 															
 															if($2->method==1){
-																expr* self = $1;
-																symbol temp = $1->sym;																
-																symbol s = Lookup(mytable,temp->name,scope_count);
-																//lvalue = emit_iftableitem();
+																expr* self = $1;															
+																self->sym = Lookup(mytable,self->sym->name,scope_count);
+																$1 = emit_iftableitem(self);
+
 															}
 															$$ = make_call($1,$2->elist);
 														}
