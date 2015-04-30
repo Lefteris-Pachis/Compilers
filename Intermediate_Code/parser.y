@@ -19,6 +19,8 @@
 	char* funcName = NULL;
 	expr* tmp;
 	label_list* break_list;
+	label_list* cont_list;
+
 	
 
 	elist_l* top;
@@ -37,6 +39,7 @@
 	struct symbol *Symbol;
 	struct expr *exprNode;
 	unsigned uVal;
+	struct forprefix *forVal;
 	struct statement *stmtVal;
 	struct calls *CallsVar;
 	struct elist_l *ElistVar;
@@ -77,7 +80,7 @@
 
 %type <uVal> N
 %type <uVal> M
-%type <uVal> forprefix
+%type <forVal> forprefix
 
 %type <stmtVal> stmt
 %type <stmtVal> loopstmt
@@ -122,9 +125,8 @@ program:	stmt program
 
 break: 		BREAK SEMICOLON 						{ 	
 														if(loopcounter > 0){
-															//$$->break_list=new_label_list(break_list,next_quad_label());
-															//printf("sssssssss%d\n",$$->break_list->label);
-															//emit_jump(jump, 0, 0, 0, 0); 
+															break_list = new_label_list(break_list,next_quad_label());
+															emit_jump(jump, 0, 0, 0, 0); 
 															Handle_stmt_break_semicolon(yylineno);
 														}else{
 															printf("Error at line: %d break is not in a loop\n",yylineno);
@@ -133,9 +135,9 @@ break: 		BREAK SEMICOLON 						{
 													};
 continue:	CONTINUE SEMICOLON 						{ 	
 														if(loopcounter > 0){
-														//$$->cont_list=new_label_list($$->cont_list,next_quad_label()); 
-														//emit_jump(jump, 0, 0, 0, 0); 
-														//Handle_stmt_continue_semicolon(yylineno); 
+															cont_list = new_label_list(cont_list,next_quad_label()); 
+															emit_jump(jump, 0, 0, 0, 0); 
+															Handle_stmt_continue_semicolon(yylineno); 
 														}else{
 															printf("Error at line: %d continue is not in a loop\n",yylineno);
 															error = 1;
@@ -409,8 +411,10 @@ funcprefix: FUNCTION funcname {
 funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS {;EnterScopeSpace(); scope_count--;  resetfuctionlocalsoffset();}
 			;
 
+funcblockstart: { push_loopcounter_stack(loopcounter); loopcounter = 0; };
+funcblockend: 	{ loopcounter = pop_loopcounter_stack(); };
 
-funcbody:  block { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
+funcbody:	funcblockstart block funcblockend { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
 			;
 
 funcdef:  funcprefix funcargs funcbody  {	
@@ -517,10 +521,17 @@ whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestar
 N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };
 M:			{ $$ = next_quad_label(); };
 
-forprefix:	FOR L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{  }
+forprefix:	FOR L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{ 
+																	$$ = malloc(sizeof(struct forprefix));
+																	$$->test = $5;
+																	$$->enter = next_quad_label();
+																	emit(if_eq,$6,newexpr_constbool('1'),0);
+ 																}
 			;
 
-forstmt: 	forprefix N elist R_PARENTHESIS N loopstmt N 			{  }
+forstmt: 	forprefix N elist R_PARENTHESIS N loopstmt N 			{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$5,$6,$7,yylineno);
+																		
+ 																	}
 			;
 /*forstmt:	FOR L_PARENTHESIS elist SEMICOLON expr SEMICOLON elist R_PARENTHESIS stmt { Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(yylineno); }
 			;*/

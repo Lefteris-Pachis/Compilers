@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 
+extern label_list* break_list;
+extern label_list* cont_list;
+
 void Handle_stmt_expr_semicolon(int lineNo){
 	printf("Line: %d \tstmt: expr;\n", lineNo);
 }
@@ -592,16 +595,34 @@ void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadn
 	printf("Line: %d \twhilestmt: whilestart whilecond stmt\n", lineNo);
 	emit_jump(jump, 0, 0, 0, quadnum1);
 	patchlabel(quadnum2,next_quad_label());
-	struct statement *tmp = stmt;
-	//while(tmp->break_list->label != 0){
-	//	patchlabel(tmp->break_list->label,next_quad_label());
-	//	patchlabel(tmp->cont_list->label,quadnum1);
-	//	tmp->break_list = tmp->break_list->next;
-	//}
+	struct label_list *tmp = break_list;
+	while(tmp){
+		patchlabel(tmp->label,next_quad_label());
+		tmp = tmp->next;
+	}
+	tmp = cont_list;
+	while(tmp){
+		patchlabel(tmp->label,quadnum1);
+		tmp = tmp->next;
+	}
 }
 
-void Handle_forstmt_for_l_parenthesis_elist_semicolon_expr_semicolon_elist_r_parenthesis_stmt(int lineNo){
-	printf("Line: %d \tforstmt: for (elist; expr; elist) stmt\n", lineNo);
+void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,int lineNo){
+	printf("Line: %d \tforstmt: forprefix N elist) N loopstmt N\n", lineNo);
+	patchlabel(forprefix->enter,N2+1);
+	patchlabel(N1,next_quad_label());
+	patchlabel(N2,forprefix->test);
+	patchlabel(N3,N1+1);
+	struct label_list *tmp = break_list;
+	while(tmp){
+		patchlabel(tmp->label,next_quad_label());
+		tmp = tmp->next;
+	}
+	tmp = cont_list;
+	while(tmp){
+		patchlabel(tmp->label,N1+1);
+		tmp = tmp->next;
+	}
 }
 
 void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo){

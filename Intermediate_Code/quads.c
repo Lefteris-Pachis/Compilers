@@ -115,7 +115,6 @@ expr* emit_iftableitem(expr* e){
 	else{
 		expr* result = newexpr(var_e);
 		result->sym = new_temp();
-		printf("GGGGGGGGGGGGGGGGGGG\n");
 		emit(tablegetelem,e,e->index,result);
 		return result;
 	}
@@ -459,3 +458,34 @@ expr* member_item(expr* lval, char* name){
 	item->index = newexpr_conststring(name);
 	return item;
 }
+
+
+void push_loopcounter_stack(int loopcounter)
+{
+    struct loopcounter_stack *temp;
+    temp=malloc(sizeof(struct loopcounter_stack));
+    temp->loopcounter=loopcounter;
+    if (loopcounter_stack_top == NULL)
+    {
+         loopcounter_stack_top=temp;
+         loopcounter_stack_top->next=NULL;
+    }
+    else
+    {
+        temp->next=loopcounter_stack_top;
+        loopcounter_stack_top=temp;
+    }
+}
+
+int pop_loopcounter_stack()
+{
+    struct loopcounter_stack *temp, *var=loopcounter_stack_top;
+    if(var==loopcounter_stack_top)
+    {
+        loopcounter_stack_top = loopcounter_stack_top->next;
+        return var->loopcounter;
+    }
+   	return 0;
+}
+
+

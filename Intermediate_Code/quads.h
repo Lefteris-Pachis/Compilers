@@ -84,18 +84,24 @@ typedef struct statement{
 	struct statement *next;
 }statement;
 
+struct loopcounter_stack{
+	int loopcounter;
+	struct loopcounter_stack *next;
+}*loopcounter_stack_top;
+
+struct forprefix{
+	unsigned test;
+	unsigned enter;
+};
+
+void push_loopcounter_stack(int loopcounter);
+int pop_loopcounter_stack();
 
 /*push sthn stoiva pou krataei ta offset*/
 void push_to_stack(scopespace_t offset);
 
-/*push sthn stoiva pou krataei ta onomata twn synarthsewn*/
-void push_to_fuction_names_stack(char* name);
-
 /*pop apo stn stoiva gia offset*/
 scopespace_t pop_from_stack();
-
-/*pop apo stn stoiva gia onomata synarthsewn*/
-char* pop_from_fuction_names_stack();
 
 typedef struct elist_l{
 	expr*	 		arg;
@@ -114,9 +120,6 @@ expr* member_item(expr* lval, char* name);
 /*push sthn stoiva*/
 void push_to_stack(unsigned offset);
 
-
-/*pop apo stn stoiva*/
-scopespace_t pop_from_stack();
 
 void resetformalargsoffset(void);
 
