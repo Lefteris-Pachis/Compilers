@@ -21,9 +21,6 @@
 	label_list* break_list;
 	label_list* cont_list;
 
-	
-
-	elist_l* top;
 
 	extern int yylineno;
 	extern char* yytext;
@@ -95,7 +92,8 @@
 %type <CallsVar> normcall
 
 %type <ElistVar> elist
-%type <ElistVar> objectdef
+%type <exprNode> objectdef
+%type <ElistVar> indexed
 
 %right		ASSIGN
 %left		OR
@@ -176,12 +174,77 @@ expr:	assignexpr									{ Handle_expr_assignexpr(yylineno);
 		;
 
 term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
-		| UMINUS expr 								{ Handle_term_uminus_expr(yylineno); }
-		| NOT expr 									{ Handle_term_not_expr(yylineno); }
-		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
-		| lvalue PLUS_PLUS							{ $$ = $1; state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; } }
-		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } }
-		| lvalue MINUS_MINUS 						{ $$ = $1; state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } }
+		| MINUS expr %prec UMINUS						{ Handle_term_uminus_expr(yylineno); 
+														checkuminus($2);
+														$$ = newexpr(arithexpr_e);
+														$$->sym = new_temp();
+														emit(uminus,$2,0,$$);
+													}
+		| NOT expr 									{ Handle_term_not_expr(yylineno); 
+														$$ = newexpr(boolexpr_e);
+														$$->sym = new_temp();
+														emit(not,$2,0,$$);
+													}
+		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
+														if($2->type == tableitem_e){
+															$$ = emit_iftableitem($2);
+															emit(add,$$,newexpr_constint(1),$$);
+															emit(tablesetelem,$2,$2->index,$$);
+
+														}
+														else{
+															emit(add,$2,newexpr_constint(1),$2);
+															$$ = newexpr(arithexpr_e);
+															$$->sym = new_temp();
+															emit(assign,$2,0,$$);
+														}
+													}
+		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; }
+														$$ = newexpr(var_e);
+														$$->sym = new_temp();														
+
+														if($1->type == tableitem_e){
+															expr* val = emit_iftableitem($1);
+															emit(assign,val,0,$$);
+															emit(add,val,newexpr_constint(1),val);
+															emit(tablesetelem,$1,$1->index,val);
+
+														}
+														else{
+															emit(assign,$1,0,$$);
+															emit(add,$1,newexpr_constint(1),$1);
+														}
+													}
+		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
+														if($2->type == tableitem_e){
+															$$ = emit_iftableitem($2);
+															emit(sub,$$,newexpr_constint(1),$$);
+															emit(tablesetelem,$2,$2->index,$$);
+
+														}
+														else{
+															emit(sub,$2,newexpr_constint(1),$2);
+															$$ = newexpr(arithexpr_e);
+															$$->sym = new_temp();
+															emit(assign,$2,0,$$);
+														}
+													}
+		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } 
+														$$ = newexpr(var_e);
+														$$->sym = new_temp();														
+
+														if($1->type == tableitem_e){
+															expr* val = emit_iftableitem($1);
+															emit(assign,val,0,$$);
+															emit(sub,val,newexpr_constint(1),val);
+															emit(tablesetelem,$1,$1->index,val);
+
+														}
+														else{
+															emit(assign,$1,0,$$);
+															emit(sub,$1,newexpr_constint(1),$1);
+														}
+													}
 		| primary 									{ $$ = $1; Handle_term_primary(yylineno); }
 		;
 
@@ -308,8 +371,8 @@ call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ Handle_call_call_l_parenthesi
 															
 															if($2->method==1){
 																expr* self = $1;															
-																self->sym = Lookup(mytable,self->sym->name,scope_count);
-																$1 = emit_iftableitem(self);
+																$1 = emit_iftableitem(member_item(self,$2->name));
+																push_elist(self);
 
 															}
 															$$ = make_call($1,$2->elist);
@@ -342,29 +405,56 @@ methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ Handle_methodcall_d_do
 			;
 
 elist: 		expr  				{ 
-									Handle_elist_expr(yylineno); 
-									push_elist((expr*)$1,top);
+									Handle_elist_expr(yylineno);
+									//printf("%s\n", $1->sym->name); 
+									push_elist($1);
 								}
 			| elist COMMA expr 	{ Handle_elist_elist_comma_expr(yylineno); 
-
-									push_elist((expr*)$3,top);
+									//printf("%s\n", $3->sym->name);
+									push_elist($3);
 								}
 			|
 			;
 
 
 
-objectdef: 	L_BRACKET elist R_BRACKET 		{ Handle_objectdef_l_bracket_elist_r_bracket(yylineno); }
-			| L_BRACKET indexed R_BRACKET 	{ Handle_objectdef_l_bracket_indexed_r_bracket(yylineno); }
+objectdef: 	L_BRACKET elist R_BRACKET 		{ Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+												expr* t = newexpr(newtable_e);
+												t->sym = new_temp();
+												emit(tablecreate,0,0,t);
+												int i=0;
+												expr* tmp;
+												while((tmp = pop_elist())!=NULL){
+													emit(tablesetelem,t,newexpr_constint(i++),tmp);
+												}
+												$$ = t; 
+											}
+			| L_BRACKET indexed R_BRACKET 	{ Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
+
+												expr* t = newexpr(newtable_e);
+												t->sym = new_temp();
+												emit(tablecreate,0,0,t);
+												int i=0;
+												expr* tmp;
+												expr* tmp2;
+												while((tmp = pop_elist())!=NULL  && (tmp2 = pop_elist())!=NULL){
+													emit(tablesetelem,t,tmp,tmp2);
+												}
+												$$ = t;
+											}
 			;
 
-indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); }
-			| indexed COMMA indexedelem { Handle_indexed_indexed_comma_indexedelem(yylineno); }
+indexed: 	indexedelem  		{ Handle_indexed_indexedelem(yylineno); 
+									
+								}
+			| indexed COMMA indexedelem { Handle_indexed_indexed_comma_indexedelem(yylineno); 
+
+										}
 			;
 
 
 
-indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); }
+indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); push_elist($2); push_elist($4);}
 				;
 
 block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 

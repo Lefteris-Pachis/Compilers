@@ -401,9 +401,10 @@ expr* make_call(expr *lval, elist_l* elist){
 	expr* result;
 	expr* tmp;
 	expr* func = emit_iftableitem(lval);
-	while((tmp=pop_elist(elist))!=NULL){
+	//assert((tmp=pop_elist(elist))!=NULL);
+	while((tmp=pop_elist())!=NULL){
 		
-		emit(param,0,0,(expr*)tmp);
+		emit(param,0,0,tmp);
 	}
 	emit(call,0,0,func);
 	result = newexpr(var_e);
@@ -413,19 +414,18 @@ expr* make_call(expr *lval, elist_l* elist){
 }
 
 /* push first argument */
-void push_elist(expr* elist,elist_l* top){
+void push_elist(expr* elist){
 
-	elist_l *tmp;
+	elist_l *tmp = top;
 	elist_l *node = malloc(sizeof(elist_l));
 
 	if(top == NULL){
 		node->arg = elist;
 		node->next = NULL;
 		top = node;
-	}
-
-	if(top != NULL){
-		tmp = top;
+		
+	}else{
+		
 		node->arg = elist;
 		node->next = NULL;
 		while(tmp->next!=NULL){
@@ -436,16 +436,18 @@ void push_elist(expr* elist,elist_l* top){
 }
 
 /* pop first argument */
-expr* pop_elist(elist_l* head){
+expr* pop_elist(){
 
-	elist_l *tmp;
+	elist_l *tmp = top;
 
-	if(head == NULL){
+	if(top == NULL){
+		
 		return NULL;
 	}
-	else if(head != NULL){
-		tmp = head;
-		head = head->next;
+	else{
+		tmp = top;
+		top = tmp->next;
+		
 		return tmp->arg;
 	}
 }

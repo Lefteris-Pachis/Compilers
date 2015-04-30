@@ -108,6 +108,9 @@ typedef struct elist_l{
 	struct elist_l* next;
 }elist_l;
 
+
+elist_l* top;
+
 typedef struct calls{
 	elist_l* 		elist;
 	unsigned 		method;
@@ -133,10 +136,10 @@ void restorecurrscopeoffset(unsigned n);
 expr* make_call(expr *lval, elist_l* elist);
 
 /* push sta elist args */
-void push_elist(expr* elist, elist_l* top);
+void push_elist(expr* elist);
 
 /* pop apo lista args */
-expr* pop_elist(elist_l* head);
+expr* pop_elist();
 
 
 /*GLOBAL VARIABLES*/
