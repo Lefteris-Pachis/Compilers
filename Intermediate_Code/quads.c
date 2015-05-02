@@ -292,26 +292,27 @@ void Print_Quads(void){
     icode = fopen("icode.txt","w");
     for(i=0; i<currQuad; i++){
     	op = (quads[i]).op;
-    	fprintf(icode,"%d: %s\t ",i+1,table_op[op]);
+    	fprintf(icode,"%d: %s\t",i+1,table_op[op]);
     	if((op==add) || (op==and) || (op==or) || (op==sub) || (op==mul) || (op==divv) || (op==mod) || (op==tablegetelem) || (op==tablesetelem)){
-			fprintf(icode,"%s\t ", print_expr(quads[i].arg1));
-			fprintf(icode,"%s\t ", print_expr(quads[i].arg2));
-			fprintf(icode,"%s\t ", print_expr(quads[i].result));
+			fprintf(icode,"%s\t", print_expr(quads[i].arg1));
+			fprintf(icode,"%s\t", print_expr(quads[i].arg2));
+			fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}else if((op==if_greater) || (op==if_greatereq)	|| (op==if_less) || (op==if_lesseq) || (op==if_noteq) || (op==if_eq)){
-			fprintf(icode,"%s\t ", print_expr(quads[i].arg1));
-			fprintf(icode,"%s\t ", print_expr(quads[i].arg2));
+			fprintf(icode,"%s\t", print_expr(quads[i].arg1));
+			fprintf(icode,"%s\t", print_expr(quads[i].arg2));
 			fprintf(icode,"%d ", quads[i].label);
      	}else if((op==not) || (op==uminus) || (op==assign)){
-			fprintf(icode,"%s\t ", print_expr(quads[i].arg1));
-			fprintf(icode,"%s\t ", print_expr(quads[i].result));
+			fprintf(icode,"%s\t", print_expr(quads[i].arg1));
+			fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}else if(op==jump){
-	 		fprintf(icode,"%d ", quads[i].label);	 
+	 		fprintf(icode,"%d", quads[i].label);	 
       	}else if((op==call)	|| (op==param) || (op==getretval) ||  (op==funcstart) ||  (op==funcend) || (op==tablecreate)){	
-			fprintf(icode,"%s\t ", print_expr(quads[i].result));
+			fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}else{
 	 		if(quads[i].result!= NULL)
-	    		fprintf(icode,"%s\t ", print_expr(quads[i].result));
+	    		fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}
+      	//fprintf(icode,"Line: %d", quads[i].line);
     	fprintf(icode,"\n");
     }
     fclose(icode);
@@ -335,7 +336,7 @@ static char *print_expr(expr * expression){
     	sprintf(tmp, "%d", expression->intConst);
     	return tmp;
    	}else if(type==constdouble_e){
-    	sprintf(tmp, "%lf", expression->doubleConst);
+    	sprintf(tmp, "%f", expression->doubleConst);
     	return tmp;
    	}else if(type==constbool_e){
     	if (expression->boolConst=='0')return "FALSE";
@@ -346,7 +347,6 @@ static char *print_expr(expr * expression){
 	  	tmp = strcat(tmp,expression->strConst);
 		tmp[strlen(tmp)] = '\"';
 		return tmp;
-        // return expression->strConst;
    	}else if(type==newtable_e){
    		return (expression->sym)->name;
    	}else if(type==nil_e){

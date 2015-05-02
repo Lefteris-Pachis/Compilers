@@ -242,9 +242,11 @@ int Handle_term_plus_plus_lvalue(int lineNo, char* id_val){
 	if(id_val != NULL)
 	{
 		symbol sym = Lookup(mytable,id_val,0);
-		if(sym->type == libraryfunc_s){
-			printf("Error at line: %d cannot increment a library function\n",lineNo);
-			return -1;
+		if(sym){
+			if(sym->type == libraryfunc_s){
+				printf("Error at line: %d cannot increment a library function\n",lineNo);
+				return -1;
+			}
 		}
 	}
 	return 0;
@@ -254,9 +256,11 @@ int Handle_term_lvalue_plus_plus(int lineNo, char* id_val){
 	if(id_val != NULL)
 	{
 		symbol sym = Lookup(mytable,id_val,0);
-		if(sym->type == libraryfunc_s){
-			printf("Error at line: %d cannot increment a library function\n",lineNo);
-			return -1;
+		if(sym){
+			if(sym->type == libraryfunc_s){
+				printf("Error at line: %d cannot increment a library function\n",lineNo);
+				return -1;
+			}
 		}
 	}
 	return 0;
@@ -266,9 +270,11 @@ int Handle_term_minus_minus_lvalue(int lineNo, char* id_val){
 	if(id_val != NULL)
 	{
 		symbol sym = Lookup(mytable,id_val,0);
-		if(sym->type == libraryfunc_s){
-			printf("Error at line: %d cannot decrement a library function\n",lineNo);
-			return -1;
+		if(sym){
+			if(sym->type == libraryfunc_s){
+				printf("Error at line: %d cannot decrement a library function\n",lineNo);
+				return -1;
+			}
 		}
 	}
 	return 0;
@@ -278,9 +284,11 @@ int Handle_term_lvalue_minus_minus(int lineNo, char* id_val){
 	if(id_val != NULL)
 	{
 		symbol sym = Lookup(mytable,id_val,0);
-		if(sym->type == libraryfunc_s){
-			printf("Error at line: %d cannot decrement a library function\n",lineNo);
-			return -1;
+		if(sym){
+			if(sym->type == libraryfunc_s){
+				printf("Error at line: %d cannot decrement a library function\n",lineNo);
+				return -1;
+			}
 		}
 	}
 	return 0;
