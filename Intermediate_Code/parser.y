@@ -20,6 +20,7 @@
 	char* funcName = NULL;
 	label_list* break_list;
 	label_list* cont_list;
+	int table_flag;
 
 
 	extern int yylineno;
@@ -351,7 +352,7 @@ call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthes
 															if($2->method==1){
 																expr* self = $1;															
 																$1 = emit_iftableitem(member_item(self,$2->name));
-																push_elist(self);
+																push_elist(self,0);
 
 															}
 															$$ = make_call($1,$2->elist);
@@ -385,37 +386,64 @@ methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ 	Handle_methodcall_d_d
 
 elist: 		expr  				{ 
 									Handle_elist_expr(yylineno);
-									if(for_flag == 0)
-										push_elist($1);
+									if(for_flag == 0){
+										if(table_flag == 1){
+											push_elist($1,1);
+											table_flag = 0;
+											printf("OKKKKKKKKKKKKk" );
+										}
+										else{
+											push_elist($1,0);
+											printf("11111111111111" );
+										}
+									}
 								}
 			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno); 
-									push_elist($3);
+										if(table_flag == 1){
+											push_elist($3,1);
+											table_flag = 0;
+											printf("OKKKKKKKKKKKKk" );
+										}
+										else{
+											push_elist($3,0);
+											printf("2222222222222222" );
+										}
+									
 								}
 			|
 			;
 
 
 
-objectdef: 	L_BRACKET elist R_BRACKET 		{ Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+objectdef: 	L_BRACKET {table_flag = 1;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
 												int i=0;
-												expr* tmp;
+												elist_l* tmp;
+												elist_l* tmp1=top;
+
 												while((tmp = pop_elist())!=NULL){
-													emit(tablesetelem,t,newexpr_constint(i++),tmp);
+													if(tmp->del == 1){
+														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
+														break;
+													}
+													else{
+														//printf("GG");
+														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
+													}
 												}
 												$$ = t; 
 											}
-			| L_BRACKET indexed R_BRACKET 	{ Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
+			| L_BRACKET {table_flag = 1;} indexed R_BRACKET { Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
 												int i=0;
-												expr* tmp;
-												expr* tmp2;
+												elist_l* tmp;
+												elist_l* tmp2;
 												while((tmp = pop_elist())!=NULL  && (tmp2 = pop_elist())!=NULL){
-													emit(tablesetelem,t,tmp,tmp2);
+													emit(tablesetelem,t,tmp->arg,tmp2->arg);
 												}
 												$$ = t;
 											}
@@ -427,7 +455,7 @@ indexed: 	indexedelem  				{ Handle_indexed_indexedelem(yylineno); }
 
 
 
-indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); push_elist($2); push_elist($4);}
+indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); push_elist($2,0); push_elist($4,0);}
 				;
 
 block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 

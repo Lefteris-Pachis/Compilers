@@ -414,7 +414,7 @@ expr* make_call(expr *lval, elist_l* elist){
 }
 
 /* push first argument */
-void push_elist(expr* elist){
+void push_elist(expr* elist, int flag){
 
 	elist_l *tmp = top;
 	elist_l *node = malloc(sizeof(elist_l));
@@ -422,33 +422,39 @@ void push_elist(expr* elist){
 	if(top == NULL){
 		node->arg = elist;
 		node->next = NULL;
+		node->previous = NULL;
+		node->del = flag;
 		top = node;
+		bot = node;
 		
 	}else{
 		
 		node->arg = elist;
 		node->next = NULL;
+		node->del = flag;
 		while(tmp->next!=NULL){
 			tmp = tmp->next;
 		}
 		tmp->next = node;
+		node->previous = tmp;
+		bot = node;
 	}
 }
 
 /* pop first argument */
-expr* pop_elist(){
+elist_l* pop_elist(){
 
-	elist_l *tmp = top;
+	elist_l *tmp = bot;
 
-	if(top == NULL){
+	if(bot == NULL){
 		
 		return NULL;
 	}
 	else{
-		tmp = top;
-		top = tmp->next;
+		tmp = bot;
+		bot = tmp->previous;
 		
-		return tmp->arg;
+		return tmp;
 	}
 }
 

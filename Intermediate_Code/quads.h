@@ -105,11 +105,14 @@ scopespace_t pop_from_stack();
 
 typedef struct elist_l{
 	expr*	 		arg;
+	int 			del;
 	struct elist_l* next;
+	struct elist_l* previous;
 }elist_l;
 
 
 elist_l* top;
+elist_l* bot;
 
 typedef struct calls{
 	elist_l* 		elist;
@@ -136,10 +139,10 @@ void restorecurrscopeoffset(unsigned n);
 expr* make_call(expr *lval, elist_l* elist);
 
 /* push sta elist args */
-void push_elist(expr* elist);
+void push_elist(expr* elist,int flag);
 
 /* pop apo lista args */
-expr* pop_elist();
+elist_l* pop_elist();
 
 
 /*GLOBAL VARIABLES*/
