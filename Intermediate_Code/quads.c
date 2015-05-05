@@ -364,10 +364,11 @@ static char *print_expr(expr * expression){
    	}
 }
 
-label_list* new_label_list(label_list* head,unsigned label){
+label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
 	label_list *temp;
 	temp=(label_list *)malloc(sizeof(label_list));
 	temp->label=label;
+	temp->index = index;
 	if (head== NULL){
 		head=temp;
 		head->next=NULL;
@@ -490,4 +491,31 @@ int pop_loopcounter_stack()
    	return 0;
 }
 
+void push_loopindex_stack(int loopindex)
+{
+    struct loopindex_stack *temp;
+    temp=malloc(sizeof(struct loopindex_stack));
+    temp->loopindex=loopindex;
+    if (loopindex_stack_top == NULL)
+    {
+         loopindex_stack_top=temp;
+         loopindex_stack_top->next=NULL;
+    }
+    else
+    {
+        temp->next=loopindex_stack_top;
+        loopindex_stack_top=temp;
+    }
+}
+
+int pop_loopindex_stack()
+{
+    struct loopindex_stack *temp, *var=loopindex_stack_top;
+    if(var==loopindex_stack_top)
+    {
+        loopindex_stack_top = loopindex_stack_top->next;
+        return var->loopindex;
+    }
+   	return 0;
+}
 

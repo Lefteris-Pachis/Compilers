@@ -20,6 +20,8 @@
 	char* funcName = NULL;
 	label_list* break_list;
 	label_list* cont_list;
+	int loop_index = 0;
+	int max_loop_index = 0;
 
 
 	extern int yylineno;
@@ -115,7 +117,7 @@ program:	stmt program
 
 break: 		BREAK SEMICOLON 						{ 	
 														if(loopcounter > 0){
-															break_list = new_label_list(break_list,next_quad_label());
+															break_list = label_list_insert(break_list,next_quad_label(),loop_index);
 															emit_jump(jump, 0, 0, 0, 0); 
 															Handle_stmt_break_semicolon(yylineno);
 														}else{
@@ -125,7 +127,7 @@ break: 		BREAK SEMICOLON 						{
 													};
 continue:	CONTINUE SEMICOLON 						{ 	
 														if(loopcounter > 0){
-															cont_list = new_label_list(cont_list,next_quad_label()); 
+															cont_list = label_list_insert(cont_list,next_quad_label(),loop_index); 
 															emit_jump(jump, 0, 0, 0, 0); 
 															Handle_stmt_continue_semicolon(yylineno); 
 														}else{
@@ -136,7 +138,7 @@ continue:	CONTINUE SEMICOLON 						{
 
 stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;}
 		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
-		| whilestmt									{ Handle_stmt_whilestmt(yylineno); }
+		| whilestmt									{ Handle_stmt_whilestmt(yylineno); loop_index = max_loop_index;}
 		| forstmt									{ Handle_stmt_forstmt(yylineno); }
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
 		| break 									{$$ = $1;}
@@ -529,8 +531,8 @@ ifstmt: 	ifprefix stmt 						{ Handle_ifstmt_ifprefix_stmt($1,yylineno); }
 		| 	ifprefix stmt elseprefix stmt 		{ Handle_ifstmt_ifprefix_stmt_elseprefix_stmt($1,$3,yylineno); }
 		;
 
-loopstart:	{ ++loopcounter; };
-loopend: 	{ --loopcounter; };
+loopstart:	{ ++loopcounter; loop_index++; if(max_loop_index<loop_index){max_loop_index = loop_index;} push_loopindex_stack(loop_index);};
+loopend: 	{ --loopcounter; loop_index = pop_loopindex_stack();};
 loopstmt: 	loopstart stmt loopend 				{ $$ = $2; }
 
 whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
@@ -539,7 +541,7 @@ whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis($2,yylineno); }
 			;
 
-whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,yylineno); }
+whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); }
 
 
 N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };

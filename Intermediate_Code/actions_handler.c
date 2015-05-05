@@ -599,18 +599,20 @@ unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo
 	emit_jump(jump, 0, 0, 0, 0);
 	return ret;
 }
-void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,int lineNo){
+void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,unsigned index,int lineNo){
 	printf("Line: %d \twhilestmt: whilestart whilecond stmt\n", lineNo);
 	emit_jump(jump, 0, 0, 0, quadnum1);
 	patchlabel(quadnum2,next_quad_label());
 	struct label_list *tmp = break_list;
 	while(tmp){
-		patchlabel(tmp->label,next_quad_label());
+		if(tmp->index == index)
+			patchlabel(tmp->label,next_quad_label());
 		tmp = tmp->next;
 	}
 	tmp = cont_list;
 	while(tmp){
-		patchlabel(tmp->label,quadnum1);
+		if(tmp->index == index)
+			patchlabel(tmp->label,quadnum1);
 		tmp = tmp->next;
 	}
 }

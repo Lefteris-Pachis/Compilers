@@ -1,2 +1,16 @@
-while(x==1)
-	print("*");
+while(true){
+	continue;
+	break;
+	while(true){
+	continue;
+}
+while(true){
+	continue;
+}
+}
+
+while(true){
+	break;
+	continue;
+}
+

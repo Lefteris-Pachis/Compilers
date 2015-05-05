@@ -75,6 +75,7 @@ typedef struct quad {
 
 typedef struct label_list{
 	unsigned label;
+	unsigned index;
 	struct label_list *next;
 }label_list;
 
@@ -89,6 +90,11 @@ struct loopcounter_stack{
 	struct loopcounter_stack *next;
 }*loopcounter_stack_top;
 
+struct loopindex_stack{
+	int loopindex;
+	struct loopindex_stack *next;
+}*loopindex_stack_top;
+
 struct forprefix{
 	unsigned test;
 	unsigned enter;
@@ -96,6 +102,8 @@ struct forprefix{
 
 void push_loopcounter_stack(int loopcounter);
 int pop_loopcounter_stack();
+void push_loopindex_stack(int loopindex);
+int pop_loopindex_stack();
 
 /*push sthn stoiva pou krataei ta offset*/
 void push_to_stack(scopespace_t offset);
@@ -181,7 +189,7 @@ expr* emit_iftableitem(expr* e);
 void checkuminus(expr* e);
 unsigned int istempexpr(expr* e);
 
-label_list* label_list_insert(label_list* head,unsigned label);
+label_list* label_list_insert(label_list* head,unsigned label,unsigned index);
 
 void Print_Quads(void);
 static char *print_expr(expr * expression);
