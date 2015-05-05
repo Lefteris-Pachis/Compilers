@@ -104,7 +104,7 @@ unsigned Handle_whilestart_while(int lineNo);
 unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo);
 void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,unsigned index,int lineNo);
 
-void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,int lineNo);
+void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,unsigned index,int lineNo);
 
 void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo);
 void Handle_returnstmt_return_semicolon(int lineNo);

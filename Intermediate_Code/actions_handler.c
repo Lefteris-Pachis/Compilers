@@ -617,7 +617,7 @@ void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadn
 	}
 }
 
-void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,int lineNo){
+void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,unsigned index,int lineNo){
 	printf("Line: %d \tforstmt: forprefix N elist) N loopstmt N\n", lineNo);
 	patchlabel(forprefix->enter,N2+1);
 	patchlabel(N1,next_quad_label());
@@ -625,12 +625,14 @@ void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefi
 	patchlabel(N3,N1+1);
 	struct label_list *tmp = break_list;
 	while(tmp){
-		patchlabel(tmp->label,next_quad_label());
+		if(tmp->index == index)
+			patchlabel(tmp->label,next_quad_label());
 		tmp = tmp->next;
 	}
 	tmp = cont_list;
 	while(tmp){
-		patchlabel(tmp->label,N1+1);
+		if(tmp->index == index)
+			patchlabel(tmp->label,N1+1);
 		tmp = tmp->next;
 	}
 }

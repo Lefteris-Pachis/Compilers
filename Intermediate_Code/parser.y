@@ -141,7 +141,7 @@ continue:	CONTINUE SEMICOLON 						{
 stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;}
 		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
 		| whilestmt									{ Handle_stmt_whilestmt(yylineno); loop_index = max_loop_index;}
-		| forstmt									{ Handle_stmt_forstmt(yylineno); }
+		| forstmt									{ Handle_stmt_forstmt(yylineno); loop_index = max_loop_index;}
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
 		| break 									{$$ = $1;}
 		| continue 									{$$ = $1;}
@@ -585,7 +585,7 @@ forprefix:	FOR {for_flag = 1;} L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{
  																}
 			;
 
-forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 			{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$6,$7,$8,yylineno);
+forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 			{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$6,$7,$8,loop_index,yylineno);
 																		
  																	}
 			;
