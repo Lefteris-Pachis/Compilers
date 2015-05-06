@@ -135,11 +135,16 @@ expr* Handle_expr_expr_greater_than_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_greater, arg1, arg2, (expr*)0, next_quad_label()+3);
-		emit(assign, newexpr_constbool('0'), (expr*)0, e);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		//e->sym = new_temp();
+		//emit_jump(if_greater, arg1, arg2, (expr*)0, next_quad_label()+3);		//olikh apotimhsh
+		//emit(assign, newexpr_constbool('0'), (expr*)0, e);
+		//emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
+		//emit(assign, newexpr_constbool('1'), (expr*)0, e);
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_greater,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
@@ -148,11 +153,16 @@ expr* Handle_expr_expr_less_than_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_less, arg1, arg2, (expr*)0, next_quad_label()+3);
+		//e->sym = new_temp();
+		/*emit_jump(if_less, arg1, arg2, (expr*)0, next_quad_label()+3);
 		emit(assign, newexpr_constbool('0'), (expr*)0, e);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);*/
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_less,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
@@ -161,11 +171,16 @@ expr* Handle_expr_expr_greater_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_greatereq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		//e->sym = new_temp();
+		/*emit_jump(if_greatereq, arg1, arg2, (expr*)0, next_quad_label()+3);
 		emit(assign, newexpr_constbool('0'), (expr*)0, e);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);*/
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_greatereq,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
@@ -174,11 +189,16 @@ expr* Handle_expr_expr_less_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_lesseq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		//e->sym = new_temp();
+		/*emit_jump(if_lesseq, arg1, arg2, (expr*)0, next_quad_label()+3);
 		emit(assign, newexpr_constbool('0'), (expr*)0, e);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);*/
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_lesseq,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
@@ -187,11 +207,16 @@ expr* Handle_expr_expr_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_eq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		//e->sym = new_temp();
+		/*emit_jump(if_eq, arg1, arg2, (expr*)0, next_quad_label()+3);
 		emit(assign, newexpr_constbool('0'), (expr*)0, e);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);*/
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_eq,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
@@ -200,42 +225,79 @@ expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	expr* e = NULL;
 	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
-		e->sym = new_temp();
-		emit_jump(if_noteq, arg1, arg2, (expr*)0, next_quad_label()+3);
+		//e->sym = new_temp();
+		/*emit_jump(if_noteq, arg1, arg2, (expr*)0, next_quad_label()+3);
 		emit(assign, newexpr_constbool('0'), (expr*)0, e);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, next_quad_label()+2);
-		emit(assign, newexpr_constbool('1'), (expr*)0, e);
+		emit(assign, newexpr_constbool('1'), (expr*)0, e);*/
+																				//merikh apotimhsh
+		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+		emit_jump(if_noteq,arg1, arg2, (expr*)0, 0);
+		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	}
 	return e;
 }
-expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,int lineNo){
+expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr and expr \n", lineNo);
-	expr* e = NULL;
+	expr* e = NULL;			//olikh apotimhsh
 	e = newexpr(boolexpr_e);
-	e->sym = new_temp();
-	emit(and, arg1, arg2, e);
+	//e->sym = new_temp();
+	/*emit(and, arg1, arg2, e);
+	return e;*/
+								//merikh apotimhsh
+	struct label_list *tmp = arg1->true_list;
+	while(tmp){
+		patchlabel(tmp->label,M_quad);
+		tmp = tmp->next;
+	}
+	e->true_list = arg2->true_list;
+	e->false_list = merge(arg1->false_list,arg2->false_list);
 	return e;
 }
-expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,int lineNo){
+expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr or expr \n", lineNo);
-	expr* e = NULL;
+	expr* e = NULL;			//olikh apotimhsh
 	e = newexpr(boolexpr_e);
-	e->sym = new_temp();
-	emit(or, arg1, arg2, e);
+	//e->sym = new_temp();
+	/*emit(or, arg1, arg2, e);
+	return e;*/
+								//merikh apotimhsh
+
+	struct label_list *tmp = arg1->false_list;
+	while(tmp){
+		patchlabel(tmp->label,M_quad);
+		tmp = tmp->next;
+	}
+	printf("or\n");
+	e->true_list = merge(arg1->true_list,arg2->true_list);
+	printf("or\n");
+	e->false_list = arg2->false_list;
+	printf("or\n");
 	return e;
+
 }
 void Handle_expr_term(int lineNo){
 	printf("Line: %d \texpr: term\n", lineNo);
 }
 
 void Handle_term_l_parenthesis_expr_r_parenthesis(int lineNo){
-	printf("Line: %d \tterm: (term)\n", lineNo);
+	printf("Line: %d \tterm: (expr)\n", lineNo);
 }
 void Handle_term_uminus_expr(int lineNo){
 	printf("Line: %d \tterm: -expr\n", lineNo);
 }
-void Handle_term_not_expr(int lineNo){
+expr* Handle_term_not_expr(expr* expr,int lineNo){
 	printf("Line: %d \tterm: not expr\n", lineNo);
+	struct expr *e = NULL;
+	e = newexpr(boolexpr_e);
+	//e->sym = new_temp();
+	//emit(not,$2,0,e); 	//olikh apotimhsh
+							//merikh apotimhsh
+	e->true_list = expr->false_list;
+	e->false_list = expr->true_list;
+	printf("not\n");
+	return e;
 }
 int Handle_term_plus_plus_lvalue(int lineNo, char* id_val){
 	printf("Line: %d \tterm: ++lvalue\n", lineNo);
@@ -644,4 +706,26 @@ void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo){
 void Handle_returnstmt_return_semicolon(int lineNo){
 	printf("Line: %d \treturnstmt: return;\n", lineNo);
 	emit_ret(ret,newexpr(nil_e));
+}
+
+expr *Handle_relop(int relop,expr* expr){
+	struct expr *e = NULL;
+	if(relop == 1){
+		struct label_list *tmp = expr->true_list;
+		while(tmp){
+			patchlabel(tmp->label,next_quad_label());
+			tmp = tmp->next;
+		}
+		e = newexpr(boolexpr_e);
+		e->sym = new_temp();
+		emit(assign, newexpr_constbool('1'), (struct expr*)0, e);
+		emit_jump(jump, (struct expr*)0, (struct expr*)0, (struct expr*)0, next_quad_label()+2);
+		tmp = expr->false_list;
+		while(tmp){
+			patchlabel(tmp->label,next_quad_label());
+			tmp = tmp->next;
+		}
+		emit(assign, newexpr_constbool('0'), (struct expr*)0, e);
+	}
+	return e;
 }

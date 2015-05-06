@@ -30,6 +30,11 @@ typedef struct S_Stack{
 Stack *Head;
 Stack *Tail;
 
+typedef struct label_list{
+	unsigned label;
+	unsigned index;
+	struct label_list *next;
+}label_list;
 
 typedef enum expr_t { 
 		var_e,
@@ -61,6 +66,8 @@ struct expr {
 	char*				strConst;
 	unsigned char 		boolConst;
 	expr*				next;
+	label_list 			*true_list;
+	label_list 			*false_list;
 };
 
 typedef struct quad {
@@ -73,11 +80,9 @@ typedef struct quad {
 }quad;
 
 
-typedef struct label_list{
-	unsigned label;
-	unsigned index;
-	struct label_list *next;
-}label_list;
+struct M{
+	unsigned quad;
+};
 
 typedef struct statement{
 	label_list *break_list;
@@ -193,6 +198,7 @@ void checkuminus(expr* e);
 unsigned int istempexpr(expr* e);
 
 label_list* label_list_insert(label_list* head,unsigned label,unsigned index);
+label_list* merge(label_list* list1, label_list* list2);
 
 void Print_Quads(void);
 static char *print_expr(expr * expression);

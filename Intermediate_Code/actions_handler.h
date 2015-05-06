@@ -25,13 +25,13 @@ expr* Handle_expr_expr_greater_eq_expr(expr* arg1,expr* arg2,int lineNo);
 expr* Handle_expr_expr_less_eq_expr(expr* arg1,expr* arg2,int lineNo);
 expr* Handle_expr_expr_eq_expr(expr* arg1,expr* arg2,int lineNo);
 expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo);
-expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,int lineNo);
-expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,int lineNo);
+expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo);
+expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo);
 void Handle_expr_term(int lineNo);
 
 void Handle_term_l_parenthesis_expr_r_parenthesis(int lineNo);
 void Handle_term_uminus_expr(int lineNo);
-void Handle_term_not_expr(int lineNo);
+expr* Handle_term_not_expr(expr* expr,int lineNo);
 int Handle_term_plus_plus_lvalue(int lineNo, char* id_val);
 int Handle_term_lvalue_plus_plus(int lineNo, char* id_val);
 int Handle_term_minus_minus_lvalue(int lineNo, char* id_val);
@@ -108,5 +108,7 @@ void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefi
 
 void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo);
 void Handle_returnstmt_return_semicolon(int lineNo);
+
+expr *Handle_relop(int relop,expr* expr);
 
 #endif

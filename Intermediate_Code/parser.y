@@ -23,7 +23,7 @@
 	int loop_index = 0;
 	int max_loop_index = 0;
 	int table_flag;
-
+	int relop = 0;
 
 
 	extern int yylineno;
@@ -102,18 +102,19 @@
 %right		ASSIGN
 %left		OR
 %left		AND
+%nonassoc	NOT
 %nonassoc	EQ NOT_EQ
 %nonassoc	GREATER_THAN GREATER_EQ LESS_THAN LESS_EQ
 %left		PLUS MINUS
 %left		MUL DIV MOD
-%right		NOT PLUS_PLUS MINUS_MINUS UMINUS
+%right		PLUS_PLUS MINUS_MINUS UMINUS
 %left		DOT D_DOT
 %left		L_BRACKET R_BRACKET
 %left		L_PARENTHESIS R_PARENTHESIS
 %left 		ELSE
 %%
 
-program:	stmt program
+program:	stmt {loop_index = max_loop_index;}program
 		|/* empty */
 		;
 
@@ -138,10 +139,13 @@ continue:	CONTINUE SEMICOLON 						{
 														}
 													};
 
-stmt:	expr SEMICOLON 								{ Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;}
+stmt:	expr SEMICOLON 								{ 	Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;
+														if(Handle_relop(relop,$1)!=NULL)
+															relop = 0;
+													}
 		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
-		| whilestmt									{ Handle_stmt_whilestmt(yylineno); loop_index = max_loop_index;}
-		| forstmt									{ Handle_stmt_forstmt(yylineno); loop_index = max_loop_index;}
+		| whilestmt									{ Handle_stmt_whilestmt(yylineno); /*if(loop_index>1){loop_index = max_loop_index-1;}else{loop_index = max_loop_index;}*/}
+		| forstmt									{ Handle_stmt_forstmt(yylineno); /*if(loop_index>1){loop_index = max_loop_index-1;}else{loop_index = max_loop_index;};*/}
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
 		| break 									{$$ = $1;}
 		| continue 									{$$ = $1;}
@@ -158,28 +162,35 @@ expr:	assignexpr									{ 	Handle_expr_assignexpr(yylineno);
 		| expr MUL expr 							{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
 		| expr DIV expr 							{ $$ = Handle_expr_expr_div_expr($1, $3, yylineno); }
 		| expr MOD expr 							{ $$ = Handle_expr_expr_mod_expr($1, $3, yylineno); }
-		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); }
-		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); }
-		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); }
-		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); }
-		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); }
-		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); }
-		| expr AND expr  							{ $$ = Handle_expr_expr_and_expr($1, $3,yylineno); }
-		| expr OR expr 								{ $$ = Handle_expr_expr_or_expr($1, $3,yylineno); }
+		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); relop = 1;}
+		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); relop = 1;}
+		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr AND M expr  							{ $$ = Handle_expr_expr_and_expr($1, $4,$3,yylineno); relop = 1;}
+		| expr OR M expr 							{ $$ = Handle_expr_expr_or_expr($1, $4,$3,yylineno); relop = 1;}
 		| term 										{ $$=$1;	Handle_expr_term(yylineno); }
 		;
 
-term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ $$ = $2; Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); }
+
+term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ 
+														expr *e = Handle_relop(relop,$2);
+														if(e!=NULL)
+															relop = 0;
+														else
+															e = $2;
+														$$ = e;
+														Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); 
+													}
 		| MINUS expr %prec UMINUS						{ Handle_term_uminus_expr(yylineno); 
 														checkuminus($2);
 														$$ = newexpr(arithexpr_e);
 														$$->sym = new_temp();
 														emit(uminus,$2,0,$$);
 													}
-		| NOT expr 									{ Handle_term_not_expr(yylineno); 
-														$$ = newexpr(boolexpr_e);
-														$$->sym = new_temp();
-														emit(not,$2,0,$$);
+		| NOT expr 									{ $$ = Handle_term_not_expr($2,yylineno); 
+														relop = 1;
 													}
 		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
 														if($2->type == tableitem_e){
@@ -263,11 +274,18 @@ assignexpr:	lvalue ASSIGN expr 						{
 																	emit(assign,$1,(expr*)0,$1);
 																}
 																else{
-																	emit(assign,$3,(expr*)0,$1);	
-																	if(assign_counter > 1){
-																		$$=newexpr(assignexpr_e);
-																		$$->sym=new_temp();
-																		emit(assign,$1,(expr*)0,$$);
+																	expr *e = Handle_relop(relop,$3);
+																	if(e!=NULL){
+																		relop = 0;
+																		emit(assign, e, (expr*)0, $1);
+																	}
+																	else{
+																		emit(assign,$3,(expr*)0,$1);	
+																		//if(assign_counter > 1){
+																			$$=newexpr(assignexpr_e);
+																			$$->sym=new_temp();
+																			emit(assign,$1,(expr*)0,$$);
+																		//}
 																	}
 																}
 															}
@@ -550,13 +568,22 @@ idlist_1: 	COMMA idlist 	{ ;Handle_idlist_1_comma_idlist(yylineno); }
 			| 				{  }
 			;
 
-ifprefix: 	IF L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis($3,yylineno); }
+ifprefix: 	IF L_PARENTHESIS expr R_PARENTHESIS 	{ 
+														expr *e = Handle_relop(relop,$3);
+														if(e!=NULL)
+															relop = 0;
+														else
+															e = $3;
+														$$ = Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(e,yylineno); 
+
+														
+}
 			;
 
 elseprefix: ELSE 									{ $$ = Handle_elseprefix_else(yylineno); }
 			;
 
-ifstmt: 	ifprefix stmt 						{ Handle_ifstmt_ifprefix_stmt($1,yylineno); }
+ifstmt: 	ifprefix stmt 						{ 	Handle_ifstmt_ifprefix_stmt($1,yylineno); }
 		| 	ifprefix stmt elseprefix stmt 		{ Handle_ifstmt_ifprefix_stmt_elseprefix_stmt($1,$3,yylineno); }
 		;
 
@@ -567,7 +594,14 @@ loopstmt: 	loopstart stmt loopend 				{ $$ = $2; }
 whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 			;
 
-whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ $$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis($2,yylineno); }
+whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ 
+													expr *e = Handle_relop(relop,$2);
+													if(e!=NULL)
+														relop = 0;
+													else
+														e = $2;
+													$$ = Handle_whilecond_l_parenthesis_expr_r_parenthesis(e,yylineno); 
+												}
 			;
 
 whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); }
@@ -577,10 +611,15 @@ N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };
 M:			{ $$ = next_quad_label(); };
 
 forprefix:	FOR {for_flag = 1;} L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{ 
+																	expr *e = Handle_relop(relop,$7);
+																	if(e!=NULL)
+																		relop = 0;
+																	else
+																		e = $7;
 																	$$ = malloc(sizeof(struct forprefix));
 																	$$->test = $6;
 																	$$->enter = next_quad_label();
-																	emit(if_eq,$7,newexpr_constbool('1'),0);
+																	emit(if_eq,e,newexpr_constbool('1'),0);
 																	
  																}
 			;

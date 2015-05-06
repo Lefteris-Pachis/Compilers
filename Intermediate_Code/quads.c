@@ -369,6 +369,7 @@ label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
 	temp=(label_list *)malloc(sizeof(label_list));
 	temp->label=label;
 	temp->index = index;
+	printf("insert::label::%d::index::%d\n",label,index );
 	if (head== NULL){
 		head=temp;
 		head->next=NULL;
