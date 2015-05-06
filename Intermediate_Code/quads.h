@@ -80,10 +80,6 @@ typedef struct quad {
 }quad;
 
 
-struct M{
-	unsigned quad;
-};
-
 typedef struct statement{
 	label_list *break_list;
 	label_list *cont_list;
