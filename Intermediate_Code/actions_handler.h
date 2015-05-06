@@ -110,5 +110,6 @@ void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo);
 void Handle_returnstmt_return_semicolon(int lineNo);
 
 expr *Handle_relop(int relop,expr* expr);
+void Scan_jumps(int from,unsigned start,unsigned end);
 
 #endif

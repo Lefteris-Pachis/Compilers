@@ -96,6 +96,16 @@ struct loopindex_stack{
 	struct loopindex_stack *next;
 }*loopindex_stack_top;
 
+struct start_stack{
+	unsigned start;
+	struct start_stack *next;
+}*start_stack_top;
+
+struct stop_stack{
+	unsigned stop;
+	struct stop_stack *next;
+}*stop_stack_top;
+
 struct forprefix{
 	unsigned test;
 	unsigned enter;
@@ -105,6 +115,10 @@ void push_loopcounter_stack(int loopcounter);
 int pop_loopcounter_stack();
 void push_loopindex_stack(int loopindex);
 int pop_loopindex_stack();
+void push_start_stack(unsigned start);
+unsigned pop_start_stack();
+void push_stop_stack(unsigned stop);
+unsigned pop_stop_stack();
 
 /*push sthn stoiva pou krataei ta offset*/
 void push_to_stack(scopespace_t offset);
@@ -198,4 +212,5 @@ label_list* merge(label_list* list1, label_list* list2);
 
 void Print_Quads(void);
 static char *print_expr(expr * expression);
+int ispached(unsigned quadnum);
 #endif

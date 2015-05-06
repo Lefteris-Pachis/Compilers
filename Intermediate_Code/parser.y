@@ -24,6 +24,8 @@
 	int max_loop_index = 0;
 	int table_flag;
 	int relop = 0;
+	unsigned start = 0;
+	unsigned end = 0;
 
 
 	extern int yylineno;
@@ -144,8 +146,8 @@ stmt:	expr SEMICOLON 								{ 	Handle_stmt_expr_semicolon(yylineno); assign_cou
 															relop = 0;
 													}
 		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
-		| whilestmt									{ Handle_stmt_whilestmt(yylineno); /*if(loop_index>1){loop_index = max_loop_index-1;}else{loop_index = max_loop_index;}*/}
-		| forstmt									{ Handle_stmt_forstmt(yylineno); /*if(loop_index>1){loop_index = max_loop_index-1;}else{loop_index = max_loop_index;};*/}
+		| whilestmt									{ Handle_stmt_whilestmt(yylineno); Scan_jumps(0,start,end);}
+		| forstmt									{ Handle_stmt_forstmt(yylineno); Scan_jumps(1,start,end);}
 		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
 		| break 									{$$ = $1;}
 		| continue 									{$$ = $1;}
@@ -595,6 +597,8 @@ whilestart:	WHILE 								{ $$ = Handle_whilestart_while(yylineno); }
 			;
 
 whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{ 
+													start = next_quad_label();
+													push_start_stack(start);
 													expr *e = Handle_relop(relop,$2);
 													if(e!=NULL)
 														relop = 0;
@@ -604,13 +608,15 @@ whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{
 												}
 			;
 
-whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); }
+whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); end = next_quad_label(); push_stop_stack(end);start=pop_start_stack(); end = pop_stop_stack(); }
 
 
 N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };
 M:			{ $$ = next_quad_label(); };
 
 forprefix:	FOR {for_flag = 1;} L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{ 
+																	start = next_quad_label();
+																	push_start_stack(start);
 																	expr *e = Handle_relop(relop,$7);
 																	if(e!=NULL)
 																		relop = 0;
@@ -620,12 +626,13 @@ forprefix:	FOR {for_flag = 1;} L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{
 																	$$->test = $6;
 																	$$->enter = next_quad_label();
 																	emit(if_eq,e,newexpr_constbool('1'),0);
-																	
- 																}
+																}
 			;
 
 forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 			{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$6,$7,$8,loop_index,yylineno);
-																		
+																						end = next_quad_label();	
+																						push_stop_stack(end);
+																						start=pop_start_stack(); end = pop_stop_stack(); 
  																	}
 			;
 

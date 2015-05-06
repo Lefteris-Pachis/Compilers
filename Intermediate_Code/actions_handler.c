@@ -729,3 +729,25 @@ expr *Handle_relop(int relop,expr* expr){
 	}
 	return e;
 }
+
+void Scan_jumps(int from,unsigned start,unsigned end){
+	struct label_list *tmp = break_list;
+	
+	while(tmp){
+		if(ispached(tmp->label) == 0)
+			if(from == 0)
+				patchlabel(tmp->label,end);
+			else
+				patchlabel(tmp->label,end);
+		tmp = tmp->next;
+	}
+	tmp = cont_list;
+	while(tmp){
+		if(ispached(tmp->label) == 0)
+			if(from == 0)
+				patchlabel(tmp->label,start);
+			else
+				patchlabel(tmp->label,start+2);
+		tmp = tmp->next;
+	}
+}

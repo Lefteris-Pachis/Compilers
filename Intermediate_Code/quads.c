@@ -129,6 +129,13 @@ void patchlabel (unsigned quadnum, unsigned label){
 	quads[quadnum-1].label = label;
 }
 
+int ispached(unsigned quadnum){
+	if(quads[quadnum-1].label == 0)
+		return 0;
+	else
+		return 1;
+}
+
 /*TEMP VARIABLES FUNCTIONS*/
 char* new_temp_name(){
 	char * t_id=malloc(102);
@@ -369,7 +376,7 @@ label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
 	temp=(label_list *)malloc(sizeof(label_list));
 	temp->label=label;
 	temp->index = index;
-	printf("insert::label::%d::index::%d\n",label,index );
+	//printf("insert::label::%d::index::%d\n",label,index );
 	if (head== NULL){
 		head=temp;
 		head->next=NULL;
@@ -526,3 +533,51 @@ int pop_loopindex_stack()
    	return 0;
 }
 
+void push_start_stack(unsigned start){
+	struct start_stack *temp;
+    temp=malloc(sizeof(struct start_stack));
+    temp->start=start;
+    if (start_stack_top == NULL)
+    {
+         start_stack_top=temp;
+         start_stack_top->next=NULL;
+    }
+    else
+    {
+        temp->next=start_stack_top;
+        start_stack_top=temp;
+    }
+}
+unsigned pop_start_stack(){
+	struct start_stack *temp, *var=start_stack_top;
+    if(var==start_stack_top)
+    {
+        start_stack_top = start_stack_top->next;
+        return var->start;
+    }
+   	return 0;
+}
+void push_stop_stack(unsigned stop){
+	struct stop_stack *temp;
+    temp=malloc(sizeof(struct stop_stack));
+    temp->stop=stop;
+    if (stop_stack_top == NULL)
+    {
+         stop_stack_top=temp;
+         stop_stack_top->next=NULL;
+    }
+    else
+    {
+        temp->next=stop_stack_top;
+        stop_stack_top=temp;
+    }
+}
+unsigned pop_stop_stack(){
+	struct stop_stack *temp, *var=stop_stack_top;
+    if(var==stop_stack_top)
+    {
+        stop_stack_top = stop_stack_top->next;
+        return var->stop;
+    }
+   	return 0;
+}

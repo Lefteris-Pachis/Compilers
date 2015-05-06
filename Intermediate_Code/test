@@ -10,13 +10,14 @@
 //a>b or not c<d;
 //a > b or c < d and e >= f or g <= h and not i == j or not k != l;
 //y=((x>y)==(x>z));
-for (20-0; 21; 22-0) {
+/*for (20-0; 21; 22-0) {
 	while (23)
 		break;
 	continue;
+}*/
+while (23){
+	continue;
+	for (20-0; 21; 22-0)
+		break;
+	break;
 }
-//while (23){
-//	for (20-0; 21; 22-0)
-//		break;
-//	continue;
-//}
