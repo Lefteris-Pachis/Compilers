@@ -106,6 +106,11 @@ struct stop_stack{
 	struct stop_stack *next;
 }*stop_stack_top;
 
+struct total_expr_stack{
+	unsigned total_expr;
+	struct total_expr_stack *next;
+}*total_expr_stack_top;
+
 struct forprefix{
 	unsigned test;
 	unsigned enter;
@@ -119,6 +124,8 @@ void push_start_stack(unsigned start);
 unsigned pop_start_stack();
 void push_stop_stack(unsigned stop);
 unsigned pop_stop_stack();
+void push_total_expr_stack(unsigned total_expr);
+unsigned pop_total_expr_stack();
 
 /*push sthn stoiva pou krataei ta offset*/
 void push_to_stack(scopespace_t offset);
@@ -135,7 +142,7 @@ typedef struct elist_l{
 
 
 elist_l* top;
-elist_l* bot;
+elist_l* top_1;
 
 typedef struct calls{
 	elist_l* 		elist;
@@ -164,8 +171,13 @@ expr* make_call(expr *lval, elist_l* elist);
 /* push sta elist args */
 void push_elist(expr* elist,int flag);
 
+
+/* push sta elist args */
+void push_elist_1(expr* elist,int flag);
 /* pop apo lista args */
 elist_l* pop_elist();
+
+elist_l* pop_elist_1();
 
 
 /*GLOBAL VARIABLES*/

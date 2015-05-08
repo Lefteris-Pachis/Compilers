@@ -14,6 +14,7 @@
 	int error = 0;
 	int flag_emit = 0;
 	int for_flag = 0;
+	int total_expr;
 	int loopcounter = 0;
 	int assign_counter = 0;
 	char* id_val;
@@ -373,7 +374,8 @@ call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthes
 														}
 			| lvalue callsuffix 						{ 	Handle_call_lvalue_callsuffix(yylineno);
 															if($2->method==1){
-																expr* self = $1;															
+																expr* self = $1;
+																															
 																$1 = emit_iftableitem(member_item(self,$2->name));
 																push_elist(self,0);
 
@@ -413,24 +415,29 @@ elist: 		expr  				{
 										if(table_flag == 1){
 											push_elist($1,1);
 											table_flag = 0;
-											printf("OKKKKKKKKKKKKk" );
+											printf("------%d",$1->intConst );
 										}
 										else{
 											push_elist($1,0);
-											printf("11111111111111" );
+											printf("------%d",$1->intConst );
 										}
+										total_expr++;
+										$$=top;
 									}
+
 								}
 			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno); 
 										if(table_flag == 1){
 											push_elist($3,1);
 											table_flag = 0;
-											printf("OKKKKKKKKKKKKk" );
+											printf("------%d",$3->intConst );
 										}
 										else{
 											push_elist($3,0);
-											printf("2222222222222222" );
+											printf("------%d",$3->intConst );
 										}
+										total_expr++;
+										$$=top;
 									
 								}
 			|
@@ -438,26 +445,66 @@ elist: 		expr  				{
 
 
 
-objectdef: 	L_BRACKET {table_flag = 1;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+objectdef: 	L_BRACKET{table_flag=1;push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
 												int i=0;
-												elist_l* tmp;
+												elist_l* tmp=top;
 												elist_l* tmp1=top;
+												elist_l* temporary;
+
+												while(tmp!=NULL){
+													printf("LIST:::::%d",tmp->arg->intConst);
+													printf("del:::::\t%d\n",tmp->del);
+													tmp=tmp->next;
+
+												}
 
 												while((tmp = pop_elist())!=NULL){
+													printf("POP:::::%d\n",tmp->arg->intConst);
+													//push_elist_1 (tmp->arg,tmp->del);
+
+													
+
 													if(tmp->del == 1){
-														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
+
+														emit(tablesetelem,t,newexpr_constint(--total_expr),tmp->arg);
+
 														break;
+													}
+													else{
+														//printf("GG");
+														emit(tablesetelem,t,newexpr_constint(--total_expr),tmp->arg);
+													}
+
+
+												}
+												/*while((tmp = pop_elist_1())!=NULL){
+													printf("POP_1:::::%d\n",tmp->arg->intConst);
+						
+
+													if(tmp->del == 1){
+
+														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
+
+														//break;
 													}
 													else{
 														//printf("GG");
 														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
 													}
-												}
-												$$ = t; 
+													
+
+												}*/
+
+
+
+												$$ = t;
+												total_expr=pop_total_expr_stack();
 											}
+
+
 			| L_BRACKET {table_flag = 1;} indexed R_BRACKET { Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();

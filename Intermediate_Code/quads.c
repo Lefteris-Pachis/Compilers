@@ -408,12 +408,12 @@ label_list* merge(label_list* list1, label_list* list2) {
 expr* make_call(expr *lval, elist_l* elist){
 
 	expr* result;
-	expr* tmp;
+	elist_l* tmp;
 	expr* func = emit_iftableitem(lval);
 	//assert((tmp=pop_elist(elist))!=NULL);
 	while((tmp=pop_elist())!=NULL){
 		
-		emit(param,0,0,tmp);
+		emit(param,0,0,tmp->arg);
 	}
 	emit(call,0,0,func);
 	result = newexpr(var_e);
@@ -431,41 +431,84 @@ void push_elist(expr* elist, int flag){
 	if(top == NULL){
 		node->arg = elist;
 		node->next = NULL;
-		node->previous = NULL;
 		node->del = flag;
 		top = node;
-		bot = node;
 		
 	}else{
 		
 		node->arg = elist;
+		node->del = flag;
+
+		node->next =top;
+		top= node;
+	}
+}
+
+
+
+/* push first argument */
+void push_elist_1(expr* elist, int flag){
+
+	elist_l *tmp = top_1;
+	elist_l *node = malloc(sizeof(elist_l));
+	printf("Inside_push%d\n",elist->intConst);
+
+	if(top_1 == NULL){
+		node->arg = elist;
 		node->next = NULL;
 		node->del = flag;
-		while(tmp->next!=NULL){
-			tmp = tmp->next;
-		}
-		tmp->next = node;
-		node->previous = tmp;
-		bot = node;
+		top_1= node;
+		
+	}else{
+		
+		node->arg = elist;
+		node->del = flag;
+
+		node->next =top_1;
+		top_1= node;
 	}
 }
 
 /* pop first argument */
 elist_l* pop_elist(){
 
-	elist_l *tmp = bot;
+	elist_l *tmp ;
 
-	if(bot == NULL){
+
+	if(top == NULL){
 		
 		return NULL;
 	}
 	else{
-		tmp = bot;
-		bot = tmp->previous;
+		tmp = top;
+		top = top->next;
+
+
 		
 		return tmp;
 	}
 }
+
+/* pop first argument */
+elist_l* pop_elist_1(){
+
+	elist_l *tmp ;
+
+
+	if(top_1 == NULL){
+		
+		return NULL;
+	}
+	else{
+		tmp = top_1;
+		top_1 = top_1->next;
+
+
+		
+		return tmp;
+	}
+}
+
 
 expr* member_item(expr* lval, char* name){
 
@@ -578,6 +621,31 @@ unsigned pop_stop_stack(){
     {
         stop_stack_top = stop_stack_top->next;
         return var->stop;
+    }
+   	return 0;
+}
+
+void push_total_expr_stack(unsigned total_expr){
+	struct total_expr_stack *temp;
+    temp=malloc(sizeof(struct total_expr_stack));
+    temp->total_expr=total_expr;
+    if (total_expr_stack_top == NULL)
+    {
+         total_expr_stack_top=temp;
+         total_expr_stack_top->next=NULL;
+    }
+    else
+    {
+        temp->next=total_expr_stack_top;
+        total_expr_stack_top=temp;
+    }
+}
+unsigned pop_total_expr_stack(){
+	struct total_expr_stack *temp, *var=total_expr_stack_top;
+    if(var==total_expr_stack_top)
+    {
+        total_expr_stack_top = total_expr_stack_top->next;
+        return var->total_expr;
     }
    	return 0;
 }
