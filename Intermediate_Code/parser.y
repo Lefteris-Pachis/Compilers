@@ -16,7 +16,6 @@
 	int for_flag = 0;
 	int total_expr;
 	int loopcounter = 0;
-	int assign_counter = 0;
 	char* id_val;
 	char* funcName = NULL;
 	label_list* break_list;
@@ -121,184 +120,178 @@ program:	stmt {loop_index = max_loop_index;}program
 		|/* empty */
 		;
 
-break: 		BREAK SEMICOLON 						{ 	
-														if(loopcounter > 0){
-															break_list = label_list_insert(break_list,next_quad_label(),loop_index);
-															emit_jump(jump, 0, 0, 0, 0); 
-															Handle_stmt_break_semicolon(yylineno);
-														}else{
-															printf("Error at line: %d break is not in a loop\n",yylineno);
-															error = 1;
-														} 
-													};
-continue:	CONTINUE SEMICOLON 						{ 	
-														if(loopcounter > 0){
-															cont_list = label_list_insert(cont_list,next_quad_label(),loop_index); 
-															emit_jump(jump, 0, 0, 0, 0); 
-															Handle_stmt_continue_semicolon(yylineno); 
-														}else{
-															printf("Error at line: %d continue is not in a loop\n",yylineno);
-															error = 1;
-														}
-													};
+break: 		BREAK SEMICOLON 		{ 	
+										if(loopcounter > 0){
+											break_list = label_list_insert(break_list,next_quad_label(),loop_index);
+											emit_jump(jump, 0, 0, 0, 0); 
+											Handle_stmt_break_semicolon(yylineno);
+										}else{
+											printf("Error at line: %d break is not in a loop\n",yylineno);
+											error = 1;
+										} 
+									};
+continue:	CONTINUE SEMICOLON 		{ 	
+										if(loopcounter > 0){
+											cont_list = label_list_insert(cont_list,next_quad_label(),loop_index); 
+											emit_jump(jump, 0, 0, 0, 0); 
+											Handle_stmt_continue_semicolon(yylineno); 
+										}else{
+											printf("Error at line: %d continue is not in a loop\n",yylineno);
+											error = 1;
+										}
+									};
 
-stmt:	expr SEMICOLON 								{ 	Handle_stmt_expr_semicolon(yylineno); assign_counter = 0;
-														if(Handle_relop(relop,$1)!=NULL)
-															relop = 0;
-													}
-		| ifstmt									{ Handle_stmt_ifstmt(yylineno); }
-		| whilestmt									{ Handle_stmt_whilestmt(yylineno); Scan_jumps(0,start,end);}
-		| forstmt									{ Handle_stmt_forstmt(yylineno); Scan_jumps(1,start,end);}
-		| returnstmt								{ Handle_stmt_returnstmt(yylineno); }
-		| break 									{$$ = $1;}
-		| continue 									{$$ = $1;}
-		| block										{ Handle_stmt_block(yylineno); }
-		| funcdef									{ Handle_stmt_funcdef(yylineno); }
-		| SEMICOLON 								{ Handle_stmt_semicolon(yylineno); }
+stmt:	expr SEMICOLON 				{ 	Handle_stmt_expr_semicolon(yylineno);
+										if(Handle_relop(relop,$1)!=NULL)
+											relop = 0;
+									}
+		| ifstmt					{ Handle_stmt_ifstmt(yylineno); }
+		| whilestmt					{ Handle_stmt_whilestmt(yylineno); Scan_jumps(0,start,end);}
+		| forstmt					{ Handle_stmt_forstmt(yylineno); Scan_jumps(1,start,end);}
+		| returnstmt				{ Handle_stmt_returnstmt(yylineno); }
+		| break 					{$$ = $1;}
+		| continue 					{$$ = $1;}
+		| block						{ Handle_stmt_block(yylineno); }
+		| funcdef					{ Handle_stmt_funcdef(yylineno); }
+		| SEMICOLON 				{ Handle_stmt_semicolon(yylineno); }
 		;
 
-expr:	assignexpr									{ 	Handle_expr_assignexpr(yylineno);
-														$$=$1;
-													 }
-		| expr PLUS expr 							{ $$ = Handle_expr_expr_plus_expr($1, $3, yylineno); }
-		| expr MINUS expr 							{ $$ = Handle_expr_expr_minus_expr($1, $3, yylineno); }
-		| expr MUL expr 							{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
-		| expr DIV expr 							{ $$ = Handle_expr_expr_div_expr($1, $3, yylineno); }
-		| expr MOD expr 							{ $$ = Handle_expr_expr_mod_expr($1, $3, yylineno); }
-		| expr EQ expr 								{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); relop = 1;}
-		| expr NOT_EQ expr  						{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); relop = 1;}
-		| expr LESS_THAN expr  						{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); relop = 1;}
-		| expr GREATER_THAN expr  					{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); relop = 1;}
-		| expr LESS_EQ expr 						{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); relop = 1;}
-		| expr GREATER_EQ expr 						{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); relop = 1;}
-		| expr AND M expr  							{ $$ = Handle_expr_expr_and_expr($1, $4,$3,yylineno); relop = 1;}
-		| expr OR M expr 							{ $$ = Handle_expr_expr_or_expr($1, $4,$3,yylineno); relop = 1;}
-		| term 										{ $$=$1;	Handle_expr_term(yylineno); }
-		;
-
-
-term: 	L_PARENTHESIS expr R_PARENTHESIS 			{ 
-														expr *e = Handle_relop(relop,$2);
-														if(e!=NULL)
-															relop = 0;
-														else
-															e = $2;
-														$$ = e;
-														Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); 
-													}
-		| MINUS expr %prec UMINUS						{ Handle_term_uminus_expr(yylineno); 
-														checkuminus($2);
-														$$ = newexpr(arithexpr_e);
-														$$->sym = new_temp();
-														emit(uminus,$2,0,$$);
-													}
-		| NOT expr 									{ $$ = Handle_term_not_expr($2,yylineno); 
-														relop = 1;
-													}
-		| PLUS_PLUS lvalue 							{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
-														if($2->type == tableitem_e){
-															$$ = emit_iftableitem($2);
-															emit(add,$$,newexpr_constint(1),$$);
-															emit(tablesetelem,$2,$2->index,$$);
-														}
-														else{
-															emit(add,$2,newexpr_constint(1),$2);
-															$$ = newexpr(arithexpr_e);
-															$$->sym = new_temp();
-															emit(assign,$2,0,$$);
-														}
-													}
-		| lvalue PLUS_PLUS							{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; }
-														$$ = newexpr(var_e);
-														$$->sym = new_temp();														
-
-														if($1->type == tableitem_e){
-															expr* val = emit_iftableitem($1);
-															emit(assign,val,0,$$);
-															emit(add,val,newexpr_constint(1),val);
-															emit(tablesetelem,$1,$1->index,val);
-
-														}
-														else{
-															emit(assign,$1,0,$$);
-															emit(add,$1,newexpr_constint(1),$1);
-														}
-													}
-		| MINUS_MINUS lvalue 						{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
-														if($2->type == tableitem_e){
-															$$ = emit_iftableitem($2);
-															emit(sub,$$,newexpr_constint(1),$$);
-															emit(tablesetelem,$2,$2->index,$$);
-
-														}
-														else{
-															emit(sub,$2,newexpr_constint(1),$2);
-															$$ = newexpr(arithexpr_e);
-															$$->sym = new_temp();
-															emit(assign,$2,0,$$);
-														}
-													}
-		| lvalue MINUS_MINUS 						{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } 
-														$$ = newexpr(var_e);
-														$$->sym = new_temp();														
-
-														if($1->type == tableitem_e){
-															expr* val = emit_iftableitem($1);
-															emit(assign,val,0,$$);
-															emit(sub,val,newexpr_constint(1),val);
-															emit(tablesetelem,$1,$1->index,val);
-
-														}
-														else{
-															emit(assign,$1,0,$$);
-															emit(sub,$1,newexpr_constint(1),$1);
-														}
-													}
-		| primary 									{ $$ = $1; Handle_term_primary(yylineno); }
+expr:	assignexpr					{ $$=$1; Handle_expr_assignexpr(yylineno); }
+		| expr PLUS expr 			{ $$ = Handle_expr_expr_plus_expr($1, $3, yylineno); }
+		| expr MINUS expr 			{ $$ = Handle_expr_expr_minus_expr($1, $3, yylineno); }
+		| expr MUL expr 			{ $$ = Handle_expr_expr_mul_expr($1, $3, yylineno); }
+		| expr DIV expr 			{ $$ = Handle_expr_expr_div_expr($1, $3, yylineno); }
+		| expr MOD expr 			{ $$ = Handle_expr_expr_mod_expr($1, $3, yylineno); }
+		| expr EQ expr 				{ $$ = Handle_expr_expr_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr NOT_EQ expr  		{ $$ = Handle_expr_expr_not_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr LESS_THAN expr  		{ $$ = Handle_expr_expr_less_than_expr($1, $3,yylineno); relop = 1;}
+		| expr GREATER_THAN expr  	{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); relop = 1;}
+		| expr LESS_EQ expr 		{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr GREATER_EQ expr 		{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); relop = 1;}
+		| expr AND M expr  			{ $$ = Handle_expr_expr_and_expr($1, $4,$3,yylineno); relop = 1;}
+		| expr OR M expr 			{ $$ = Handle_expr_expr_or_expr($1, $4,$3,yylineno); relop = 1;}
+		| term 						{ $$=$1; Handle_expr_term(yylineno); }
 		;
 
 
-assignexpr:	lvalue ASSIGN expr 						{ 	
-														assign_counter++;
-														if(count_id > 1)
-															if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
-																tmp_state = 0;
-														count_id = 0; 
-														state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
-														if(state == -1) { error = 1; }
-														if(($1->type)==tableitem_e){
-															emit(tablesetelem,$1,$1->index,$3);
-															$$=emit_iftableitem($1);
-															$$->type=assignexpr_e;
-														}
-														else{ 
-															if(($1)!=NULL){
-																if(istempname($1->sym->name)){
-																	emit(assign,$1,(expr*)0,$1);
-																}
-																else{
-																	expr *e = Handle_relop(relop,$3);
-																	if(e!=NULL){
-																		relop = 0;
-																		emit(assign, e, (expr*)0, $1);
-																	}
-																	else{
-																		emit(assign,$3,(expr*)0,$1);	
-																		//if(assign_counter > 1){
-																			$$=newexpr(assignexpr_e);
-																			$$->sym=new_temp();
-																			emit(assign,$1,(expr*)0,$$);
-																		//}
-																	}
-																}
-															}
-															else{
-																emit(assign,$3,(expr*)0,$$);
-															}
+term: 	L_PARENTHESIS expr R_PARENTHESIS 	{ 
+												expr *e = Handle_relop(relop,$2);
+												if(e!=NULL)
+													relop = 0;
+												else
+													e = $2;
+												$$ = e;
+												Handle_term_l_parenthesis_expr_r_parenthesis(yylineno); 
+											}
+		| MINUS expr %prec UMINUS			{ 	Handle_term_uminus_expr(yylineno); 
+												checkuminus($2);
+												$$ = newexpr(arithexpr_e);
+												$$->sym = new_temp();
+												emit(uminus,$2,0,$$);
+											}
+		| NOT expr 							{ 	$$ = Handle_term_not_expr($2,yylineno); 
+												relop = 1;
+											}
+		| PLUS_PLUS lvalue 					{ state = Handle_term_plus_plus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
+												if($2->type == tableitem_e){
+													$$ = emit_iftableitem($2);
+													emit(add,$$,newexpr_constint(1),$$);
+													emit(tablesetelem,$2,$2->index,$$);
+												}
+												else{
+													emit(add,$2,newexpr_constint(1),$2);
+													$$ = newexpr(arithexpr_e);
+													$$->sym = new_temp();
+													emit(assign,$2,0,$$);
+												}
+											}
+		| lvalue PLUS_PLUS					{ state = Handle_term_lvalue_plus_plus(yylineno,id_val); if(state == -1) { error = 1; }
+												$$ = newexpr(var_e);
+												$$->sym = new_temp();
+												if($1->type == tableitem_e){
+													expr* val = emit_iftableitem($1);
+													emit(assign,val,0,$$);
+													emit(add,val,newexpr_constint(1),val);
+													emit(tablesetelem,$1,$1->index,val);
 
-														}
-	}
-			;	
+												}
+												else{
+													emit(assign,$1,0,$$);
+													emit(add,$1,newexpr_constint(1),$1);
+												}
+											}
+		| MINUS_MINUS lvalue 				{ state = Handle_term_minus_minus_lvalue(yylineno,id_val); if(state == -1) { error = 1; } 
+												if($2->type == tableitem_e){
+													$$ = emit_iftableitem($2);
+													emit(sub,$$,newexpr_constint(1),$$);
+													emit(tablesetelem,$2,$2->index,$$);
+
+												}
+												else{
+													emit(sub,$2,newexpr_constint(1),$2);
+													$$ = newexpr(arithexpr_e);
+													$$->sym = new_temp();
+													emit(assign,$2,0,$$);
+												}
+											}
+		| lvalue MINUS_MINUS 				{ state = Handle_term_lvalue_minus_minus(yylineno,id_val); if(state == -1) { error = 1; } 
+												$$ = newexpr(var_e);
+												$$->sym = new_temp();														
+
+												if($1->type == tableitem_e){
+													expr* val = emit_iftableitem($1);
+													emit(assign,val,0,$$);
+													emit(sub,val,newexpr_constint(1),val);
+													emit(tablesetelem,$1,$1->index,val);
+
+												}
+												else{
+													emit(assign,$1,0,$$);
+													emit(sub,$1,newexpr_constint(1),$1);
+												}
+											}
+		| primary 							{ $$ = $1; Handle_term_primary(yylineno); }
+		;
+
+
+assignexpr:	lvalue ASSIGN expr 		{ 	
+										if(count_id > 1)
+											if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
+												tmp_state = 0;
+										count_id = 0; 
+										state = Handle_assignexpr_lvalue_assign_expr(yylineno,tmp_state); 
+										if(state == -1) { error = 1; }
+										if(($1->type)==tableitem_e){
+											emit(tablesetelem,$1,$1->index,$3);
+											$$=emit_iftableitem($1);
+											$$->type=assignexpr_e;
+										}
+										else{ 
+											if(($1)!=NULL){
+												if(istempname($1->sym->name)){
+													emit(assign,$1,(expr*)0,$1);
+												}
+												else{
+													expr *e = Handle_relop(relop,$3);
+													if(e!=NULL){
+														relop = 0;
+														emit(assign, e, (expr*)0, $1);
+													}
+													else{
+														emit(assign,$3,(expr*)0,$1);	
+														$$=newexpr(assignexpr_e);
+														$$->sym=new_temp();
+														emit(assign,$1,(expr*)0,$$);
+													}
+												}
+											}
+											else{
+												emit(assign,$3,(expr*)0,$$);
+											}
+
+										}
+									}
+									;	
 
 primary:	lvalue 									{ 	
 														Handle_primary_lvalue(yylineno); 
@@ -438,7 +431,8 @@ elist: 		expr  				{
 			|					{$$=NULL;}
 			;
 
-objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { 
+												Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
@@ -453,7 +447,8 @@ objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_B
 												$$ = t;
 												total_expr=pop_total_expr_stack();
 											}
-			| L_BRACKET {push_total_expr_stack(total_expr);total_expr=0;} indexed R_BRACKET { Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
+			| L_BRACKET {push_total_expr_stack(total_expr);total_expr=0;} indexed R_BRACKET { 
+												Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
@@ -498,31 +493,29 @@ funcname:	ID 				{ $$=$1; }
 			| 				{ $$=Create_Function_Id(); }
 			;
 
-funcprefix: FUNCTION funcname {	
-								if(function_counter < scope_count)
-									function_counter = scope_count; 
-								function_counter++; 
-								funcName=$2;
-
-								if(istempname($2)){
-									state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block($2 ,scope_count, yylineno); 
-								}
-								else{
-
-									state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, scope_count, yylineno); 
-								}
-								if(state == -1) { error = 1; }
-								$<Symbol>$=Lookup(mytable,$2,scope_count);
-								$<Symbol>$->iaddress=next_quad_label();	
-								emit(funcstart,0,0,lvalue_expr($<Symbol>$));
-								push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
-								EnterScopeSpace();
-								resetformalargsoffset();
+funcprefix: FUNCTION funcname 	{	
+									if(function_counter < scope_count)
+										function_counter = scope_count; 
+									function_counter++; 
+									funcName=$2;
+									if(istempname($2)){
+										state = Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block($2 ,scope_count, yylineno); 
+									}
+									else{
+										state = Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block($2, scope_count, yylineno); 
+									}
+									if(state == -1) { error = 1; }
+									$<Symbol>$=Lookup(mytable,$2,scope_count);
+									$<Symbol>$->iaddress=next_quad_label();	
+									emit(funcstart,0,0,lvalue_expr($<Symbol>$));
+									push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
+									EnterScopeSpace();
+									resetformalargsoffset();
 								}								
 			;
 
 
-funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS {;EnterScopeSpace(); scope_count--;  resetfuctionlocalsoffset();}
+funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS { EnterScopeSpace(); scope_count--;  resetfuctionlocalsoffset();}
 			;
 
 funcblockstart: { push_loopcounter_stack(loopcounter); loopcounter = 0; };
@@ -578,16 +571,14 @@ ifprefix: 	IF L_PARENTHESIS expr R_PARENTHESIS 	{
 															relop = 0;
 														else
 															e = $3;
-														$$ = Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(e,yylineno); 
-
-														
-}
+														$$ = Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(e,yylineno); 													
+													}
 			;
 
 elseprefix: ELSE 									{ $$ = Handle_elseprefix_else(yylineno); }
 			;
 
-ifstmt: 	ifprefix stmt 						{ 	Handle_ifstmt_ifprefix_stmt($1,yylineno); }
+ifstmt: 	ifprefix stmt 						{ Handle_ifstmt_ifprefix_stmt($1,yylineno); }
 		| 	ifprefix stmt elseprefix stmt 		{ Handle_ifstmt_ifprefix_stmt_elseprefix_stmt($1,$3,yylineno); }
 		;
 
@@ -610,32 +601,39 @@ whilecond:	L_PARENTHESIS expr R_PARENTHESIS 	{
 												}
 			;
 
-whilestmt:	whilestart whilecond loopstmt 		{ $$ = $3; Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); end = next_quad_label(); push_stop_stack(end);start=pop_start_stack(); end = pop_stop_stack(); }
+whilestmt:	whilestart whilecond loopstmt 		{ 
+													$$ = $3; 
+													Handle_whilestmt_whilestart_whilecond_stmt($1,$2,$3,loop_index,yylineno); 
+													end = next_quad_label(); 
+													push_stop_stack(end);
+													start=pop_start_stack(); 
+													end = pop_stop_stack(); 
+												}
 
 
 N:			{ $$ = next_quad_label(); emit_jump(jump, 0, 0, 0, 0); };
 M:			{ $$ = next_quad_label(); };
 
 forprefix:	FOR {for_flag = 1;} L_PARENTHESIS elist SEMICOLON M expr SEMICOLON 	{ 
-																	start = next_quad_label();
-																	push_start_stack(start);
-																	expr *e = Handle_relop(relop,$7);
-																	if(e!=NULL)
-																		relop = 0;
-																	else
-																		e = $7;
-																	$$ = malloc(sizeof(struct forprefix));
-																	$$->test = $6;
-																	$$->enter = next_quad_label();
-																	emit(if_eq,e,newexpr_constbool('1'),0);
-																}
+																					start = next_quad_label();
+																					push_start_stack(start);
+																					expr *e = Handle_relop(relop,$7);
+																					if(e!=NULL)
+																						relop = 0;
+																					else
+																						e = $7;
+																					$$ = malloc(sizeof(struct forprefix));
+																					$$->test = $6;
+																					$$->enter = next_quad_label();
+																					emit(if_eq,e,newexpr_constbool('1'),0);
+																				}
 			;
 
-forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 			{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$6,$7,$8,loop_index,yylineno);
-																						end = next_quad_label();	
-																						push_stop_stack(end);
-																						start=pop_start_stack(); end = pop_stop_stack(); 
- 																	}
+forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 	{ 	Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N($1,$2,$6,$7,$8,loop_index,yylineno);
+																				end = next_quad_label();	
+																				push_stop_stack(end);
+																				start=pop_start_stack(); end = pop_stop_stack(); 
+ 																			}
 			;
 
 returnstmt:	RETURN expr SEMICOLON 	{ Handle_returnstmt_return_expr_semicolon($2,yylineno); }

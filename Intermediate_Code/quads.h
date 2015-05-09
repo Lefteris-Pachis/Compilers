@@ -79,7 +79,6 @@ typedef struct quad {
 	unsigned	line;
 }quad;
 
-
 typedef struct statement{
 	label_list *break_list;
 	label_list *cont_list;
@@ -145,31 +144,17 @@ void push_to_stack(scopespace_t offset);
 /*pop apo stn stoiva gia offset*/
 scopespace_t pop_from_stack();
 
-
 expr* member_item(expr* lval, char* name);
 
 /*push sthn stoiva*/
 void push_to_stack(unsigned offset);
 
-
 void resetformalargsoffset(void);
-
 void resetfuctionlocalsoffset(void);
-
-
 void restorecurrscopeoffset(unsigned n);
 
 /* CALL FUNCTIONS */
-
 expr* make_call(expr *lval, expr* elist);
-
-
-
-
-/*GLOBAL VARIABLES*/
-
-
-
 
 /*QUADS FUNCTIONS*/
 void expand(void);

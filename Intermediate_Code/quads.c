@@ -64,8 +64,6 @@ void emit_ret(iopcode op, expr* result){
 	total++;
 }
 
-
-
 /*push sthn stoiva*/
 void push_to_stack(scopespace_t offset){
 
@@ -94,7 +92,6 @@ void push_to_stack(scopespace_t offset){
 	}
 }
 
-
 /*pop apo stn stoiva*/
 scopespace_t pop_from_stack(){
 	Stack *tmp=Tail;
@@ -107,7 +104,6 @@ scopespace_t pop_from_stack(){
 		return tmp->offset; //pop
 	}
 }
-
 
 expr* emit_iftableitem(expr* e){
 	if(e->type != tableitem_e)
@@ -319,7 +315,7 @@ void Print_Quads(void){
 	 		if(quads[i].result!= NULL)
 	    		fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}
-      	//fprintf(icode,"Line: %d", quads[i].line);
+      	//fprintf(icode,"\t\t\tLine: %d", quads[i].line);
     	fprintf(icode,"\n");
     }
     fclose(icode);
@@ -364,11 +360,8 @@ static char *print_expr(expr * expression){
     	return (expression->sym)->name;
    	}else if(type==assignexpr_e){
     	return (expression->sym)->name;
-   	}else{
-		printf("RESULT:%d\n", type);
-		printf("%d\n", expression->type); 
+   	}else
     	assert(0);
-   	}
 }
 
 label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
@@ -388,7 +381,6 @@ label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
 	}
 }
 
-
 label_list* merge(label_list* list1, label_list* list2) {
   if (list1 == NULL) return list2;
   if (list2 == NULL) return list1;
@@ -403,7 +395,6 @@ label_list* merge(label_list* list1, label_list* list2) {
 }
 
 /* call functions */
-
 expr* make_call(expr *lval, expr* elist){
 
 	expr* result;
@@ -421,9 +412,6 @@ expr* make_call(expr *lval, expr* elist){
 	return result;
 }
 
-
-
-
 expr* member_item(expr* lval, char* name){
 
 	lval = emit_iftableitem(lval);
@@ -432,7 +420,6 @@ expr* member_item(expr* lval, char* name){
 	item->index = newexpr_conststring(name);
 	return item;
 }
-
 
 void push_loopcounter_stack(int loopcounter)
 {
@@ -505,6 +492,7 @@ void push_start_stack(unsigned start){
         start_stack_top=temp;
     }
 }
+
 unsigned pop_start_stack(){
 	struct start_stack *temp, *var=start_stack_top;
     if(var==start_stack_top)
@@ -514,6 +502,7 @@ unsigned pop_start_stack(){
     }
    	return 0;
 }
+
 void push_stop_stack(unsigned stop){
 	struct stop_stack *temp;
     temp=malloc(sizeof(struct stop_stack));
@@ -529,6 +518,7 @@ void push_stop_stack(unsigned stop){
         stop_stack_top=temp;
     }
 }
+
 unsigned pop_stop_stack(){
 	struct stop_stack *temp, *var=stop_stack_top;
     if(var==stop_stack_top)
@@ -554,6 +544,7 @@ void push_total_expr_stack(unsigned total_expr){
         total_expr_stack_top=temp;
     }
 }
+
 unsigned pop_total_expr_stack(){
 	struct total_expr_stack *temp, *var=total_expr_stack_top;
     if(var==total_expr_stack_top)

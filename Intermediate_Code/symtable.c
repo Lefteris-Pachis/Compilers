@@ -167,61 +167,6 @@ int Insert_to_Hash(SymTable_T oSymTable, const char *name, symbol_t type, unsign
 	return 1;
 }
 
-
-/*int Insert_Func(SymTable_T oSymTable, const char *func_name, const char *func_type, int func_scope, int func_line)
-{
-	int hashcode;
-	if(func_name != NULL)
-		hashcode = SymTable_hash(func_name);
-	else
-		hashcode = 0;
-
-	symbol put;
-	symbol parse;
-
-	assert(oSymTable!=NULL);
-
-	put=malloc(sizeof(struct symbol));
-
-	if(func_name != NULL){
-		
-		put->func_name=malloc((strlen(func_name)+1)*sizeof(char));
-		put->func_name = strdup(func_name);
-	}
-
-	if(func_type != NULL){
-		
-		put->func_type=malloc((strlen(func_type)+1)*sizeof(char));
-		put->func_type = strdup(func_type);
-	}
-
-	put->args=NULL;
-
-	put->scope = func_scope;
-
-	put->line = func_line;
-
-	put->hiden = 0;
-
-	put->next = NULL;
-
-	
-	if(oSymTable->hashtable[hashcode]->var_name==NULL && oSymTable->hashtable[hashcode]->func_name==NULL)
-	{
-		oSymTable->hashtable[hashcode] = put;
-
-	}
-	else{
-		parse = oSymTable->hashtable[hashcode];
-		put->next = parse;
-		parse = put;
-		oSymTable->hashtable[hashcode] = parse;
-	}
-
-
-	return 1;
-}*/
-
 void Hide(SymTable_T oSymTable, int scope)
 {
 	if(scope != 0){
@@ -254,11 +199,6 @@ symbol Lookup
 				if(strcmp(parse->name,name) == 0 && parse->hiden == 0)
 					return parse;
 			}
-			/*else if(parse->func_name != NULL)
-			{
-				if(strcmp(parse->func_name,name) == 0 && parse->hiden == 0)
-					return parse;
-			}*/
 			parse=parse->next;
 		}
 	}
@@ -270,11 +210,6 @@ symbol Lookup
 				if((strcmp(parse->name,name) == 0) && parse->hiden == 0)
 					return parse;
 			}
-			/*else if(parse->func_name!=NULL  && parse->scope == scope)
-			{
-				if((strcmp(parse->func_name,name) == 0) && parse->hiden == 0)
-					return parse;
-			}*/
 			parse=parse->next;
 		}
 	}
