@@ -144,6 +144,7 @@ continue:	CONTINUE SEMICOLON 		{
 stmt:	expr SEMICOLON 				{ 	Handle_stmt_expr_semicolon(yylineno);
 										if(Handle_relop(relop,$1)!=NULL)
 											relop = 0;
+										prev_id_state=0;
 									}
 		| ifstmt					{ Handle_stmt_ifstmt(yylineno); }
 		| whilestmt					{ Handle_stmt_whilestmt(yylineno); Scan_jumps(0,start,end);}
@@ -254,7 +255,7 @@ term: 	L_PARENTHESIS expr R_PARENTHESIS 	{
 		;
 
 
-assignexpr:	lvalue ASSIGN expr 		{ 	
+assignexpr:	lvalue ASSIGN expr 		{
 										if(count_id > 1)
 											if(prev_id_state == 0 && (tmp_state == -2 || tmp_state == -3 ))
 												tmp_state = 0;
@@ -341,7 +342,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if($$->sym)
  															$$ = lvalue_expr($$->sym);
 													}
-			| member 								{ Handle_lvalue_member(yylineno); }
+			| member 								{ $$ = $1; Handle_lvalue_member(yylineno); }
 			;
 
 member:		lvalue DOT ID 							{ 		Handle_member_lvalue_dot_id(yylineno);

@@ -133,73 +133,73 @@ expr* Handle_expr_expr_mod_expr(expr* arg1,expr* arg2,int lineNo){
 expr* Handle_expr_expr_greater_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr > expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_greater,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_less_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr < expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_less,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_greater_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr >= expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_greatereq,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_less_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr <= expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_lesseq,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr == expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_eq,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr != expr \n", lineNo);
 	expr* e = NULL;
-	if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
+	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == var_e) && (arg2->type == arithexpr_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
 		e = newexpr(boolexpr_e);
 		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
 		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
 		emit_jump(if_noteq,arg1, arg2, (expr*)0, 0);
 		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	}
+	//}
 	return e;
 }
 expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
@@ -224,11 +224,8 @@ expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo)
 		patchlabel(tmp->label,M_quad);
 		tmp = tmp->next;
 	}
-	printf("or\n");
 	e->true_list = merge(arg1->true_list,arg2->true_list);
-	printf("or\n");
 	e->false_list = arg2->false_list;
-	printf("or\n");
 	return e;
 
 }
@@ -248,7 +245,6 @@ expr* Handle_term_not_expr(expr* expr,int lineNo){
 	e = newexpr(boolexpr_e);
 	e->true_list = expr->false_list;
 	e->false_list = expr->true_list;
-	printf("not\n");
 	return e;
 }
 int Handle_term_plus_plus_lvalue(int lineNo, char* id_val){

@@ -24,4 +24,6 @@
 //a..f(not y);
 //[{"x":0},{"y":a+b},{-1:0}];
 //[1,2];
-(function(a,b){a;b();})(a(), b()());
+//(function(a,b){a;b();})(a(), b()());
+print(x);
+x = print("x");
