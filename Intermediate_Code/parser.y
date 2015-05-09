@@ -369,10 +369,20 @@ member:		lvalue DOT ID 							{ 		Handle_member_lvalue_dot_id(yylineno);
 			| call L_BRACKET expr R_BRACKET 		{ Handle_member_call_l_bracket_expr_r_bracket(yylineno); }
 			;
 
-call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno); 
+call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno);
+															expr *e = Handle_relop(relop,$3->arg);
+															if(e!=NULL){
+																$3->arg = e;
+																relop = 0; 
+															}
 															$$ = make_call($1,$3);
 														}
 			| lvalue callsuffix 						{ 	Handle_call_lvalue_callsuffix(yylineno);
+															expr *e = Handle_relop(relop,$2->elist->arg);
+															if(e!=NULL){
+																$2->elist->arg = e;
+																relop = 0; 
+															}
 															if($2->method==1){
 																expr* self = $1;
 																															
@@ -383,6 +393,11 @@ call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthes
 															$$ = make_call($1,$2->elist);
 														}
 			| L_PARENTHESIS funcdef R_PARENTHESIS L_PARENTHESIS elist R_PARENTHESIS 	{ 	Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_parenthesis(yylineno); 
+																							expr *e = Handle_relop(relop,$5->arg);
+																							if(e!=NULL){
+																								$5->arg = e;
+																								relop = 0; 
+																							}
 																							expr* func = newexpr(programfunc_e);
 																							func->sym = $2;
 																							$$ = make_call(func,$5);
