@@ -537,7 +537,7 @@ void Handle_indexed_indexed_comma_indexedelem(int lineNo){
 	printf("Line: %d \tindexed: indexed , indexedelem\n", lineNo);
 }
 void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
-	printf("Line: %d \tindexedelem: {expr: exprexpr}\n", lineNo);
+	printf("Line: %d \tindexedelem: {expr: expr}\n", lineNo);
 }
 
 void Handle_block_l_brace_block_1_r_brace(int lineNo){

@@ -376,7 +376,6 @@ label_list* label_list_insert(label_list* head,unsigned label,unsigned index){
 	temp=(label_list *)malloc(sizeof(label_list));
 	temp->label=label;
 	temp->index = index;
-	//printf("insert::label::%d::index::%d\n",label,index );
 	if (head== NULL){
 		head=temp;
 		head->next=NULL;
@@ -405,15 +404,15 @@ label_list* merge(label_list* list1, label_list* list2) {
 
 /* call functions */
 
-expr* make_call(expr *lval, elist_l* elist){
+expr* make_call(expr *lval, expr* elist){
 
 	expr* result;
-	elist_l* tmp;
+	expr* tmp=elist;
 	expr* func = emit_iftableitem(lval);
-	//assert((tmp=pop_elist(elist))!=NULL);
-	while((tmp=pop_elist())!=NULL){
+	while(tmp!=NULL){
 		
-		emit(param,0,0,tmp->arg);
+		emit(param,0,0,tmp);
+		tmp=tmp->next;
 	}
 	emit(call,0,0,func);
 	result = newexpr(var_e);
@@ -422,92 +421,7 @@ expr* make_call(expr *lval, elist_l* elist){
 	return result;
 }
 
-/* push first argument */
-void push_elist(expr* elist, int flag){
 
-	elist_l *tmp = top;
-	elist_l *node = malloc(sizeof(elist_l));
-
-	if(top == NULL){
-		node->arg = elist;
-		node->next = NULL;
-		node->del = flag;
-		top = node;
-		
-	}else{
-		
-		node->arg = elist;
-		node->del = flag;
-
-		node->next =top;
-		top= node;
-	}
-}
-
-
-
-/* push first argument */
-void push_elist_1(expr* elist, int flag){
-
-	elist_l *tmp = top_1;
-	elist_l *node = malloc(sizeof(elist_l));
-	printf("Inside_push%d\n",elist->intConst);
-
-	if(top_1 == NULL){
-		node->arg = elist;
-		node->next = NULL;
-		node->del = flag;
-		top_1= node;
-		
-	}else{
-		
-		node->arg = elist;
-		node->del = flag;
-
-		node->next =top_1;
-		top_1= node;
-	}
-}
-
-/* pop first argument */
-elist_l* pop_elist(){
-
-	elist_l *tmp ;
-
-
-	if(top == NULL){
-		
-		return NULL;
-	}
-	else{
-		tmp = top;
-		top = top->next;
-
-
-		
-		return tmp;
-	}
-}
-
-/* pop first argument */
-elist_l* pop_elist_1(){
-
-	elist_l *tmp ;
-
-
-	if(top_1 == NULL){
-		
-		return NULL;
-	}
-	else{
-		tmp = top_1;
-		top_1 = top_1->next;
-
-
-		
-		return tmp;
-	}
-}
 
 
 expr* member_item(expr* lval, char* name){
@@ -648,4 +562,38 @@ unsigned pop_total_expr_stack(){
         return var->total_expr;
     }
    	return 0;
+}
+
+expr* expr_list_insert(expr* head,expr *expr){
+	struct expr *temp,*tmp=head;
+	temp=(struct expr *)malloc(sizeof(struct expr));
+	temp=expr;
+	if (head== NULL){
+		head=temp;
+		head->next=NULL;
+		return head;
+	}
+	else{
+		while(tmp->next != NULL)
+     		tmp= tmp->next;
+     	tmp->next= temp;
+		return head;
+	}
+}
+
+indexed* indexed_list_insert(indexed* head, indexed* index){
+	struct indexed *temp,*tmp=head;
+	temp=(struct indexed *)malloc(sizeof(struct indexed));
+	temp=index;
+	if (head== NULL){
+		head=temp;
+		head->next=NULL;
+		return head;
+	}
+	else{
+		while(tmp->next != NULL)
+     		tmp= tmp->next;
+     	tmp->next= temp;
+		return head;
+	}
 }

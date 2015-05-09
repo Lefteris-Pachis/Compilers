@@ -116,6 +116,18 @@ struct forprefix{
 	unsigned enter;
 };
 
+typedef struct indexed{
+	expr*	 		x;
+	expr*	 		y;
+	struct indexed* next;
+}indexed;
+
+typedef struct calls{
+	expr* 		elist;
+	unsigned 	method;
+	char* 		name;
+}calls;
+
 void push_loopcounter_stack(int loopcounter);
 int pop_loopcounter_stack();
 void push_loopindex_stack(int loopindex);
@@ -133,23 +145,6 @@ void push_to_stack(scopespace_t offset);
 /*pop apo stn stoiva gia offset*/
 scopespace_t pop_from_stack();
 
-typedef struct elist_l{
-	expr*	 		arg;
-	int 			del;
-	struct elist_l* next;
-	struct elist_l* previous;
-}elist_l;
-
-
-elist_l* top;
-elist_l* top_1;
-
-typedef struct calls{
-	elist_l* 		elist;
-	unsigned 		method;
-	char* 			name;
-}calls;
-
 
 expr* member_item(expr* lval, char* name);
 
@@ -166,18 +161,9 @@ void restorecurrscopeoffset(unsigned n);
 
 /* CALL FUNCTIONS */
 
-expr* make_call(expr *lval, elist_l* elist);
-
-/* push sta elist args */
-void push_elist(expr* elist,int flag);
+expr* make_call(expr *lval, expr* elist);
 
 
-/* push sta elist args */
-void push_elist_1(expr* elist,int flag);
-/* pop apo lista args */
-elist_l* pop_elist();
-
-elist_l* pop_elist_1();
 
 
 /*GLOBAL VARIABLES*/
@@ -221,6 +207,9 @@ unsigned int istempexpr(expr* e);
 
 label_list* label_list_insert(label_list* head,unsigned label,unsigned index);
 label_list* merge(label_list* list1, label_list* list2);
+
+expr* expr_list_insert(expr* head,expr *expr);
+indexed* indexed_list_insert(indexed* head, indexed* index);
 
 void Print_Quads(void);
 static char *print_expr(expr * expression);

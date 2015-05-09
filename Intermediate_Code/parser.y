@@ -23,7 +23,6 @@
 	label_list* cont_list;
 	int loop_index = 0;
 	int max_loop_index = 0;
-	int table_flag;
 	int relop = 0;
 	unsigned start = 0;
 	unsigned end = 0;
@@ -46,7 +45,7 @@
 	struct forprefix *forVal;
 	struct statement *stmtVal;
 	struct calls *CallsVar;
-	struct elist_l *ElistVar;
+	struct indexed *indexedVar;
 }
 
 %start program
@@ -98,9 +97,10 @@
 %type <CallsVar> methodcall
 %type <CallsVar> normcall
 
-%type <ElistVar> elist
+%type <exprNode> elist
 %type <exprNode> objectdef
-%type <ElistVar> indexed
+%type <indexedVar> indexed
+%type <indexedVar> indexedelem
 
 %right		ASSIGN
 %left		OR
@@ -370,32 +370,30 @@ member:		lvalue DOT ID 							{ 		Handle_member_lvalue_dot_id(yylineno);
 			;
 
 call: 		call L_PARENTHESIS elist R_PARENTHESIS 		{ 	Handle_call_call_l_parenthesis_elist_r_parenthesis(yylineno);
-															expr *e = Handle_relop(relop,$3->arg);
+															expr *e = Handle_relop(relop,$3);
 															if(e!=NULL){
-																$3->arg = e;
+																$3 = e;
 																relop = 0; 
 															}
 															$$ = make_call($1,$3);
 														}
 			| lvalue callsuffix 						{ 	Handle_call_lvalue_callsuffix(yylineno);
-															expr *e = Handle_relop(relop,$2->elist->arg);
+															expr *e = Handle_relop(relop,$2->elist);
 															if(e!=NULL){
-																$2->elist->arg = e;
+																$2->elist = e;
 																relop = 0; 
 															}
 															if($2->method==1){
 																expr* self = $1;
-																															
 																$1 = emit_iftableitem(member_item(self,$2->name));
-																push_elist(self,0);
-
+																$2->elist=expr_list_insert($2->elist,self);
 															}
 															$$ = make_call($1,$2->elist);
 														}
 			| L_PARENTHESIS funcdef R_PARENTHESIS L_PARENTHESIS elist R_PARENTHESIS 	{ 	Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_parenthesis(yylineno); 
-																							expr *e = Handle_relop(relop,$5->arg);
+																							expr *e = Handle_relop(relop,$5);
 																							if(e!=NULL){
-																								$5->arg = e;
+																								$5 = e;
 																								relop = 0; 
 																							}
 																							expr* func = newexpr(programfunc_e);
@@ -427,120 +425,62 @@ methodcall: D_DOT ID L_PARENTHESIS elist R_PARENTHESIS 	{ 	Handle_methodcall_d_d
 elist: 		expr  				{ 
 									Handle_elist_expr(yylineno);
 									if(for_flag == 0){
-										if(table_flag == 1){
-											push_elist($1,1);
-											table_flag = 0;
-											printf("------%d",$1->intConst );
-										}
-										else{
-											push_elist($1,0);
-											printf("------%d",$1->intConst );
-										}
 										total_expr++;
-										$$=top;
 									}
-
+									$$=$1;
 								}
-			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno); 
-										if(table_flag == 1){
-											push_elist($3,1);
-											table_flag = 0;
-											printf("------%d",$3->intConst );
-										}
-										else{
-											push_elist($3,0);
-											printf("------%d",$3->intConst );
-										}
+			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno);
+									if(for_flag == 0){
 										total_expr++;
-										$$=top;
-									
+										$$=expr_list_insert($1,$3);
+									}
 								}
-			|
+			|					{$$=NULL;}
 			;
 
-
-
-objectdef: 	L_BRACKET{table_flag=1;push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
 												int i=0;
-												elist_l* tmp=top;
-												elist_l* tmp1=top;
-												elist_l* temporary;
-
-												while(tmp!=NULL){
-													printf("LIST:::::%d",tmp->arg->intConst);
-													printf("del:::::\t%d\n",tmp->del);
-													tmp=tmp->next;
-
+												expr* tmp=$3;
+												if(total_expr!=0){
+													while(tmp!=NULL){
+														emit(tablesetelem,t,newexpr_constint(i++),tmp);
+														tmp=tmp->next;
+													}
 												}
-
-												while((tmp = pop_elist())!=NULL){
-													printf("POP:::::%d\n",tmp->arg->intConst);
-													//push_elist_1 (tmp->arg,tmp->del);
-
-													
-
-													if(tmp->del == 1){
-
-														emit(tablesetelem,t,newexpr_constint(--total_expr),tmp->arg);
-
-														break;
-													}
-													else{
-														//printf("GG");
-														emit(tablesetelem,t,newexpr_constint(--total_expr),tmp->arg);
-													}
-
-
-												}
-												/*while((tmp = pop_elist_1())!=NULL){
-													printf("POP_1:::::%d\n",tmp->arg->intConst);
-						
-
-													if(tmp->del == 1){
-
-														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
-
-														//break;
-													}
-													else{
-														//printf("GG");
-														emit(tablesetelem,t,newexpr_constint(i++),tmp->arg);
-													}
-													
-
-												}*/
-
-
-
 												$$ = t;
 												total_expr=pop_total_expr_stack();
 											}
-
-
-			| L_BRACKET {table_flag = 1;} indexed R_BRACKET { Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
+			| L_BRACKET {push_total_expr_stack(total_expr);total_expr=0;} indexed R_BRACKET { Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
 												int i=0;
-												elist_l* tmp;
-												elist_l* tmp2;
-												while((tmp = pop_elist())!=NULL  && (tmp2 = pop_elist())!=NULL){
-													emit(tablesetelem,t,tmp->arg,tmp2->arg);
+												indexed* tmp=$3;
+												if(total_expr!=0){
+													while(tmp!=NULL){
+														emit(tablesetelem,t,tmp->x,tmp->y);
+														tmp=tmp->next;
+													}
 												}
 												$$ = t;
+												total_expr=pop_total_expr_stack();
 											}
 			;
 
-indexed: 	indexedelem  				{ Handle_indexed_indexedelem(yylineno); }
-			| indexed COMMA indexedelem { Handle_indexed_indexed_comma_indexedelem(yylineno); }
+indexed: 	indexedelem  				{ Handle_indexed_indexedelem(yylineno); $$=$1;}
+			| indexed COMMA indexedelem { Handle_indexed_indexed_comma_indexedelem(yylineno); $$ = indexed_list_insert($1,$3);}
 			;
 
-
-
-indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); push_elist($2,0); push_elist($4,0);}
+indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr_colon_expr_r_brace(yylineno); 
+														total_expr++;
+														$$ = malloc(sizeof(struct indexed));
+														$$->x=expr_list_insert($$->x,$2);
+														total_expr++;
+														$$->y=expr_list_insert($$->y,$4);
+													}
 				;
 
 block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
