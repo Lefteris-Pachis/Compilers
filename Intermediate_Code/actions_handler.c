@@ -641,13 +641,25 @@ void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefi
 	}
 }
 
-void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo){
-	printf("Line: %d \treturnstmt: return expr;\n", lineNo);
-	emit_ret(ret,expr);
+int Handle_returnstmt_return_expr_semicolon(expr* expr,int function_counter,int lineNo){
+	if(function_counter > 0){
+		printf("Line: %d \treturnstmt: return expr;\n", lineNo);
+		emit_ret(ret,expr);
+		return 0;
+	}else{
+		printf("Error at line: %d return is not in a function\n",lineNo);
+		return 1;
+	}
 }
-void Handle_returnstmt_return_semicolon(int lineNo){
-	printf("Line: %d \treturnstmt: return;\n", lineNo);
-	emit_ret(ret,newexpr(nil_e));
+int Handle_returnstmt_return_semicolon(int function_counter,int lineNo){
+	if(function_counter > 0){
+		printf("Line: %d \treturnstmt: return;\n", lineNo);
+		emit_ret(ret,newexpr(nil_e));
+		return 0;
+	}else{
+		printf("Error at line: %d return is not in a function\n",lineNo);
+		return 1;
+	}
 }
 
 expr *Handle_relop(int relop,expr* expr){

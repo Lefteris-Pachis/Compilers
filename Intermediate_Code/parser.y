@@ -637,8 +637,8 @@ forstmt: 	forprefix N elist R_PARENTHESIS {for_flag = 0;} N loopstmt N 	{ 	Handl
  																			}
 			;
 
-returnstmt:	RETURN expr SEMICOLON 	{ Handle_returnstmt_return_expr_semicolon($2,yylineno); }
-			|RETURN SEMICOLON 		{ Handle_returnstmt_return_semicolon(yylineno); }
+returnstmt:	RETURN expr SEMICOLON 	{ error = Handle_returnstmt_return_expr_semicolon($2,function_counter,yylineno); }
+			|RETURN SEMICOLON 		{ error = Handle_returnstmt_return_semicolon(function_counter,yylineno); }
 			;
 
 %%

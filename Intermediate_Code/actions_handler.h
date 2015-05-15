@@ -103,8 +103,8 @@ void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadn
 
 void Handle_forstmt_forprefix_N_elist_r_parenthesis_N_loopstmt_N(struct forprefix *forprefix,unsigned N1,unsigned N2,struct statement *stmt,unsigned N3,unsigned index,int lineNo);
 
-void Handle_returnstmt_return_expr_semicolon(expr* expr,int lineNo);
-void Handle_returnstmt_return_semicolon(int lineNo);
+int Handle_returnstmt_return_expr_semicolon(expr* expr,int function_counter,int lineNo);
+int Handle_returnstmt_return_semicolon(int function_counter,int lineNo);
 
 expr *Handle_relop(int relop,expr* expr);
 void Scan_jumps(int from,unsigned start,unsigned end);
