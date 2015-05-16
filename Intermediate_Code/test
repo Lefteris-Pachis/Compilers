@@ -27,7 +27,6 @@
 //(function(a,b){a;b();})(a(), b()());
 //print(x);
 //x = print("x");
-function f(){
-	
-}
-return;
+//function f(){	}
+//return;
+[{1:a>b},{3:3}];

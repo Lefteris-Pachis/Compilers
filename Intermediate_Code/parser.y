@@ -434,30 +434,64 @@ elist: 		expr  				{
 
 objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { 
 												Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
+												
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
+												int flag = 0;
 												int i=0;
 												expr* tmp=$3;
 												if(total_expr!=0){
 													while(tmp!=NULL){
-														emit(tablesetelem,t,newexpr_constint(i++),tmp);
+														expr *e = NULL;
+														if(tmp->type == boolexpr_e)
+															e = Handle_relop(relop,tmp);
+														if(e!=NULL){
+															if(flag == 0){
+																emit(tablecreate,0,0,t);
+																flag = 1;
+															}
+															emit(tablesetelem,t,newexpr_constint(i++),e);
+														}else{
+															if(flag == 0){
+																emit(tablecreate,0,0,t);
+																flag = 1;
+															}
+															emit(tablesetelem,t,newexpr_constint(i++),tmp);
+														}
 														tmp=tmp->next;
 													}
 												}
 												$$ = t;
 												total_expr=pop_total_expr_stack();
+												if(relop == 1)
+													relop = 0;
 											}
 			| L_BRACKET {push_total_expr_stack(total_expr);total_expr=0;} indexed R_BRACKET { 
 												Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
-												emit(tablecreate,0,0,t);
+												int flag = 0;
 												int i=0;
 												indexed* tmp=$3;
 												if(total_expr!=0){
 													while(tmp!=NULL){
-														emit(tablesetelem,t,tmp->x,tmp->y);
+														expr *e = NULL;
+														if(tmp->y->type == boolexpr_e)
+															e = Handle_relop(relop,tmp->y);
+														if(e!=NULL){
+															if(flag == 0){
+																emit(tablecreate,0,0,t);
+																flag = 1;
+															}
+															emit(tablesetelem,t,tmp->x,e);
+														}else{
+															if(flag == 0){
+																emit(tablecreate,0,0,t);
+																flag = 1;
+															}
+															emit(tablesetelem,t,tmp->x,tmp->y);
+														}
 														tmp=tmp->next;
 													}
 												}
