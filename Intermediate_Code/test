@@ -29,4 +29,7 @@
 //x = print("x");
 //function f(){	}
 //return;
-[{1:a>b},{3:3}];
+//[a>b,1,2,3];
+//[{1:a>b},{0:a},{3:c}];
+//a and not b; ////////////////
+a and not c or not b;

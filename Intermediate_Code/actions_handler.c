@@ -204,6 +204,11 @@ expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo){
 }
 expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr and expr \n", lineNo);
+	if(arg2->type == var_e){
+		emit_jump(if_eq,arg2,newexpr_constbool('1'),(expr*)0,next_quad_label()+2);
+		arg2->false_list = label_list_insert(arg2->false_list,next_quad_label(),0);
+		emit_jump(jump,(expr*)0, (expr*)0, (expr*)0,0);
+	}
 	expr* e = NULL;			
 	e = newexpr(boolexpr_e);
 	struct label_list *tmp = arg1->true_list;
@@ -217,6 +222,10 @@ expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo
 }
 expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr or expr \n", lineNo);
+	if(arg2->type == var_e){
+		arg2->true_list = label_list_insert(arg2->true_list,next_quad_label(),0);
+		emit_jump(if_eq,arg2,newexpr_constbool('1'),(expr*)0,0);
+	}
 	expr* e = NULL;			
 	e = newexpr(boolexpr_e);
 	struct label_list *tmp = arg1->false_list;
@@ -243,6 +252,12 @@ expr* Handle_term_not_expr(expr* expr,int lineNo){
 	printf("Line: %d \tterm: not expr\n", lineNo);
 	struct expr *e = NULL;
 	e = newexpr(boolexpr_e);
+	if(expr->type == var_e){
+		expr->false_list = label_list_insert(expr->false_list,next_quad_label(),0);
+		emit_jump(if_eq,expr,newexpr_constbool('0'),0,0);
+		expr->true_list = label_list_insert(expr->true_list,next_quad_label(),0);
+		emit_jump(jump,0, 0, 0, 0);
+	}
 	e->true_list = expr->false_list;
 	e->false_list = expr->true_list;
 	return e;

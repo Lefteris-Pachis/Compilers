@@ -104,12 +104,11 @@
 %right		ASSIGN
 %left		OR
 %left		AND
-%nonassoc	NOT
 %nonassoc	EQ NOT_EQ
 %nonassoc	GREATER_THAN GREATER_EQ LESS_THAN LESS_EQ
 %left		PLUS MINUS
 %left		MUL DIV MOD
-%right		PLUS_PLUS MINUS_MINUS UMINUS
+%right		NOT PLUS_PLUS MINUS_MINUS UMINUS
 %left		DOT D_DOT
 %left		L_BRACKET R_BRACKET
 %left		L_PARENTHESIS R_PARENTHESIS
@@ -169,8 +168,17 @@ expr:	assignexpr					{ $$=$1; Handle_expr_assignexpr(yylineno); }
 		| expr GREATER_THAN expr  	{ $$ = Handle_expr_expr_greater_than_expr($1, $3,yylineno); relop = 1;}
 		| expr LESS_EQ expr 		{ $$ = Handle_expr_expr_less_eq_expr($1, $3,yylineno); relop = 1;}
 		| expr GREATER_EQ expr 		{ $$ = Handle_expr_expr_greater_eq_expr($1, $3,yylineno); relop = 1;}
-		| expr AND M expr  			{ $$ = Handle_expr_expr_and_expr($1, $4,$3,yylineno); relop = 1;}
-		| expr OR M expr 			{ $$ = Handle_expr_expr_or_expr($1, $4,$3,yylineno); relop = 1;}
+		| expr AND {					if($1->type == var_e){
+											emit_jump(if_eq,$1,newexpr_constbool('1'),(expr*)0,next_quad_label()+2);
+											$1->false_list = label_list_insert($1->false_list,next_quad_label(),0);
+											emit_jump(jump,(expr*)0, (expr*)0, (expr*)0,0);
+										}	
+				} M expr  		{ $$ = Handle_expr_expr_and_expr($1, $5,$4,yylineno); relop = 1;}
+		| expr OR{						if($1->type == var_e){
+											$1->true_list = label_list_insert($1->true_list,next_quad_label(),0);
+											emit_jump(if_eq,$1,newexpr_constbool('1'),(expr*)0,0);
+										}	
+				} M expr 			{ $$ = Handle_expr_expr_or_expr($1, $5,$4,yylineno); relop = 1;}
 		| term 						{ $$=$1; Handle_expr_term(yylineno); }
 		;
 
@@ -316,9 +324,8 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
  														if(state < -1) { tmp_state = state; } else { tmp_state = 0; } 
  														if(state == -1) { error = 1; }
  														id_val = strdup($1);
- 														$$ = malloc(sizeof(expr*));
+ 														$$ = newexpr(var_e);
  														int i = scope_count;
- 														$$ = malloc(sizeof(expr*));
  														while(!$$->sym){
  															$$->sym = Lookup(mytable,id_val,i);
  															i--;
@@ -329,7 +336,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 														state = Handle_lvalue_local_id($2,scope_count,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
-														$$ = malloc(sizeof(expr*));
+														$$ = newexpr(var_e);
  														$$->sym = Lookup(mytable,id_val,scope_count);
  														if($$->sym)
  															$$ = lvalue_expr($$->sym);
@@ -337,7 +344,7 @@ lvalue:		ID 										{ 	state = Handle_lvalue_id($1,scope_count,yylineno,functi
 			| D_COLON ID 							{ 	state = Handle_lvalue_d_colon_id($2,yylineno); 
 														if(state == -1) { error = 1; }
 														id_val = strdup($2);
-														$$ = malloc(sizeof(expr*));
+														$$ = newexpr(var_e);
  														$$->sym = Lookup(mytable,id_val,0);
  														if($$->sym)
  															$$ = lvalue_expr($$->sym);
@@ -420,12 +427,24 @@ elist: 		expr  				{
 									Handle_elist_expr(yylineno);
 									if(for_flag == 0){
 										total_expr++;
+										expr *e = NULL;
+										e = Handle_relop(relop,$1);
+										if(e){
+											$1 = e;
+											relop = 0;
+										}
 									}
 									$$=$1;
 								}
 			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno);
 									if(for_flag == 0){
 										total_expr++;
+										expr *e = NULL;
+										e = Handle_relop(relop,$3);
+										if(e){
+											$3 = e;
+											relop = 0;
+										}
 										$$=expr_list_insert($1,$3);
 									}
 								}
@@ -433,65 +452,31 @@ elist: 		expr  				{
 			;
 
 objectdef: 	L_BRACKET{push_total_expr_stack(total_expr);total_expr=0;} elist R_BRACKET { 
-												Handle_objectdef_l_bracket_elist_r_bracket(yylineno); 
-												
+												Handle_objectdef_l_bracket_elist_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
 												emit(tablecreate,0,0,t);
-												int flag = 0;
 												int i=0;
 												expr* tmp=$3;
 												if(total_expr!=0){
 													while(tmp!=NULL){
-														expr *e = NULL;
-														if(tmp->type == boolexpr_e)
-															e = Handle_relop(relop,tmp);
-														if(e!=NULL){
-															if(flag == 0){
-																emit(tablecreate,0,0,t);
-																flag = 1;
-															}
-															emit(tablesetelem,t,newexpr_constint(i++),e);
-														}else{
-															if(flag == 0){
-																emit(tablecreate,0,0,t);
-																flag = 1;
-															}
-															emit(tablesetelem,t,newexpr_constint(i++),tmp);
-														}
+														emit(tablesetelem,t,newexpr_constint(i++),tmp);
 														tmp=tmp->next;
 													}
 												}
 												$$ = t;
 												total_expr=pop_total_expr_stack();
-												if(relop == 1)
-													relop = 0;
 											}
 			| L_BRACKET {push_total_expr_stack(total_expr);total_expr=0;} indexed R_BRACKET { 
 												Handle_objectdef_l_bracket_indexed_r_bracket(yylineno);
 												expr* t = newexpr(newtable_e);
 												t->sym = new_temp();
-												int flag = 0;
+												emit(tablecreate,0,0,t);
 												int i=0;
 												indexed* tmp=$3;
 												if(total_expr!=0){
 													while(tmp!=NULL){
-														expr *e = NULL;
-														if(tmp->y->type == boolexpr_e)
-															e = Handle_relop(relop,tmp->y);
-														if(e!=NULL){
-															if(flag == 0){
-																emit(tablecreate,0,0,t);
-																flag = 1;
-															}
-															emit(tablesetelem,t,tmp->x,e);
-														}else{
-															if(flag == 0){
-																emit(tablecreate,0,0,t);
-																flag = 1;
-															}
-															emit(tablesetelem,t,tmp->x,tmp->y);
-														}
+														emit(tablesetelem,t,tmp->x,tmp->y);
 														tmp=tmp->next;
 													}
 												}
@@ -509,6 +494,12 @@ indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr
 														$$ = malloc(sizeof(struct indexed));
 														$$->x=expr_list_insert($$->x,$2);
 														total_expr++;
+														expr *e = NULL;
+														e = Handle_relop(relop,$4);
+														if(e){
+															$4 = e;
+															relop = 0;
+														}
 														$$->y=expr_list_insert($$->y,$4);
 													}
 				;
