@@ -60,6 +60,9 @@ typedef struct incomplete_jump{
 	struct incomplete_jump* next;
 }incomplete_jump;
 
+
+
+
 void make_operand(expr* e, vmarg* arg);
 void make_int_operand(vmarg* arg, int val);
 void make_double_operand(vmarg* arg, double val);
@@ -67,6 +70,7 @@ void make_bool_operand(vmarg* arg, unsigned val);
 void make_retval_operand(vmarg* arg);
 
 void add_incomplete_jump(unsigned instrNo, unsigned iaddress);
+void patch_incomplete_jumps();
 
 void generate_instruction(vmopcode op, quad* quad);
 void generate_relational_instruction(vmopcode op, quad* quad);

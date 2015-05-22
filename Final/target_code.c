@@ -10,9 +10,12 @@ char** 		namedLibfuncs 			= (char**) 0;
 unsigned 	total_namedLibfuncs 	= 0;
 userfunc* 	userFuncs 				= (userfunc*) 0;
 unsigned 	total_userFuncs 		= 0;
+incomplete_jump* ij_head 			= (incomplete_jump*) 0;
+unsigned	ij_total 				= 0;
 
 extern int 		yylineno;
 extern quad* 	quads;
+extern int 		total;
 
 instruction*	instructions = (instruction*) 0;
 unsigned		totalIn = 0;
@@ -95,6 +98,42 @@ void make_retval_operand(vmarg* arg){
 
 void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 
+	incomplete_jump* tmp = ij_head;
+
+	if(ij_head == NULL){
+		ij_head->instrNo = instrNo;
+		ij_head->iaddress = iaddress;
+		ij_head->next = NULL;
+		ij_total++;
+	}
+	else if(ij_head!=NULL){
+
+		while(tmp!=NULL){
+
+			tmp = tmp->next;
+		}
+
+		tmp->instrNo = instrNo;
+		tmp->iaddress = iaddress;
+		tmp->next = NULL;
+		ij_total++;
+	}
+
+}
+
+void patch_incomplete_jumps(){
+
+	incomplete_jump* tmp = ij_head;
+
+	while(tmp!=NULL){
+		if(incomplete_jump->iaddress == total){
+			instructions[tmp->instrNo]->result = totalIn;	
+		}
+		else{
+			instructions[tmp->instrNo]->result = quads[tmp->iaddress]->taddresss;	
+		}
+		tmp = tmp->next;
+	}
 }
 
 void generate_instruction(vmopcode op, quad* quad){
