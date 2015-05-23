@@ -1,5 +1,6 @@
 #include "generate.h"
 #include "quads.h"
+#include "target_code.h"
 
 extern quad* quads;
 extern unsigned currQuad;
@@ -155,8 +156,20 @@ void generate_GETRETVAL(quad* quad){
 }
 
 void generate_FUNCSTART(quad* quad){
-	printf("***GENERATE_FUNCSTART***\n");
-	generate_funcstart_instruction(quad);
+	//printf("***GENERATE_FUNCSTART***\n");
+	symbol f = quad->result->sym;
+	f->taddress = nextinstructionlabel();
+	quad->taddress = nextinstructionlabel();
+
+	//userf.add
+
+	push_func(f);
+
+	instruction t;
+	t.opcode = funcenter_v;
+	make_operand(quad->result,&t.result);
+	t_emit(&t);
+
 }
 
 void generate_RETURN(quad* quad){

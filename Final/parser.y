@@ -3,6 +3,8 @@
 	#include "actions_handler.h"
 	#include "symtable.h"
 	#include "quads.h"
+	#include "target_code.h"
+	#include "generate.h"
 	int yyerror(const char* yaccProvidedMessage);
 	int alpha_yylex(void);
 	int scope_count = 0;
@@ -689,8 +691,11 @@ int main(int argc, char** argv){
 	
 	if(error == 0){
 		Print_Hash(mytable);
-		Print_Quads();
+		//Print_Quads();
 	}else
-		printf("Errors occured!\n");	
+		printf("Errors occured!\n");
+
+	generate();
+	printConsts();	
 	return 0;
 }

@@ -21,17 +21,19 @@ typedef enum vmopcode{
 }vmopcode;
 
 typedef enum vmarg_t{
+
 	label_a 	= 0,
 	global_a 	= 1,
 	formal_a 	= 2,
 	local_a 	= 3,
-	number_a 	= 4,
-	string_a 	= 5,
-	bool_a 		= 6,
-	nil_a 		= 7,
-	userfunc_a 	= 8,
-	libfunc_a 	= 9,
-	retval_a 	= 10
+	integer_a 	= 4,
+	double_a	= 5,
+	string_a 	= 6,
+	bool_a 		= 7,
+	nil_a 		= 8,
+	userfunc_a 	= 9,
+	libfunc_a 	= 10,
+	retval_a 	= 11
 }vmarg_t;
 
 typedef struct vmarg{
@@ -59,11 +61,21 @@ typedef struct incomplete_jump{
 	struct incomplete_jump* next;
 }incomplete_jump;
 
+typedef struct func_stack{
+	symbol func;
+	struct func_stack* next;
+}func_stack;
 
+struct func_stack *f_top;
+
+
+void push_func(symbol sym);
+symbol pop_func();
 
 
 void make_operand(expr* e, vmarg* arg);
-void make_number_operand(vmarg* arg, double val);
+void make_int_operand(vmarg* arg, int val);
+void make_double_operand(vmarg* arg, double val);
 void make_bool_operand(vmarg* arg, unsigned val);
 void make_retval_operand(vmarg* arg);
 
@@ -80,7 +92,9 @@ void generate_funcend_instruction(quad* quad);
 void generate_return_instruction(quad* quad);
 
 unsigned consts_newstring(char* s);
-unsigned consts_newnumber(double d);
+unsigned consts_newdouble(double d);
+unsigned consts_newint(int d);
+
 unsigned userfuncs_newfunc(symbol sym);
 unsigned libfuncs_newused(const char* s);
 char* consts_getstring(unsigned index);
@@ -92,4 +106,7 @@ void t_expand();
 void t_emit(instruction* instruction);
 unsigned nextinstructionlabel();
 void Print_Instructions();
+
+
+void printConsts();
 #endif
