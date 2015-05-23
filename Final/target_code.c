@@ -1,9 +1,7 @@
 #include "target_code.h"
 
-int* 		intConsts 				= (int*) 0;
-unsigned	total_int_Consts		= 0;
-double* 	doubleConsts 			= (double*) 0;
-unsigned	total_double_Consts 	= 0;
+double* 	numberConsts 			= (double*) 0;
+unsigned	total_number_Consts 	= 0;
 char** 		stringConsts 			= (char**) 0;
 unsigned 	total_string_Consts 	= 0;
 char** 		namedLibfuncs 			= (char**) 0;
@@ -46,7 +44,7 @@ void make_operand(expr* e, vmarg* arg){
 			break;
 		case constint_e:
 			//if(e->sym == NULL){
-				arg->val = consts_newint(e->intConst);
+				arg->val = consts_newnumber(e->intConst);
 				arg->type = integer_a;
 			//}
 			//else{
@@ -55,7 +53,7 @@ void make_operand(expr* e, vmarg* arg){
 			//}
 			break;
 		case constdouble_e:
-			arg->val = consts_newdouble(e->doubleConst);
+			arg->val = consts_newnumber(e->doubleConst);
 			arg->type = double_a;
 			break;
 		case nil_e:
@@ -77,14 +75,11 @@ void make_operand(expr* e, vmarg* arg){
 	}
 }
 
-void make_int_operand(vmarg* arg, int val){
-	arg->val = consts_newint(val);
-	arg->type = integer_a;
+void make_number_operand(vmarg* arg, int val){
+	arg->val = consts_newnumber(val);
+	arg->type = number_a;
 }
-void make_double_operand(vmarg* arg, double val){
-	arg->val = consts_newdouble(val);
-	arg->type = double_a;
-}
+
 void make_bool_operand(vmarg* arg, unsigned val){
 	arg->val = val;
 	arg->type = bool_a;

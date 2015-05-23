@@ -25,14 +25,13 @@ typedef enum vmarg_t{
 	global_a 	= 1,
 	formal_a 	= 2,
 	local_a 	= 3,
-	integer_a 	= 4,
-	double_a 	= 5,
-	string_a 	= 6,
-	bool_a 		= 7,
-	nil_a 		= 8,
-	userfunc_a 	= 9,
-	libfunc_a 	= 10,
-	retval_a 	= 11
+	number_a 	= 4,
+	string_a 	= 5,
+	bool_a 		= 6,
+	nil_a 		= 7,
+	userfunc_a 	= 8,
+	libfunc_a 	= 9,
+	retval_a 	= 10
 }vmarg_t;
 
 typedef struct vmarg{
@@ -61,8 +60,7 @@ typedef struct incomplete_jump{
 }incomplete_jump;
 
 void make_operand(expr* e, vmarg* arg);
-void make_int_operand(vmarg* arg, int val);
-void make_double_operand(vmarg* arg, double val);
+void make_number_operand(vmarg* arg, double val);
 void make_bool_operand(vmarg* arg, unsigned val);
 void make_retval_operand(vmarg* arg);
 
@@ -78,13 +76,11 @@ void generate_funcend_instruction(quad* quad);
 void generate_return_instruction(quad* quad);
 
 unsigned consts_newstring(char* s);
-unsigned consts_newint(int i);
-unsigned consts_newdouble(double d);
+unsigned consts_newnumber(double d);
 unsigned userfuncs_newfunc(symbol sym);
 unsigned libfuncs_newused(const char* s);
 char* consts_getstring(unsigned index);
-int consts_getint(unsigned index);
-double consts_getdouble(unsigned index);
+double consts_getnumber(unsigned index);
 userfunc* userfuncs_get(unsigned index);
 char* libfuncs_getused(unsigned index);
 
