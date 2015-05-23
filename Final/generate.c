@@ -127,18 +127,31 @@ void generate_IF_LESSEQ(quad* quad){
 }
 
 void generate_PARAM(quad* quad){
-	printf("***GENERATE_PARAM***\n");
-	generate_param_instruction(quad);
+	//printf("***GENERATE_PARAM***\n");
+	quad->taddress = nextinstructionlabel();
+	instruction t;
+	t.opcode = pusharg_v;
+	make_operand(quad->arg1, &t.arg1);
+	t_emit(&t);
 }
 
 void generate_CALL(quad* quad){
-	printf("***GENERATE_CALL***\n");
-	generate_call_instruction(quad);
+	//printf("***GENERATE_CALL***\n");
+	quad->taddress = nextinstructionlabel();
+	instruction t;
+	t.opcode = call_v;
+	make_operand(quad->arg1, &t.arg1);
+	t_emit(&t);
 }
 
 void generate_GETRETVAL(quad* quad){
-	printf("***GENERATE_GETRETVAL***\n");
-	generate_retval_instruction(quad);
+	//printf("***GENERATE_GETRETVAL***\n");
+	quad->taddress = nextinstructionlabel();
+	instruction t;
+	t.opcode = assign_v;
+	make_operand(quad->result, &t.result);
+	make_retval_operand(&t.arg1);
+	t_emit(&t);
 }
 
 void generate_FUNCSTART(quad* quad){
