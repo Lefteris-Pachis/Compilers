@@ -5,11 +5,16 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define AVM_STACKSIZE 4096
-#define AVM_WIPEOUT(m) memset(&(m),0,sizeof(m))
-#define AVM_TABLE_HASHSIZE 211
-#define AVM_STACKENV_SIZE 4
+#define AVM_STACKSIZE 			4096
+#define AVM_WIPEOUT(m) 			memset(&(m),0,sizeof(m))
+#define AVM_TABLE_HASHSIZE 		211
+#define AVM_STACKENV_SIZE 		4
+#define AVM_NUMACTUALS_OFFSET 	4
+#define	AVM_SAVEDPC_OFFSET 		3
+#define	AVM_SAVEDTOP_OFFSET		2
+#define	AVM_SAVEDTOPSP_OFFSET 	1
 
 typedef enum avm_memcell_t{
 	number_m  	= 0,
@@ -50,11 +55,15 @@ struct avm_table{
 };
 
 typedef void (*memclear_func_t)(avm_memcell *);
+typedef void (*library_func_t) (void);
+typedef char* (*tostring_func_t) (avm_memcell*);
+typedef unsigned char (*tobool_func_t) (avm_memcell*);
+
 
 avm_table* 		avm_tablenew(void);
 void 			avm_tabledestroy(avm_table* t);
-avm_memcell* 	avm_tablegetelem(avm_memcell* key);
-void 			avm_tablesetelem(avm_memcell* key, avm_memcell* value);
+avm_memcell* 	avm_tablegetelem(avm_table* table,avm_memcell* index);
+void 			avm_tablesetelem(avm_table* table,avm_memcell* index, avm_memcell* content);
 void 			avm_bucketsinit(avm_table_bucket** p);
 void 			avm_tablebucketsdestroy(avm_table_bucket** p);
 void 			avm_tableincrefcounter(avm_table* t);
@@ -74,5 +83,40 @@ void 			avm_warning(char* format);
 void 			avm_error(char* format, char* s);
 
 void 			avm_assign(avm_memcell* lv, avm_memcell* rv);
+
+void 			memclear_table (avm_memcell* m);
+void 			memclear_string (avm_memcell* m);
+
+void 			avm_dec_top(void);
+void 			avm_push_envvalue(unsigned val);
+void 			avm_callsaveenviroment(void);
+unsigned 		avm_get_envvalue(unsigned i);
+unsigned 		avm_totalactuals(void);
+avm_memcell* 	avm_getactual(unsigned i);
+userfunc* 		avm_getfuncinfo(unsigned address);
+void 			avm_calllibfunc(char* id);
+library_func_t 	avm_getlibraryfunc(char* id);	/* Typical hashing */
+
+char* 			avm_tostring(avm_memcell* m);
+char* 			number_tostring(avm_memcell* m);
+char* 			string_tostring(avm_memcell* m);
+char* 			bool_tostring(avm_memcell* m);
+char* 			table_tostring(avm_memcell* m);
+char* 			userfunc_tostring(avm_memcell* m);
+char* 			libfunc_tostring(avm_memcell* m);
+char* 			nil_tostring(avm_memcell* m);
+char* 			undef_tostring(avm_memcell* m);
+
+unsigned char 	avm_tobool(avm_memcell* m);
+unsigned char 	number_tobool(avm_memcell* m);
+unsigned char 	string_tobool(avm_memcell* m);
+unsigned char 	bool_tobool(avm_memcell* m);
+unsigned char 	table_tobool(avm_memcell* m);
+unsigned char 	userfunc_tobool(avm_memcell* m);
+unsigned char 	libfunc_tobool(avm_memcell* m);
+unsigned char 	nil_tobool(avm_memcell* m);
+unsigned char 	undef_tobool(avm_memcell* m);
+
+void 			avm_initialize(void);
 
 #endif

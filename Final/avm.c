@@ -4,9 +4,31 @@ avm_memcell stack[AVM_STACKSIZE];
 avm_memcell ax, bx, cx;
 avm_memcell retval;
 avm_memcell top, topsp;
+unsigned totalActuals = 0;
+extern unsigned pc;
+extern userfunc* userFuncs;
 
+tostring_func_t tostringFuncs[] = {
+	number_tostring,
+	string_tostring,
+	bool_tostring,
+	table_tostring,
+	userfunc_tostring,
+	libfunc_tostring,
+	nil_tostring,
+	undef_tostring
+};
 
-
+tobool_func_t toboolFuncs[] = {
+	number_tobool,
+	string_tobool,
+	bool_tobool,
+	table_tobool,
+	userfunc_tobool,
+	libfunc_tobool,
+	nil_tobool,
+	undef_tobool
+};
 
 void avm_initstack(void){
 	unsigned i;
@@ -62,11 +84,11 @@ void avm_tabledecrefcounter(avm_table* t){
 		avm_tabledestroy(t);
 }
 
-avm_memcell* avm_tablegetelem(avm_memcell* key){
+avm_memcell* avm_tablegetelem(avm_table* table,avm_memcell* index){
 
 }
 
-void avm_tablesetelem(avm_memcell* key, avm_memcell* value){
+void avm_tablesetelem(avm_table* table,avm_memcell* index, avm_memcell* content){
 
 }
 
@@ -151,14 +173,14 @@ void avm_memcellclear(avm_memcell* m){
 	}
 }
 
-extern void memclear_string (avm_memcell* m){
+void memclear_string (avm_memcell* m){
 	assert(m->data.strVal);
 	free(m->data.strVal);
 }
 
-extern void memclear_table (avm_memcell* m){
+void memclear_table (avm_memcell* m){
 	assert(m->data.tableVal);
-	//avm_tabledecrefcounter(m->data.tableVal);
+	avm_tabledecrefcounter(m->data.tableVal);
 }
 
 void avm_warning(char* format){
@@ -191,4 +213,154 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 	else if(lv->type == table_m){
 		avm_tableincrefcounter(lv->data.tableVal);
 	}
+}
+
+void avm_dec_top(void){
+	if(!top){
+		avm_error("stack overflow");
+		executionFinished = 1;
+	}
+	else
+		--top;
+}
+
+void avm_push_envvalue(unsigned val){
+	stack[top].type 		= number_m;
+	stack[top].data.numVal 	= val;
+	avm_dec_top();
+}
+
+void avm_callsaveenviroment(void){
+	avm_push_envvalue(totalActuals);
+	avm_push_envvalue(pc + 1);
+	avm_push_envvalue(top + totalActuals + 2);
+	avm_push_envvalue(topsp);
+}
+
+unsigned avm_get_envvalue(unsigned i){
+	unsigned val;
+	assert(stack[i].type == number_m);
+	val = (unsigned) stack[i].data.numVal;
+	assert(stack[i].data.numVal == ((double) val));
+	return val;
+}
+
+unsigned avm_totalactuals(void){
+	return avm_get_envvalue(topsp + AVM_NUMACTUALS_OFFSET);
+}
+
+avm_memcell* avm_getactual(unsigned i){
+	assert(i < avm_totalactuals());
+	return &stack[topsp + AVM_STACKENV_SIZE + 1 + i];
+}
+
+userfunc* avm_getfuncinfo(unsigned address){
+	return (userFuncs + address);
+}
+
+void avm_calllibfunc(char* id){
+	library_func_t f = avm_getlibraryfunc(id);
+	if(!f){
+		avm_error("Unsupported lib func '%s' called!", id);
+		executionFinished = 1;
+	}
+	else{
+		topsp = top;		/* Enter function sequence. No stack locals */
+		totalActuals = 0;
+		(*f) ();
+		if(!executionFinished)		/* An error may naturally occur inside */
+			execute_funcexit((instruction*) 0);	/* Return sequence */
+	}
+}
+
+char* avm_tostring(avm_memcell* m){
+	assert(m->type >= 0 && m->type <= undef_m);
+	return (*tostringFuncs[m->type])(m);
+}
+
+char* number_tostring(avm_memcell* m){
+	char* s = (char*)malloc(512*sizeof(char));
+	sprintf(s, "%f", m->data.numVal);
+	return s;
+}
+
+char* string_tostring(avm_memcell* m){
+	char* s;
+	s = strdup(m->data.strVal);
+	return s;
+}
+
+char* bool_tostring(avm_memcell* m){
+	if(m->data.boolVal == 1)
+		return "true";
+	else
+		return "false";
+}
+
+char* table_tostring(avm_memcell* m){
+
+}
+
+char* userfunc_tostring(avm_memcell* m){
+	char* s = (char*) malloc(512*sizeof(char));
+	sprintf(s, "%d", m->data.funcVal);
+	return s;
+}
+
+char* libfunc_tostring(avm_memcell* m){
+	char* s;
+	s = strdup(m->data.libfuncVal);
+	return s;
+}
+
+char* nil_tostring(avm_memcell* m){
+	return "nil";
+}
+
+char* undef_tostring(avm_memcell* m){
+	return "undef";
+}
+
+unsigned char avm_tobool(avm_memcell* m){
+	assert(m->type >= 0 && m->type < undef_m);
+	return (*toboolFuncs[m->type])(m);
+}
+
+unsigned char number_tobool(avm_memcell* m){
+	return (m->data.numVal != 0);
+}
+
+unsigned char string_tobool(avm_memcell* m){
+	return (m->data.strVal[0] != 0);
+}
+
+unsigned char bool_tobool(avm_memcell* m){
+	return m->data.boolVal;
+}
+
+unsigned char table_tobool(avm_memcell* m){
+	return 1;
+}
+
+unsigned char userfunc_tobool(avm_memcell* m){
+	return 1;
+}
+
+unsigned char libfunc_tobool(avm_memcell* m){
+	return 1;
+}
+
+unsigned char nil_tobool(avm_memcell* m){
+	return 0;
+}
+
+unsigned char undef_tobool(avm_memcell* m){
+	assert(0);
+	return 0;
+}
+
+void avm_initialize(){
+	avm_initstack();
+	avm_registerlibfunc("print", libfunc_print);
+	avm_registerlibfunc("typeof", libfunc_typeof);
 }
