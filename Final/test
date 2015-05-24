@@ -1,35 +1,7 @@
-//x = a < b or c < d and e < f;
-//a<b or a>b;
-//not a;
-//if(x<a){
-//	y=2;
-//}
-//for(i=0;i<a;i++){
-//	y=2;
-//}
-//a>b or not c<d;
-//a > b or c < d and e >= f or g <= h and not i == j or not k != l;
-//y=((x>y)==(x>z));
-/*for (20-0; 21; 22-0) {
-	while (23)
-		break;
-	continue;
-}*/
-//while (23){
-//	continue;
-//	for (20-0; 21; 22-0)
-//		break;
-//	break;
-//}
-//a..f(not y);
-//[{"x":0},{"y":a+b},{-1:0}];
-//[1,2];
-//(function(a,b){a;b();})(a(), b()());
-//print(x);
-//x = print("x");
-//function f(){	}
-//return;
-//[a>b,1,2,3];
-//[{1:a>b},{0:a},{3:c}];
-//a and not b; ////////////////
-a and not c or not b;
+a = 10;
+b = 1.234;
+
+c = "lol";
+
+d = 3.2;
+e = "manos";
