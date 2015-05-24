@@ -5,7 +5,8 @@
 #include "target_code.h"
 
 typedef void (*generator_func_t) (quad*);
-
+vmarg * reset_operand();
+return_list * appendRL(return_list *head,int label);
 void generate(void);
 void generate_ADD(quad* quad);
 void generate_SUB(quad* quad);
@@ -24,9 +25,9 @@ void generate_IF_GREATER(quad* quad);
 void generate_IF_GREATERQ(quad* quad);
 void generate_IF_LESS(quad* quad);
 void generate_IF_LESSEQ(quad* quad);
-//void generate_NOT(quad* quad);
-//void generate_OR(quad* quad);
-//void generate_AND(quad* quad);
+void generate_NOT(quad* quad);
+void generate_OR(quad* quad);
+void generate_AND(quad* quad);
 void generate_PARAM(quad* quad);
 void generate_CALL(quad* quad);
 void generate_GETRETVAL(quad* quad);

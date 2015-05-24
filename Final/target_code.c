@@ -3,13 +3,13 @@
 double* 	doubleConsts 			= (double*) 0;
 unsigned	total_double_Consts 	= 0;
 int* 		intConsts 				= (int*) 0;
-unsigned	total_int_Consts 		= 0;
+int			total_int_Consts 		= 0;
 char** 		stringConsts 			= (char**) 0;
-unsigned 	total_string_Consts 	= 0;
+int			total_string_Consts 	= 0;
 char** 		namedLibfuncs 			= (char**) 0;
-unsigned 	total_namedLibfuncs 	= 0;
-userfunc* 	userFuncs 				= (userfunc*) 0;
-unsigned 	total_userFuncs 		= 0;
+int  		total_namedLibfuncs 	= 0;
+userfunc** 	userFuncs 				= (userfunc**) 0;
+int  	total_userFuncs 		= 0;
 incomplete_jump* ij_head 			= (incomplete_jump*) 0;
 unsigned	ij_total 				= 0;
 
@@ -93,7 +93,7 @@ void push_func(symbol sym){
 	f_top = tmp;
 }
 
-symbol pop_func(){
+func_stack* pop_func(){
 
 	func_stack* tmp;
 
@@ -102,7 +102,7 @@ symbol pop_func(){
 
 	tmp = f_top;
 	f_top = f_top->next;
-	return tmp->func;
+	return tmp;
 
 }
 
@@ -211,66 +211,81 @@ void generate_retval_instruction(quad* quad){
 
 }
 
-void generate_funcstart_instruction(quad* quad){
-
-}
-
 void generate_funcend_instruction(quad* quad){
 
 }
 
-void generate_return_instruction(quad* quad){
-
-}
 
 
-unsigned consts_newdouble(double d){
+
+int consts_newdouble(double d){
 
 	total_double_Consts++;
 
 	double* newdoubleConsts = malloc(sizeof(double)*total_double_Consts);
 
-	memcpy(newdoubleConsts,doubleConsts,total_double_Consts-1);
+	memcpy(newdoubleConsts,doubleConsts,8*(total_double_Consts-1));
 	free(doubleConsts);
 
 	doubleConsts = newdoubleConsts;
 	doubleConsts[total_double_Consts-1] = d;
 
-	return total_double_Consts;
+	return total_double_Consts-1;
 }
 
 
-unsigned consts_newint(int d){
-
+int consts_newint(int d){
 	total_int_Consts++;
 
 	int* newintConsts = malloc(sizeof(int)*total_int_Consts);
 
-	memcpy(newintConsts,intConsts,total_int_Consts-1);
+	memcpy(newintConsts,intConsts,4*(total_int_Consts-1));
 	free(intConsts);
 
 	intConsts = newintConsts;
+
 	intConsts[total_int_Consts-1] = d;
 
-	return total_int_Consts;
+	
+	return total_int_Consts-1;
 }
 
 
-unsigned consts_newstring(char* s){
+int consts_newstring(char* s){
 
 	total_string_Consts++;
 
 	char** newstringConsts = malloc(sizeof(char*)*total_string_Consts);
 
-	memcpy(newstringConsts,stringConsts,total_string_Consts-1);
+	memcpy(newstringConsts,stringConsts,sizeof(char*)*(total_string_Consts-1));
 	free(stringConsts);
 
 	stringConsts = newstringConsts;
 	stringConsts[total_string_Consts-1] = strdup(s);
 
-	return total_string_Consts;
+	return total_string_Consts-1;
 }
 
+int add_userfunction(symbol f){
+	total_userFuncs++;
+	userfunc** newuserFuncs = malloc(sizeof(userfunc*)*total_userFuncs);
+	memcpy(newuserFuncs,userFuncs,sizeof(userfunc*)*(total_userFuncs-1));
+
+	userfunc * tmp=malloc(sizeof(userfunc ));
+	free(userFuncs);
+	userFuncs=newuserFuncs;
+	printf("Function :: %s\n", f->name);
+	tmp->id=strdup(f->name);
+	printf("Function :: %s\n", tmp->id);
+	tmp->address=f->taddress;
+	tmp->localSize=f->totallocals;
+
+	userFuncs[total_userFuncs-1]=tmp;
+
+	return total_userFuncs-1;
+
+
+}
 
 void t_expand(){
 	assert(totalIn == currInstr);
@@ -295,35 +310,50 @@ void t_emit(instruction* instruction){
 	totalIn++;
 }
 
-unsigned nextinstructionlabel(){
+unsigned int  nextinstructionlabel(){
 	return currInstr;
 }
+void printUserFunction(FILE *fp){
 
+	int i;
+   for(i=0; i<total_userFuncs; i++){ 
+      fprintf( fp, "\n%d: %s %d %d ", i, userFuncs[ i]->id, userFuncs[ i ]->address, userFuncs[ i ]->localSize);
+   }
+   fprintf(fp,"\n\n\n");
+   return;
+
+}
 
 void printConsts(){
 	int i = 0;
 	
 
 	FILE* fp = fopen("const.txt","w");
+	fprintf(fp, "total_int_Consts : %d\n", total_int_Consts);
+	fprintf(fp, "total_double_Consts : %d\n", total_double_Consts);
+	fprintf(fp, "total_string_Consts : %d\n", total_string_Consts);
+	fprintf(fp, "total_userFuncs : %d\n", total_userFuncs);
 
-	for(i=0; i<total_int_Consts ; ++i){
+	for(i=0; i<total_int_Consts ; i++){
 
-		fprintf(fp, "INT -------- %d\n", intConsts[i]);
-
-	}
-
-	for(i=0; i<total_double_Consts ; ++i){
-
-		fprintf(fp, "DOUB -------- %f\n", doubleConsts[i]);
+		fprintf(fp, "INT -------- %d  %d\n", i, intConsts[i]);
 
 	}
 
-	for(i=0; i<total_string_Consts ; ++i){
+	for(i=0; i<total_double_Consts ; i++){
 
-		fprintf(fp, "STR -------- %s\n", stringConsts[i]);
+		fprintf(fp, "DOUBLE -------- %d %f\n",i, doubleConsts[i]);
 
 	}
+
+	for(i=0; i<total_string_Consts ; i++){
+
+		fprintf(fp, "STR -------- %d  %s\n", i, stringConsts[i]);
+
+	}
+	printUserFunction(fp);
 
 	fprintf( fp, "\n\n\n");
 	fclose(fp);
 }
+

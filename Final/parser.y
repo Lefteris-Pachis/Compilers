@@ -691,7 +691,7 @@ int main(int argc, char** argv){
 	
 	if(error == 0){
 		Print_Hash(mytable);
-		//Print_Quads();
+		Print_Quads();
 	}else
 		printf("Errors occured!\n");
 

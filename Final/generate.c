@@ -8,30 +8,34 @@ extern unsigned int currInstr;
 unsigned i;
 
 generator_func_t generators[] = {
-	generate_ASSIGN,
-	generate_ADD,
-	generate_SUB,
-	generate_MUL,
-	generate_DIV,
-	generate_MOD,
-	generate_UMINUS,
-	generate_IF_EQ,
-	generate_IF_NOTEQ,
-	generate_IF_LESSEQ,
-	generate_IF_GREATERQ,
-	generate_IF_LESS,
-	generate_IF_GREATER,
-	generate_JUMP,
-	generate_CALL,
-	generate_PARAM,
-	generate_RETURN,
-	generate_GETRETVAL,
-	generate_FUNCSTART,
-	generate_FUNCEND,
-	generate_NEWTABLE,
-	generate_TABLEGETELEM,
-	generate_TABLESETELEM,
-	generate_NOP
+generate_ASSIGN ,
+	generate_ADD ,
+    generate_SUB ,
+    generate_MUL ,
+    generate_DIV ,
+    generate_MOD ,
+	generate_UMINUS ,
+	generate_AND,
+	generate_OR ,
+	generate_NOT ,
+	generate_IF_EQ ,
+	generate_IF_NOTEQ ,	
+	generate_IF_LESSEQ ,
+	generate_IF_GREATERQ ,
+	generate_IF_LESS ,
+	generate_IF_GREATER ,
+	generate_CALL ,
+	generate_PARAM ,
+	generate_RETURN ,
+	generate_GETRETVAL ,
+	generate_FUNCSTART ,
+	generate_FUNCEND ,
+	generate_JUMP ,
+	generate_NEWTABLE ,
+    generate_TABLEGETELEM ,
+   	generate_TABLESETELEM ,
+    generate_NOP
+
 };
 
 void generate(void){
@@ -146,7 +150,7 @@ void generate_CALL(quad* quad){
 }
 
 void generate_GETRETVAL(quad* quad){
-	//printf("***GENERATE_GETRETVAL***\n");
+	printf("***GENERATE_GETRETVAL***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = assign_v;
@@ -156,12 +160,12 @@ void generate_GETRETVAL(quad* quad){
 }
 
 void generate_FUNCSTART(quad* quad){
-	//printf("***GENERATE_FUNCSTART***\n");
+	printf("***GENERATE_FUNCSTART***\n");
 	symbol f = quad->result->sym;
 	f->taddress = nextinstructionlabel();
 	quad->taddress = nextinstructionlabel();
 
-	//userf.add
+	add_userfunction(f);
 
 	push_func(f);
 
@@ -173,16 +177,74 @@ void generate_FUNCSTART(quad* quad){
 }
 
 void generate_RETURN(quad* quad){
+	func_stack *f;
 	printf("***GENERATE_RETURN***\n");
-	generate_return_instruction(quad);
+	quad->taddress = nextinstructionlabel();
+	instruction t;
+	t.opcode = assign_v;
+	make_retval_operand(&t.result);
+	make_operand(quad->arg1,&t.arg1);
+	t_emit(&t);
+	f=pop_func();
+	f->node=appendRL(f->node,nextinstructionlabel());
+	t.opcode=jump_v;
+	reset_operand(&t.arg1);
+	reset_operand(&t.arg2);
+	t.result.type=label_a;
+	t_emit(&t);
+
+
+	
+}
+
+
+
+vmarg * reset_operand(){
+	 return( (vmarg *) NULL);
 }
 
 void generate_FUNCEND(quad* quad){
 	printf("***GENERATE_FUNCEND***\n");
-	generate_funcend_instruction(quad);
+	func_stack *f;
+	f=pop_func();
+	//backpatch
+	quad->taddress = nextinstructionlabel();
+	instruction t;
+	t.opcode=funcexit_v;
+	make_operand(quad->result,&t.result);
+	t_emit(&t);
+
+
+
+
+}
+return_list * appendRL(return_list *head,int label){
+
+	return_list *tmp = malloc( sizeof( struct return_List ) );
+	tmp->return_label = label;
+
+	if( head == NULL ){
+		tmp->next = NULL;
+	}
+	else{
+		tmp->next = head;
+	}
+	head = tmp;
+
+	return( head );
 }
 
 void generate_UMINUS(quad* quad){
 	printf("***GENERATE_UMINUS***\n");
 	generate_instruction(uminus_v, quad);
+}
+
+void generate_OR(quad* quad){
+
+}
+void generate_NOT(quad* quad){
+	
+}
+void generate_AND(quad* quad){
+	
 }
