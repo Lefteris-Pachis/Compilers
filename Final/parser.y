@@ -506,9 +506,9 @@ indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr
 													}
 				;
 
-block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
+block: 		L_BRACE { /*EnterScopeSpace();*/ scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
 																					Handle_block_l_brace_block_1_r_brace(yylineno); 
-																					ExitScopeSpace();
+																					//ExitScopeSpace();
 																				}
 			;
 
@@ -549,7 +549,8 @@ funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS { EnterScopeSpace()
 funcblockstart: { push_loopcounter_stack(loopcounter); loopcounter = 0; };
 funcblockend: 	{ loopcounter = pop_loopcounter_stack(); };
 
-funcbody:	funcblockstart block funcblockend { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
+funcbody:	funcblockstart block funcblockend { $$=CurrScopeOffset(); 	unsigned old_offset=pop_from_stack();
+											restorecurrscopeoffset(old_offset); ExitScopeSpace(); function_counter--; }
 			;
 
 funcdef:  funcprefix funcargs funcbody  {	
@@ -696,6 +697,8 @@ int main(int argc, char** argv){
 		printf("Errors occured!\n");
 
 	generate();
-	printConsts();	
+	printConsts();
+
 	return 0;
+
 }

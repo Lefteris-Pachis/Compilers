@@ -150,6 +150,7 @@ void reset_temp(){
 symbol new_temp(){
 	char* name = new_temp_name();
 	Insert_to_Hash(mytable,name,var_s,scope_count,yylineno);
+	IncCurrScopeOffset();
 	symbol sym = Lookup(mytable,name,scope_count);
 	if(sym)
 		return sym;
@@ -164,7 +165,7 @@ unsigned int istempname(char* s){
 void restorecurrscopeoffset(unsigned n){
 
 	switch(CurrScopeSpace()){
-		case programVar     :programVarOffset=n; break;
+		case programVar     : break;
 		case functionLocal  :functionLocalOffset=n; break;
 		case formalArg      :formalArgOffset=n;break;
 		default				:assert(0);
@@ -315,7 +316,8 @@ void Print_Quads(void){
 	 		if(quads[i].result!= NULL)
 	    		fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}
-      	//fprintf(icode,"\t\t\tLine: %d", quads[i].line);
+      	fprintf(icode,"\t\t\tOffset: %d", quads[i].result->sym->offset);
+      	fprintf(icode,"\t\t\tScope_space: %d", quads[i].result->sym->space);
     	fprintf(icode,"\n");
     }
     fclose(icode);

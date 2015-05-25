@@ -3,8 +3,10 @@
 #include "target_code.h"
 
 extern quad* quads;
+extern instruction*	instructions;
 extern unsigned currQuad;
 extern unsigned int currInstr;
+extern int total_userFuncs;
 unsigned i;
 
 generator_func_t generators[] = {
@@ -161,17 +163,25 @@ void generate_GETRETVAL(quad* quad){
 
 void generate_FUNCSTART(quad* quad){
 	printf("***GENERATE_FUNCSTART***\n");
+	int index;
+	func_stack* function= malloc(sizeof(func_stack));
+
 	symbol f = quad->result->sym;
+	function->func=f;
+	function->node=NULL;
 	f->taddress = nextinstructionlabel();
+	printf("%d\n", f->taddress);
 	quad->taddress = nextinstructionlabel();
 
-	add_userfunction(f);
+	index = add_userfunction(f);
 
-	push_func(f);
+	push_func(function);
 
 	instruction t;
+
 	t.opcode = funcenter_v;
 	make_operand(quad->result,&t.result);
+	t.result.val = index;
 	t_emit(&t);
 
 }
@@ -183,10 +193,11 @@ void generate_RETURN(quad* quad){
 	instruction t;
 	t.opcode = assign_v;
 	make_retval_operand(&t.result);
-	make_operand(quad->arg1,&t.arg1);
+	make_operand(quad->result,&t.arg1);
 	t_emit(&t);
 	f=pop_func();
 	f->node=appendRL(f->node,nextinstructionlabel());
+	push_func(f);
 	t.opcode=jump_v;
 	reset_operand(&t.arg1);
 	reset_operand(&t.arg2);
@@ -204,20 +215,35 @@ vmarg * reset_operand(){
 }
 
 void generate_FUNCEND(quad* quad){
+	return_list *tmp;
 	printf("***GENERATE_FUNCEND***\n");
 	func_stack *f;
 	f=pop_func();
-	//backpatch
+	tmp=f->node;
+	if(tmp!=NULL){
+		while(tmp){
+			printf("while\n");
+			instructions[tmp->return_label].result.val=nextinstructionlabel();
+
+
+			tmp=tmp->next;
+
+		}
+	}
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode=funcexit_v;
 	make_operand(quad->result,&t.result);
+	t.result.val = total_userFuncs-1;
 	t_emit(&t);
 
 
 
 
 }
+
+
+
 return_list * appendRL(return_list *head,int label){
 
 	return_list *tmp = malloc( sizeof( struct return_List ) );

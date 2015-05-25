@@ -76,8 +76,9 @@ typedef struct func_stack{
 struct func_stack *f_top;
 
 
-void push_func(symbol sym);
+void push_func(func_stack* function);
 func_stack* pop_func();
+func_stack* top_func();
 
 
 void make_operand(expr* e, vmarg* arg);
@@ -91,10 +92,7 @@ void patch_incomplete_jumps();
 
 void generate_instruction(vmopcode op, quad* quad);
 void generate_relational_instruction(vmopcode op, quad* quad);
-void generate_param_instruction(quad* quad);
-void generate_call_instruction(quad* quad);
-void generate_retval_instruction(quad* quad);
-void generate_funcend_instruction(quad* quad);
+
 
 int  consts_newstring(char* s);
 int  consts_newdouble(double d);
@@ -112,6 +110,7 @@ void t_emit(instruction* instruction);
 unsigned int  nextinstructionlabel();
 void Print_Instructions(FILE *fp );
 int add_userfunction(symbol f);
+
 
 void printConsts();
 #endif
