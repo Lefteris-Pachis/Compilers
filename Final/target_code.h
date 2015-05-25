@@ -50,8 +50,8 @@ typedef struct instruction{
 }instruction;
 
 typedef struct userfunc{
-	unsigned 	address;
-	unsigned 	localSize;
+	int	address;
+	int	localSize;
 	char *		id;
 }userfunc;
 
@@ -61,16 +61,23 @@ typedef struct incomplete_jump{
 	struct incomplete_jump* next;
 }incomplete_jump;
 
+typedef struct return_List{
+	int return_label;
+	struct return_List *next;
+
+}return_list;
+
 typedef struct func_stack{
 	symbol func;
 	struct func_stack* next;
+	struct return_List * node;
 }func_stack;
 
 struct func_stack *f_top;
 
 
 void push_func(symbol sym);
-symbol pop_func();
+func_stack* pop_func();
 
 
 void make_operand(expr* e, vmarg* arg);
@@ -87,13 +94,11 @@ void generate_relational_instruction(vmopcode op, quad* quad);
 void generate_param_instruction(quad* quad);
 void generate_call_instruction(quad* quad);
 void generate_retval_instruction(quad* quad);
-void generate_funcstart_instruction(quad* quad);
 void generate_funcend_instruction(quad* quad);
-void generate_return_instruction(quad* quad);
 
-unsigned consts_newstring(char* s);
-unsigned consts_newdouble(double d);
-unsigned consts_newint(int d);
+int  consts_newstring(char* s);
+int  consts_newdouble(double d);
+int  consts_newint(int d);
 
 unsigned userfuncs_newfunc(symbol sym);
 unsigned libfuncs_newused(const char* s);
@@ -104,9 +109,9 @@ char* libfuncs_getused(unsigned index);
 
 void t_expand();
 void t_emit(instruction* instruction);
-unsigned nextinstructionlabel();
-void Print_Instructions();
-
+unsigned int  nextinstructionlabel();
+void Print_Instructions(FILE *fp );
+int add_userfunction(symbol f);
 
 void printConsts();
 #endif
