@@ -5,8 +5,8 @@ function f(x,y){
 }
 z = "world";
 w = cos(3.1415);
-print(x,y,z,w);
-not x;*/
-while(1){
-	
-}
+print(x,y,z,w);*/
+not x;
+//while(1){
+//	x=1;
+//}

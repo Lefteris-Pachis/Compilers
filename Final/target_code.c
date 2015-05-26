@@ -39,12 +39,15 @@ void make_operand(expr* e, vmarg* arg){
 			switch(e->sym->space){
 				case programVar:	arg->type = global_a; 	break;
 				case functionLocal: arg->type = local_a; 	break;
-				case formalArg: 	arg->type = formal_a; printf("fffffff\n");	break;
+				case formalArg: 	arg->type = formal_a; 	break;
 				default: assert(0);
 			}
 			break;
 		case constbool_e:
-			arg->val = e->boolConst;
+			if(e->boolConst == 48)
+				arg->val = 0;
+			else if(e->boolConst == 49)						/////////////////////////////////////
+				arg->val = 1;
 			arg->type = bool_a;
 			break;
 		case conststring_e:
@@ -132,9 +135,27 @@ void make_retval_operand(vmarg* arg){
 	arg->type = retval_a;
 }
 
-void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
+incomplete_jump *add_incomplete_jump(incomplete_jump *head,unsigned instrNo, unsigned iaddress){
+	incomplete_jump *temp;
+	temp=(incomplete_jump *)malloc(sizeof(incomplete_jump));
+	temp->instrNo=instrNo;
+	temp->iaddress = iaddress;
+	if (head== NULL){
+		head=temp;
+		head->next=NULL;
+		ij_total++;
+		return head;
+	}
+	else{
+		temp->next=head;
+		head=temp;
+		ij_total++;
+		return head;
+	}
 
-	incomplete_jump* tmp = ij_head;
+
+
+	/*incomplete_jump* tmp = ij_head;
 	printf("JUMP_LIST%d:::%d\n", instrNo,iaddress);
 	if(ij_head == NULL){
 		ij_head = malloc(sizeof(incomplete_jump));
@@ -154,9 +175,9 @@ void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 		tmp->iaddress = iaddress;
 		tmp->next = NULL;
 		ij_total++;
-	}
-
+	}*/
 }
+
 void Print_Instructions(FILE * fp){
 
 
@@ -198,16 +219,27 @@ void Print_Instructions(FILE * fp){
 	}
 }
 
-void patch_incomplete_jumps(){
+void print_incomplete_j(){
+	incomplete_jump* tmp = ij_head;
+	while(tmp!=NULL){
+		printf("tmp->instrNo   %d\n",tmp->instrNo);
+		printf("tmp->iaddress   %d\n",tmp->iaddress);
+		tmp = tmp->next;
+	}
+}
 
+void patch_incomplete_jumps(){
+	//print_incomplete_j();
 	incomplete_jump* tmp = ij_head;
 
 	while(tmp!=NULL){
 		if(tmp->iaddress == currQuad){
-			instructions[tmp->instrNo].result.val = totalIn;	
+			instructions[tmp->instrNo].result.val = currInstr;	
+			//printf("currInstr    %d\n", currInstr);
 		}
 		else{
-			instructions[tmp->instrNo].result.val = quads[tmp->iaddress].taddress;	
+			instructions[tmp->instrNo].result.val = tmp->iaddress-1;	
+			//printf("tmp->iaddress    %d\n", tmp->iaddress-1);
 		}
 		tmp = tmp->next;
 	}
@@ -239,10 +271,10 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 	t.result.type = label_a;
 
 	if(quad->label < i){
-		t.result.val = quads[quad->label].taddress;
+		t.result.val = quads[quad->label].taddress-1;
 	}
 	else{
-		add_incomplete_jump(nextinstructionlabel(),quad->label);
+		ij_head = add_incomplete_jump(ij_head,nextinstructionlabel(),quad->label);
 	}
 
 	quad->taddress = nextinstructionlabel();
