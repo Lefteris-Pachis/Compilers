@@ -316,9 +316,11 @@ void Print_Quads(void){
 	 		if(quads[i].result!= NULL)
 	    		fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}
-      	if(quads[i].result->sym){
-      		fprintf(icode,"\t\t\tOffset: %d", quads[i].result->sym->offset);
-      		fprintf(icode,"\t\t\tScope_space: %d", quads[i].result->sym->space);
+      	if(quads[i].result){
+      		if(quads[i].result->sym){
+      			fprintf(icode,"\t\t\tOffset: %d", quads[i].result->sym->offset);
+      			fprintf(icode,"\t\t\tScope_space: %d", quads[i].result->sym->space);
+      		}
       	}
     	fprintf(icode,"\n");
     }

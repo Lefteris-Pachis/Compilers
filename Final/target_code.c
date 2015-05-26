@@ -135,8 +135,9 @@ void make_retval_operand(vmarg* arg){
 void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 
 	incomplete_jump* tmp = ij_head;
-
+	printf("JUMP_LIST%d:::%d\n", instrNo,iaddress);
 	if(ij_head == NULL){
+		ij_head = malloc(sizeof(incomplete_jump));
 		ij_head->instrNo = instrNo;
 		ij_head->iaddress = iaddress;
 		ij_head->next = NULL;
@@ -148,7 +149,7 @@ void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 
 			tmp = tmp->next;
 		}
-
+		tmp = malloc(sizeof(incomplete_jump));
 		tmp->instrNo = instrNo;
 		tmp->iaddress = iaddress;
 		tmp->next = NULL;
@@ -215,7 +216,8 @@ void patch_incomplete_jumps(){
 void generate_instruction(vmopcode op, quad* quad){
 	instruction i;
 	i.opcode = op;
-	make_operand(quad->arg1,&i.arg1);
+	if(quad->arg1!=NULL)
+		make_operand(quad->arg1,&i.arg1);
 	if(quad->arg2!=NULL)
 		make_operand(quad->arg2,&i.arg2);
 	make_operand(quad->result,&i.result);
@@ -229,8 +231,10 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 	instruction t;
 
 	t.opcode = op;
-	make_operand(quad->arg1,&t.arg1);
-	make_operand(quad->arg2,&t.arg2);
+	if(quad->arg1)
+		make_operand(quad->arg1,&t.arg1);
+	if(quad->arg2)
+		make_operand(quad->arg2,&t.arg2);
 
 	t.result.type = label_a;
 

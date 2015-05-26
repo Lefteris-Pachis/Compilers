@@ -1,4 +1,4 @@
-x=10;
+/*x=10;
 y="hello";
 function f(x,y){
 	return x+y;
@@ -6,3 +6,7 @@ function f(x,y){
 z = "world";
 w = cos(3.1415);
 print(x,y,z,w);
+not x;*/
+while(1){
+	
+}

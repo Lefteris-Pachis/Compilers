@@ -11,7 +11,7 @@ extern char* namedLibfuncs[12];
 unsigned i;
 
 generator_func_t generators[] = {
-generate_ASSIGN ,
+ 	generate_ASSIGN ,
 	generate_ADD ,
     generate_SUB ,
     generate_MUL ,
@@ -33,18 +33,18 @@ generate_ASSIGN ,
 	generate_GETRETVAL ,
 	generate_FUNCSTART ,
 	generate_FUNCEND ,
-	generate_JUMP ,
 	generate_NEWTABLE ,
+	generate_JUMP,
     generate_TABLEGETELEM ,
    	generate_TABLESETELEM ,
     generate_NOP
-
 };
 
 void generate(void){
 	for (i = 0; i < currQuad; ++i){
 		(*generators[quads[i].op]) (quads + i);
 	}
+	patch_incomplete_jumps();
 }
 
 void generate_ADD(quad* quad){
@@ -101,7 +101,19 @@ void generate_NOP(){
 
 void generate_JUMP(quad* quad){
 	printf("***GENERATE_JUMP***\n");
-	generate_relational_instruction(jump_v, quad);
+	//generate_instruction(jump_v, quad);
+	//instruction *i = malloc(sizeof(instruction));
+	//i->opcode = jump_v;
+	//i->result.type = label_a;
+	//i->result.val = quad->label;
+	//quad->taddress = nextinstructionlabel();
+	//if(quad->result)
+	//	printf("%d\n", quad->result);
+	//make_operand(quad->result,&i.result);
+	
+	//i->srcLine = quad->line;
+	//t_emit(i);
+	generate_relational_instruction(jump_v,quad);
 }
 
 void generate_IF_EQ(quad* quad){
