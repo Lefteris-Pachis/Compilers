@@ -436,7 +436,8 @@ elist: 		expr  				{
 											relop = 0;
 										}
 									}
-									$$=$1;
+									$$ = expr_list_insert(NULL,$1);
+									//$$=$1;
 								}
 			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno);
 									if(for_flag == 0){

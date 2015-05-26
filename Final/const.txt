@@ -1,28 +1,39 @@
+namedLibfuncs : 0(print) 1(input) 2(objectmemberkeys) 3(objecttotalmembers) 4(objectcopy) 5(totalarguments) 6(argument) 7(typeof) 8(strtonum) 9(sqrt) 10(cos) 11(sin) 
+total_namedLibfuncs : 12
 total_int_Consts : 1
-total_double_Consts : 0
+total_double_Consts : 1
 total_string_Consts : 2
-total_userFuncs : 2
-INT -------- 0  3
-STR -------- 0  world
-STR -------- 1  200
+total_userFuncs : 1
+INT -------- 0  10
+DOUBLE -------- 0 3.141500
+STR -------- 0  hello
+STR -------- 1  world
 
-0: f 0 3 
-1: _F0 9 0 
-
-
+0: f 4 1 
 
 
 
-0: ENTERFUNC	9(userfunc),0	
-1: ASSIGN	4(integer),0	3(local),0	
-2: ASSIGN	3(local),0	3(local),1	
-3: ADD	2(formal),0	2(formal),0	3(local),2	
-4: ASSIGN	3(local),2	11(retval),0	
-5: JUMP	0(label),6	
-6: EXITFUNC	9(userfunc),0	
-7: ASSIGN	6(string),0	1(global),0	
-8: ASSIGN	1(global),0	1(global),1	
-9: ENTERFUNC	9(userfunc),1	
-10: EXITFUNC	9(userfunc),1	
-11: ASSIGN	6(string),1	1(global),2	
-12: ASSIGN	1(global),2	1(global),3	
+
+
+0: ASSIGN	4(integer),0	1(global),0	
+1: ASSIGN	1(global),0	1(global),1	
+2: ASSIGN	6(string),0	1(global),2	
+3: ASSIGN	1(global),2	1(global),3	
+4: ENTERFUNC	9(userfunc),0	
+5: ADD	2(formal),1	2(formal),0	3(local),0	
+6: ASSIGN	3(local),0	11(retval),0	
+7: JUMP	0(label),8	
+8: EXITFUNC	9(userfunc),0	
+9: ASSIGN	6(string),1	1(global),4	
+10: ASSIGN	1(global),4	1(global),5	
+11: PUSHARG	5(double),0	
+12: CALL	10(libfunc),10	
+13: ASSIGN	11(retval)	1(global),7	
+14: ASSIGN	1(global),7	1(global),6	
+15: ASSIGN	1(global),6	1(global),8	
+16: PUSHARG	1(global),0	
+17: PUSHARG	1(global),2	
+18: PUSHARG	1(global),4	
+19: PUSHARG	1(global),6	
+20: CALL	10(libfunc),0	
+21: ASSIGN	11(retval)	1(global),9	

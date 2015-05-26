@@ -6,8 +6,8 @@ int* 		intConsts 				= (int*) 0;
 int			total_int_Consts 		= 0;
 char** 		stringConsts 			= (char**) 0;
 int			total_string_Consts 	= 0;
-char** 		namedLibfuncs 			= (char**) 0;
-int  		total_namedLibfuncs 	= 0;
+char* 		namedLibfuncs[12] 		= {"print","input","objectmemberkeys","objecttotalmembers","objectcopy","totalarguments","argument","typeof","strtonum","sqrt","cos","sin"};
+int  		total_namedLibfuncs 	= 12;
 userfunc*	userFuncs 				= (userfunc*) 0;
 int  	total_userFuncs 		= 0;
 incomplete_jump* ij_head 			= (incomplete_jump*) 0;
@@ -179,10 +179,12 @@ void Print_Instructions(FILE * fp){
 			fprintf(icode,"%d(%s),%d\t", instructions[i].arg2.type,vmarg_t[instructions[i].arg2.type],instructions[i].arg2.val);
 			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
      	}else if((op==not_v) || (op==uminus_v) || (op==assign_v)){
-			fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
+     		if(instructions[i].arg1.type != 11)
+				fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
+			else
+				fprintf(icode,"%d(%s)\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type]);
 			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
-	 		
-      	}else if((op==call_v) ||   (op==funcenter_v) ||  (op==funcexit_v) || (op==newtable_v)){	
+      	}else if((op==call_v) || (op==pusharg_v) || (op==funcenter_v) ||  (op==funcexit_v) || (op==newtable_v)){	
 			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
       	}else{
 	 		if(instructions[i].result.type==0 )
@@ -362,10 +364,15 @@ void printConsts(){
 	
 
 	FILE* fp = fopen("const.txt","w");
+	fprintf(fp, "namedLibfuncs : ");
+	for (i = 0; i < total_namedLibfuncs; ++i)
+		fprintf(fp, "%d(%s) ",i,namedLibfuncs[i]);
+	fprintf(fp, "\ntotal_namedLibfuncs : %d\n", total_namedLibfuncs);
 	fprintf(fp, "total_int_Consts : %d\n", total_int_Consts);
 	fprintf(fp, "total_double_Consts : %d\n", total_double_Consts);
 	fprintf(fp, "total_string_Consts : %d\n", total_string_Consts);
 	fprintf(fp, "total_userFuncs : %d\n", total_userFuncs);
+
 
 	for(i=0; i<total_int_Consts ; i++){
 

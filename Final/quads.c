@@ -316,8 +316,10 @@ void Print_Quads(void){
 	 		if(quads[i].result!= NULL)
 	    		fprintf(icode,"%s\t", print_expr(quads[i].result));
       	}
-      	fprintf(icode,"\t\t\tOffset: %d", quads[i].result->sym->offset);
-      	fprintf(icode,"\t\t\tScope_space: %d", quads[i].result->sym->space);
+      	if(quads[i].result->sym){
+      		fprintf(icode,"\t\t\tOffset: %d", quads[i].result->sym->offset);
+      		fprintf(icode,"\t\t\tScope_space: %d", quads[i].result->sym->space);
+      	}
     	fprintf(icode,"\n");
     }
     fclose(icode);
@@ -561,6 +563,7 @@ expr* expr_list_insert(expr* head,expr *expr){
 	struct expr *temp,*tmp=head;
 	temp=(struct expr *)malloc(sizeof(struct expr));
 	temp=expr;
+	printf("aaaaaaaaaaaaaaaaaaaaaaaaaa%d\n",temp->intConst );
 	if (head== NULL){
 		head=temp;
 		head->next=NULL;

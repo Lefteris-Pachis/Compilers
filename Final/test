@@ -1,9 +1,8 @@
-//x=10;
-//y="hello";
+x=10;
+y="hello";
 function f(x,y){
-	po=3;
 	return x+y;
 }
-z="world";
-function (){};
-a="200";
+z = "world";
+w = cos(3.1415);
+print(x,y,z,w);

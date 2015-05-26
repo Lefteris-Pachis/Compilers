@@ -7,6 +7,7 @@ extern instruction*	instructions;
 extern unsigned currQuad;
 extern unsigned int currInstr;
 extern int total_userFuncs;
+extern char* namedLibfuncs[12];
 unsigned i;
 
 generator_func_t generators[] = {
@@ -134,20 +135,27 @@ void generate_IF_LESSEQ(quad* quad){
 }
 
 void generate_PARAM(quad* quad){
-	//printf("***GENERATE_PARAM***\n");
+	printf("***GENERATE_PARAM***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = pusharg_v;
-	make_operand(quad->arg1, &t.arg1);
+	make_operand(quad->result, &t.result);
+
 	t_emit(&t);
 }
 
 void generate_CALL(quad* quad){
-	//printf("***GENERATE_CALL***\n");
+	printf("***GENERATE_CALL***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = call_v;
-	make_operand(quad->arg1, &t.arg1);
+	make_operand(quad->result, &t.result);
+	int index;
+	for(index=0; index<12; index++){
+		if(strcmp(quad->result->sym->name,namedLibfuncs[index]) == 0)
+			break;
+	}
+	t.result.val = index;
 	t_emit(&t);
 }
 
