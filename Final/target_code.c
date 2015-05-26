@@ -6,9 +6,9 @@ int* 		intConsts 				= (int*) 0;
 int			total_int_Consts 		= 0;
 char** 		stringConsts 			= (char**) 0;
 int			total_string_Consts 	= 0;
-char** 		namedLibfuncs 			= (char**) 0;
-int  		total_namedLibfuncs 	= 0;
-userfunc** 	userFuncs 				= (userfunc**) 0;
+char* 		namedLibfuncs[12] 		= {"print","input","objectmemberkeys","objecttotalmembers","objectcopy","totalarguments","argument","typeof","strtonum","sqrt","cos","sin"};
+int  		total_namedLibfuncs 	= 12;
+userfunc*	userFuncs 				= (userfunc*) 0;
 int  	total_userFuncs 		= 0;
 incomplete_jump* ij_head 			= (incomplete_jump*) 0;
 unsigned	ij_total 				= 0;
@@ -16,7 +16,7 @@ unsigned	ij_total 				= 0;
 
 extern int 		yylineno;
 extern quad* 	quads;
-extern int 		total;
+extern int 		currQuad;
 extern unsigned	i;
 
 instruction*	instructions = (instruction*) 0;
@@ -37,9 +37,9 @@ void make_operand(expr* e, vmarg* arg){
 			assert(e->sym);
 			arg->val = e->sym->offset;
 			switch(e->sym->space){
-				case programVar:	arg->type = global_a;	break;
+				case programVar:	arg->type = global_a; 	break;
 				case functionLocal: arg->type = local_a; 	break;
-				case formalArg: 	arg->type = formal_a; 	break;
+				case formalArg: 	arg->type = formal_a; printf("fffffff\n");	break;
 				default: assert(0);
 			}
 			break;
@@ -84,13 +84,10 @@ void make_operand(expr* e, vmarg* arg){
 	}
 }
 
-void push_func(symbol sym){
+void push_func(func_stack* function){
 
-	func_stack* tmp;
-
-	tmp->func = sym;
-	tmp->next = f_top;
-	f_top = tmp;
+	function->next = f_top;
+	f_top = function;
 }
 
 func_stack* pop_func(){
@@ -105,6 +102,16 @@ func_stack* pop_func(){
 	return tmp;
 
 }
+
+func_stack* top_func(){
+	func_stack* tmp;
+	if(f_top == NULL)
+		return NULL;
+	tmp = f_top;
+	return tmp;
+}
+
+
 
 
 void make_int_operand(vmarg* arg, int val){
@@ -128,8 +135,9 @@ void make_retval_operand(vmarg* arg){
 void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 
 	incomplete_jump* tmp = ij_head;
-
+	printf("JUMP_LIST%d:::%d\n", instrNo,iaddress);
 	if(ij_head == NULL){
+		ij_head = malloc(sizeof(incomplete_jump));
 		ij_head->instrNo = instrNo;
 		ij_head->iaddress = iaddress;
 		ij_head->next = NULL;
@@ -141,7 +149,7 @@ void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 
 			tmp = tmp->next;
 		}
-
+		tmp = malloc(sizeof(incomplete_jump));
 		tmp->instrNo = instrNo;
 		tmp->iaddress = iaddress;
 		tmp->next = NULL;
@@ -149,13 +157,53 @@ void add_incomplete_jump(unsigned instrNo, unsigned iaddress){
 	}
 
 }
+void Print_Instructions(FILE * fp){
+
+
+	vmopcode op;
+	int i = 0;
+	char *table_op[25] = {"ASSIGN","ADD","SUB","MUL","DIV","MOD","UMINUS","AND","OR","NOT","JEQ","JNOTEQ",
+      "JLESSEQ","JGREATEREQ","JLESS","JGREATER","JUMP","CALL","PUSHARG","ENTERFUNC","EXITFUNC","NEWTABLE","TABLEGETELEM","TABLESETELEM","NOP"};
+     char *vmarg_t[12]={"label","global","formal","local","integer","double","string","bool","nil","userfunc","libfunc","retval"};
+   FILE* icode = fp;
+    for(i=0; i<currInstr; i++){
+
+    	op = (instructions[i]).opcode;
+
+    	fprintf(icode,"%d: %s\t",i,table_op[op]);
+    	if((op==add_v) || (op==and_v) || (op==or_v) || (op==sub_v) || (op==mul_v) || (op==div_v) || (op==mod_v) || (op==tablegetelem_v) || (op==tablesetelem_v)){
+			fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
+			fprintf(icode,"%d(%s),%d\t", instructions[i].arg2.type,vmarg_t[instructions[i].arg2.type],instructions[i].arg2.val);
+			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+      	}else if((op==jgt_v) || (op==jge_v)	|| (op==jlt_v) || (op==jle_v) || (op==jne_v) || (op==jeq_v)){
+			fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
+			fprintf(icode,"%d(%s),%d\t", instructions[i].arg2.type,vmarg_t[instructions[i].arg2.type],instructions[i].arg2.val);
+			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+     	}else if((op==not_v) || (op==uminus_v) || (op==assign_v)){
+     		if(instructions[i].arg1.type != 11)
+				fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
+			else
+				fprintf(icode,"%d(%s)\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type]);
+			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+      	}else if((op==call_v) || (op==pusharg_v) || (op==funcenter_v) ||  (op==funcexit_v) || (op==newtable_v)){	
+			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+      	}else{
+	 		if(instructions[i].result.type==0 )
+	    		fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+      	//fprintf(icode,"\t\t\tLine: %d", quads[i].line);
+    	
+    	}
+    	fprintf(icode,"\n");
+   	
+	}
+}
 
 void patch_incomplete_jumps(){
 
 	incomplete_jump* tmp = ij_head;
 
 	while(tmp!=NULL){
-		if(tmp->iaddress == total){
+		if(tmp->iaddress == currQuad){
 			instructions[tmp->instrNo].result.val = totalIn;	
 		}
 		else{
@@ -168,7 +216,8 @@ void patch_incomplete_jumps(){
 void generate_instruction(vmopcode op, quad* quad){
 	instruction i;
 	i.opcode = op;
-	make_operand(quad->arg1,&i.arg1);
+	if(quad->arg1!=NULL)
+		make_operand(quad->arg1,&i.arg1);
 	if(quad->arg2!=NULL)
 		make_operand(quad->arg2,&i.arg2);
 	make_operand(quad->result,&i.result);
@@ -182,8 +231,10 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 	instruction t;
 
 	t.opcode = op;
-	make_operand(quad->arg1,&t.arg1);
-	make_operand(quad->arg2,&t.arg2);
+	if(quad->arg1)
+		make_operand(quad->arg1,&t.arg1);
+	if(quad->arg2)
+		make_operand(quad->arg2,&t.arg2);
 
 	t.result.type = label_a;
 
@@ -199,21 +250,7 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 
 }
 
-void generate_param_instruction(quad* quad){
 
-}
-
-void generate_call_instruction(quad* quad){
-
-}
-
-void generate_retval_instruction(quad* quad){
-
-}
-
-void generate_funcend_instruction(quad* quad){
-
-}
 
 
 
@@ -268,19 +305,19 @@ int consts_newstring(char* s){
 
 int add_userfunction(symbol f){
 	total_userFuncs++;
-	userfunc** newuserFuncs = malloc(sizeof(userfunc*)*total_userFuncs);
-	memcpy(newuserFuncs,userFuncs,sizeof(userfunc*)*(total_userFuncs-1));
+	userfunc* newuserFuncs = malloc(sizeof(userfunc)*total_userFuncs);
+	memcpy(newuserFuncs,userFuncs,sizeof(userfunc)*(total_userFuncs-1));
 
-	userfunc * tmp=malloc(sizeof(userfunc ));
 	free(userFuncs);
 	userFuncs=newuserFuncs;
-	printf("Function :: %s\n", f->name);
-	tmp->id=strdup(f->name);
-	printf("Function :: %s\n", tmp->id);
-	tmp->address=f->taddress;
-	tmp->localSize=f->totallocals;
+	//printf("Function :: %s\n", f->name);
+	userFuncs[total_userFuncs-1].id=strdup(f->name);
+	//printf("Function :: %s\n", tmp->id);
+	userFuncs[total_userFuncs-1].address=f->taddress;
 
-	userFuncs[total_userFuncs-1]=tmp;
+	userFuncs[total_userFuncs-1].localSize=f->totallocals;
+
+	printf("address  %d\n",userFuncs[total_userFuncs-1].address );
 
 	return total_userFuncs-1;
 
@@ -300,12 +337,14 @@ void t_expand(){
 
 void t_emit(instruction* instruction){
 	struct instruction* i;
+	printf("currInstr%d\n", currInstr);
 	if(currInstr == totalIn)
 		t_expand();
 	i = instructions + currInstr++;
 	i->opcode = instruction->opcode;
 	i->arg1 = instruction->arg1;
 	i->arg2 = instruction->arg2;
+	i->result = instruction->result;
 	i->srcLine = instruction->srcLine;
 	totalIn++;
 }
@@ -317,7 +356,7 @@ void printUserFunction(FILE *fp){
 
 	int i;
    for(i=0; i<total_userFuncs; i++){ 
-      fprintf( fp, "\n%d: %s %d %d ", i, userFuncs[ i]->id, userFuncs[ i ]->address, userFuncs[ i ]->localSize);
+      fprintf( fp, "\n%d: %s %d %d ", i, userFuncs[ i].id, userFuncs[ i ].address, userFuncs[ i ].localSize);
    }
    fprintf(fp,"\n\n\n");
    return;
@@ -329,10 +368,15 @@ void printConsts(){
 	
 
 	FILE* fp = fopen("const.txt","w");
+	fprintf(fp, "namedLibfuncs : ");
+	for (i = 0; i < total_namedLibfuncs; ++i)
+		fprintf(fp, "%d(%s) ",i,namedLibfuncs[i]);
+	fprintf(fp, "\ntotal_namedLibfuncs : %d\n", total_namedLibfuncs);
 	fprintf(fp, "total_int_Consts : %d\n", total_int_Consts);
 	fprintf(fp, "total_double_Consts : %d\n", total_double_Consts);
 	fprintf(fp, "total_string_Consts : %d\n", total_string_Consts);
 	fprintf(fp, "total_userFuncs : %d\n", total_userFuncs);
+
 
 	for(i=0; i<total_int_Consts ; i++){
 
@@ -354,6 +398,7 @@ void printConsts(){
 	printUserFunction(fp);
 
 	fprintf( fp, "\n\n\n");
+	Print_Instructions(fp);
 	fclose(fp);
 }
 

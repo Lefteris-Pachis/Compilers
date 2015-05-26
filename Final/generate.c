@@ -3,12 +3,15 @@
 #include "target_code.h"
 
 extern quad* quads;
+extern instruction*	instructions;
 extern unsigned currQuad;
 extern unsigned int currInstr;
+extern int total_userFuncs;
+extern char* namedLibfuncs[12];
 unsigned i;
 
 generator_func_t generators[] = {
-generate_ASSIGN ,
+ 	generate_ASSIGN ,
 	generate_ADD ,
     generate_SUB ,
     generate_MUL ,
@@ -30,18 +33,18 @@ generate_ASSIGN ,
 	generate_GETRETVAL ,
 	generate_FUNCSTART ,
 	generate_FUNCEND ,
-	generate_JUMP ,
 	generate_NEWTABLE ,
+	generate_JUMP,
     generate_TABLEGETELEM ,
    	generate_TABLESETELEM ,
     generate_NOP
-
 };
 
 void generate(void){
 	for (i = 0; i < currQuad; ++i){
 		(*generators[quads[i].op]) (quads + i);
 	}
+	patch_incomplete_jumps();
 }
 
 void generate_ADD(quad* quad){
@@ -98,7 +101,19 @@ void generate_NOP(){
 
 void generate_JUMP(quad* quad){
 	printf("***GENERATE_JUMP***\n");
-	generate_relational_instruction(jump_v, quad);
+	//generate_instruction(jump_v, quad);
+	//instruction *i = malloc(sizeof(instruction));
+	//i->opcode = jump_v;
+	//i->result.type = label_a;
+	//i->result.val = quad->label;
+	//quad->taddress = nextinstructionlabel();
+	//if(quad->result)
+	//	printf("%d\n", quad->result);
+	//make_operand(quad->result,&i.result);
+	
+	//i->srcLine = quad->line;
+	//t_emit(i);
+	generate_relational_instruction(jump_v,quad);
 }
 
 void generate_IF_EQ(quad* quad){
@@ -132,20 +147,27 @@ void generate_IF_LESSEQ(quad* quad){
 }
 
 void generate_PARAM(quad* quad){
-	//printf("***GENERATE_PARAM***\n");
+	printf("***GENERATE_PARAM***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = pusharg_v;
-	make_operand(quad->arg1, &t.arg1);
+	make_operand(quad->result, &t.result);
+
 	t_emit(&t);
 }
 
 void generate_CALL(quad* quad){
-	//printf("***GENERATE_CALL***\n");
+	printf("***GENERATE_CALL***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = call_v;
-	make_operand(quad->arg1, &t.arg1);
+	make_operand(quad->result, &t.result);
+	int index;
+	for(index=0; index<12; index++){
+		if(strcmp(quad->result->sym->name,namedLibfuncs[index]) == 0)
+			break;
+	}
+	t.result.val = index;
 	t_emit(&t);
 }
 
@@ -161,17 +183,25 @@ void generate_GETRETVAL(quad* quad){
 
 void generate_FUNCSTART(quad* quad){
 	printf("***GENERATE_FUNCSTART***\n");
+	int index;
+	func_stack* function= malloc(sizeof(func_stack));
+
 	symbol f = quad->result->sym;
+	function->func=f;
+	function->node=NULL;
 	f->taddress = nextinstructionlabel();
+	printf("%d\n", f->taddress);
 	quad->taddress = nextinstructionlabel();
 
-	add_userfunction(f);
+	index = add_userfunction(f);
 
-	push_func(f);
+	push_func(function);
 
 	instruction t;
+
 	t.opcode = funcenter_v;
 	make_operand(quad->result,&t.result);
+	t.result.val = index;
 	t_emit(&t);
 
 }
@@ -183,10 +213,11 @@ void generate_RETURN(quad* quad){
 	instruction t;
 	t.opcode = assign_v;
 	make_retval_operand(&t.result);
-	make_operand(quad->arg1,&t.arg1);
+	make_operand(quad->result,&t.arg1);
 	t_emit(&t);
 	f=pop_func();
 	f->node=appendRL(f->node,nextinstructionlabel());
+	push_func(f);
 	t.opcode=jump_v;
 	reset_operand(&t.arg1);
 	reset_operand(&t.arg2);
@@ -204,20 +235,35 @@ vmarg * reset_operand(){
 }
 
 void generate_FUNCEND(quad* quad){
+	return_list *tmp;
 	printf("***GENERATE_FUNCEND***\n");
 	func_stack *f;
 	f=pop_func();
-	//backpatch
+	tmp=f->node;
+	if(tmp!=NULL){
+		while(tmp){
+			printf("while\n");
+			instructions[tmp->return_label].result.val=nextinstructionlabel();
+
+
+			tmp=tmp->next;
+
+		}
+	}
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode=funcexit_v;
 	make_operand(quad->result,&t.result);
+	t.result.val = total_userFuncs-1;
 	t_emit(&t);
 
 
 
 
 }
+
+
+
 return_list * appendRL(return_list *head,int label){
 
 	return_list *tmp = malloc( sizeof( struct return_List ) );

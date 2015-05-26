@@ -436,7 +436,8 @@ elist: 		expr  				{
 											relop = 0;
 										}
 									}
-									$$=$1;
+									$$ = expr_list_insert(NULL,$1);
+									//$$=$1;
 								}
 			| elist COMMA expr 	{ 	Handle_elist_elist_comma_expr(yylineno);
 									if(for_flag == 0){
@@ -506,9 +507,9 @@ indexedelem: 	L_BRACE expr COLON expr R_BRACE 	{ Handle_indexedelem_l_brace_expr
 													}
 				;
 
-block: 		L_BRACE { EnterScopeSpace(); scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
+block: 		L_BRACE { /*EnterScopeSpace();*/ scope_count++;} block_1 R_BRACE 		{ 	Hide(mytable,scope_count--); 
 																					Handle_block_l_brace_block_1_r_brace(yylineno); 
-																					ExitScopeSpace();
+																					//ExitScopeSpace();
 																				}
 			;
 
@@ -538,6 +539,7 @@ funcprefix: FUNCTION funcname 	{
 									emit(funcstart,0,0,lvalue_expr($<Symbol>$));
 									push_to_stack(CurrScopeSpace()); //push Current_Scope_offset
 									EnterScopeSpace();
+									IncCurrScopeOffset();
 									resetformalargsoffset();
 								}								
 			;
@@ -549,7 +551,8 @@ funcargs: L_PARENTHESIS{scope_count++;} idlist R_PARENTHESIS { EnterScopeSpace()
 funcblockstart: { push_loopcounter_stack(loopcounter); loopcounter = 0; };
 funcblockend: 	{ loopcounter = pop_loopcounter_stack(); };
 
-funcbody:	funcblockstart block funcblockend { $$=CurrScopeOffset(); ExitScopeSpace(); function_counter--; }
+funcbody:	funcblockstart block funcblockend { $$=CurrScopeOffset(); IncCurrScopeOffset();	unsigned old_offset=pop_from_stack();
+											restorecurrscopeoffset(old_offset); ExitScopeSpace(); function_counter--; }
 			;
 
 funcdef:  funcprefix funcargs funcbody  {	
@@ -582,14 +585,14 @@ const:	INTEGER 	{ 	Handle_const_integer(yylineno);
 					}
 		;
 
-idlist: ID idlist_1 	{	
+idlist: ID idlist_1 	{	 
 							state = Handle_idlist_id_idlist_1($1,funcName,scope_count,yylineno); 
 							if(state == -1) { error = 1; }
 						}
 		|				{  }
 		;
 
-idlist_1: 	COMMA idlist 	{ ;Handle_idlist_1_comma_idlist(yylineno); }
+idlist_1: 	COMMA idlist 	{ IncCurrScopeOffset(); Handle_idlist_1_comma_idlist(yylineno); }
 			| 				{  }
 			;
 
@@ -696,6 +699,8 @@ int main(int argc, char** argv){
 		printf("Errors occured!\n");
 
 	generate();
-	printConsts();	
+	printConsts();
+
 	return 0;
+
 }
