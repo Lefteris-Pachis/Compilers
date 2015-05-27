@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "exec_func.h"
 
 #define AVM_STACKSIZE 			4096
 #define AVM_WIPEOUT(m) 			memset(&(m),0,sizeof(m))
@@ -15,6 +16,8 @@
 #define	AVM_SAVEDPC_OFFSET 		3
 #define	AVM_SAVEDTOP_OFFSET		2
 #define	AVM_SAVEDTOPSP_OFFSET 	1
+#define VMLIB_CURR_SIZE			(totalVMlibs*sizeof(char*))
+#define VMLIB_NEW_SIZE			(EXPAND_SIZE*sizeof(char*) + VMLIB_CURR_SIZE)
 
 typedef enum avm_memcell_t{
 	number_m  	= 0,
@@ -65,15 +68,18 @@ void 			avm_tabledestroy(avm_table* t);
 avm_memcell* 	avm_tablegetelem(avm_table* table,avm_memcell* index);
 void 			avm_tablesetelem(avm_table* table,avm_memcell* index, avm_memcell* content);
 void 			avm_bucketsinit(avm_table_bucket** p);
+void 			avm_tablebucketsinit (avm_table_bucket** p);
 void 			avm_tablebucketsdestroy(avm_table_bucket** p);
 void 			avm_tableincrefcounter(avm_table* t);
 void 			avm_tabledecrefcounter(avm_table* t);
+
 
 void 			avm_memclear(avm_memcell* m);
 void 			avm_initstack(void);
 avm_memcell* 	avm_translate_operand(vmarg* arg, avm_memcell* reg);
 
-double 			consts_getnumber(unsigned index);
+int 			consts_getint(unsigned index);
+double 			consts_getdouble(unsigned index);
 char* 			consts_getstring(unsigned index);
 char* 			libfuncs_getused(unsigned index);
 
@@ -95,7 +101,9 @@ unsigned 		avm_totalactuals(void);
 avm_memcell* 	avm_getactual(unsigned i);
 userfunc* 		avm_getfuncinfo(unsigned address);
 void 			avm_calllibfunc(char* id);
+void 			avm_registerlibfunc(char* id, library_func_t addr);
 library_func_t 	avm_getlibraryfunc(char* id);	/* Typical hashing */
+void 			expand_VMlibs(void);
 
 char* 			avm_tostring(avm_memcell* m);
 char* 			number_tostring(avm_memcell* m);
@@ -119,6 +127,7 @@ unsigned char 	undef_tobool(avm_memcell* m);
 
 void 			avm_initialize(void);
 
-int Read_Bin();
+int 			Read_Bin();
+void 			run_avm();
 
 #endif

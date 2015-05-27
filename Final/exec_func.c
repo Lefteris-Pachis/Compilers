@@ -24,7 +24,7 @@ char* typeStrings[] = {
 void execute_call(instruction* instr){
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
-	avm_callsaveenvironment();
+	avm_callsaveenviroment();
 	
 	switch (func->type){
 		
@@ -103,8 +103,8 @@ void libfunc_typeof(void){
 		avm_error("one argument expected in 'typeof'!","");
 	else{
 		avm_memcellclear(&retval);
-		retval->type = string_m;
-		retval->data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
+		retval.type = string_m;
+		retval.data.strVal = strdup(typeStrings[avm_getactual(0)->type]);
 	}
 }
 
@@ -113,10 +113,10 @@ void libfunc_totalarguments(void){
 	avm_memcellclear(&retval);
 	if(!p_topsp){
 		avm_error("'totalarguments' called outside a function!","");
-		retval->type = nil_m;
+		retval.type = nil_m;
 	}
 	else{
-		retval->type = number_m;
-		retval->data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
+		retval.type = number_m;
+		retval.data.numVal = avm_get_envvalue(p_topsp + AVM_NUMACTUALS_OFFSET);
 	}
 }

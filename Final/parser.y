@@ -695,12 +695,15 @@ int main(int argc, char** argv){
 	if(error == 0){
 		Print_Hash(mytable);
 		Print_Quads();
+		generate();
+		printConsts();
+		if(Read_Bin()==0)
+			run_avm();
+		else
+			printf("Error on reading Binary!\n");
 	}else
 		printf("Errors occured!\n");
-
-	generate();
-	printConsts();
-
+	
 	return 0;
 
 }

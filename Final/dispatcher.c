@@ -5,6 +5,7 @@ unsigned 		pc = 0;
 unsigned		currLine = 0;
 unsigned		codeSize = 0;
 instruction*	code = (instruction *) 0;
+extern instruction* instr;
 
 execute_func_t executeFuncs[] = {
 	execute_assign,
@@ -14,9 +15,9 @@ execute_func_t executeFuncs[] = {
 	execute_div,
 	execute_mod,
 	execute_uminus,
-	execute_and,
-	execute_or,
-	execute_not,
+	0,
+	0,
+	0,
 	execute_jeq,
 	execute_jne,
 	execute_jle,
@@ -31,26 +32,27 @@ execute_func_t executeFuncs[] = {
 	execute_newtable,
 	execute_tablegetelem,
 	execute_tablesetelem,
-	execute_nop
+	0
 };
 
-void execute_cyrcle(void){
-	if(executionFinished)
+void execute_cycle(void){
+	if(executionFinished){
 		return;
-	else
+	}else
 		if(pc == AVM_ENDING_PC){
 			executionFinished = 1;
 			return;
 		}
 		else{
 			assert(pc < AVM_ENDING_PC);
-			instruction* instr = code + pc;
-			assert(instr->opcode >= 0 && instr->opcode <= AVM_MAX_INSTRUCTIONS);
-			if(instr->srcLine)
-				currLine = instr->srcLine;
+			instruction* i = instr + pc;
+			assert(i->opcode >= 0 && i->opcode <= AVM_MAX_INSTRUCTIONS);
+			if(i->srcLine)
+				currLine = i->srcLine;
 			unsigned oldPC = pc;
-			(*executeFuncs[instr->opcode])(instr);
+			(*executeFuncs[i->opcode])(i);
 			if(pc == oldPC)
 				++pc;
 		}
+
 }

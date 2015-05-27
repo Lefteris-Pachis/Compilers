@@ -132,6 +132,22 @@ void SymTable_free(SymTable_T oSymTable)
 	free(oSymTable);*/
 }
 
+int findMaxOffset(){
+	int max = 0;
+	int i = 0;
+	symbol parse;
+	while(i<BUCKETS){
+		parse = mytable->hashtable[i];
+		while(parse != NULL){
+			if ((parse->type == var_s) && (parse->offset > max))
+				max = parse->offset;
+			parse = parse->next;
+		}
+		i++;
+	}
+	return max;
+}
+
 
 int Insert_to_Hash(SymTable_T oSymTable, const char *name, symbol_t type, unsigned scope, unsigned line)
 {

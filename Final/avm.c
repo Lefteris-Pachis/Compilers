@@ -1,12 +1,42 @@
 #include "avm.h"
 
-avm_memcell stack[AVM_STACKSIZE];
-avm_memcell ax, bx, cx;
-avm_memcell retval;
-avm_memcell top, topsp;
-unsigned totalActuals = 0;
-extern unsigned pc;
-extern userfunc* userFuncs;
+avm_memcell 			stack[AVM_STACKSIZE];
+avm_memcell 			ax, bx, cx;
+avm_memcell 			retval;
+unsigned 				top, topsp;
+unsigned 				totalActuals = 0;
+extern unsigned 		pc;
+extern userfunc* 		userFuncs;
+extern unsigned char 	executionFinished;
+char**					VMlibs = (char**) 0;
+unsigned 				countlibs = 0;
+unsigned 				totalVMlibs = 0;
+instruction* 			instr;
+unsigned 				total_instr;
+double* 				Consts_Double;
+unsigned 				total_Double_Consts;
+int*					Consts_Integer;
+unsigned 				total_Integer_Consts;
+char** 					Consts_String;
+unsigned 				total_String_Consts;
+userfunc* 				Consts_Func;
+unsigned 				total_Func_Consts;
+
+
+library_func_t LibFuncs[] = {
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0
+};
 
 tostring_func_t tostringFuncs[] = {
 	number_tostring,
@@ -44,6 +74,13 @@ void avm_bucketsinit(avm_table_bucket** p){
 		p[i] = (avm_table_bucket*) 0;
 }
 
+void avm_tablebucketsinit (avm_table_bucket** p){
+	unsigned i;
+	for (i = 0; i<AVM_TABLE_HASHSIZE; ++i)
+		p[i] = (avm_table_bucket *) 0;
+	return;
+}
+
 avm_table* avm_tablenew(void){
 	avm_table* t = (avm_table*)malloc(sizeof(avm_table));
 	AVM_WIPEOUT(*t);
@@ -55,13 +92,13 @@ avm_table* avm_tablenew(void){
 
 void avm_tablebucketsdestroy(avm_table_bucket** p){
 	unsigned i;
-	avm_table_bucket* b,del;
+	avm_table_bucket *b,*del;
 	for(i=0; i<AVM_TABLE_HASHSIZE; ++i){
 		for(b = *p; b;){
 			del = b;
 			b = b->next;
-			avm_memclear(&del->key);
-			avm_memclear(&del->value);
+			//avm_memclear(&del->key);
+			//avm_memclear(&del->value);
 			free(del);
 		}
 		p[i] = (avm_table_bucket*) 0;
@@ -92,28 +129,41 @@ void avm_tablesetelem(avm_table* table,avm_memcell* index, avm_memcell* content)
 
 }
 
-double consts_getnumber(unsigned index){
-
+int consts_getint(unsigned index){
+	return Consts_Integer[index];
 }
+
+double consts_getdouble(unsigned index){
+	return Consts_Double[index];
+}
+
 char* consts_getstring(unsigned index){
-
+	return Consts_String[index];
 }
-char* libfuncs_getused(unsigned index){
 
+char* libfuncs_getused(unsigned index){
+	char* namedLibfuncs[12] = {"print","input","objectmemberkeys","objecttotalmembers","objectcopy","totalarguments","argument","typeof","strtonum","sqrt","cos","sin"};
+	return namedLibfuncs[index];
 }
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 	switch(arg->type){
 		/*Variables*/
-		case global_a: 	return &stack[AVM_STACKSIZE - 1 - arg->val];
+		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
 		case local_a: 	return &stack[topsp - arg->val];
 		case formal_a: 	return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];
 
 		case retval_a: 	return &retval;
 
-		case number_a:  {
+		case integer_a:  {
 			reg->type = number_m;
-			reg->data.numVal = consts_getnumber(arg->val);
+			reg->data.numVal = consts_getint(arg->val);
+			return reg;
+		}
+
+		case double_a:  {
+			reg->type = number_m;
+			reg->data.numVal = consts_getdouble(arg->val);
 			return reg;
 		}
 
@@ -217,7 +267,7 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 
 void avm_dec_top(void){
 	if(!top){
-		avm_error("stack overflow");
+		avm_error("stack overflow","");
 		executionFinished = 1;
 	}
 	else
@@ -258,7 +308,7 @@ userfunc* avm_getfuncinfo(unsigned address){
 	return (userFuncs + address);
 }
 
-void avm_calllibfunc(char* id){
+void avm_calllibfunc(char* id){	
 	library_func_t f = avm_getlibraryfunc(id);
 	if(!f){
 		avm_error("Unsupported lib func '%s' called!", id);
@@ -271,6 +321,34 @@ void avm_calllibfunc(char* id){
 		if(!executionFinished)		/* An error may naturally occur inside */
 			execute_funcexit((instruction*) 0);	/* Return sequence */
 	}
+}
+
+library_func_t avm_getlibraryfunc(char* id){
+	unsigned i;	
+	for(i = 0; i < 12; i++){
+		if(strcmp(id, *(VMlibs+i)) == 0)
+			return LibFuncs[i];
+	}
+}
+
+void avm_registerlibfunc(char* id, library_func_t addr){
+		char** str;
+		if(countlibs == totalVMlibs) expand_VMlibs();
+		str = VMlibs + countlibs;
+		*str = strdup(id);
+		LibFuncs[countlibs] = addr;
+		countlibs++;
+}
+
+void expand_VMlibs(){
+	char** s = (char**) malloc(VMLIB_NEW_SIZE);
+	assert(totalVMlibs == countlibs);
+	if (VMlibs){
+		memcpy(s, VMlibs, VMLIB_CURR_SIZE);
+		free(VMlibs);
+	}
+	VMlibs = s;
+	totalVMlibs += EXPAND_SIZE;
 }
 
 char* avm_tostring(avm_memcell* m){
@@ -362,7 +440,7 @@ unsigned char undef_tobool(avm_memcell* m){
 void avm_initialize(){
 	avm_initstack();
 	avm_registerlibfunc("print", libfunc_print);
-	avm_registerlibfunc("typeof", libfunc_typeof);
+	//avm_registerlibfunc("typeof", libfunc_typeof);
 }
 
 
@@ -384,29 +462,41 @@ int Read_Bin(){
     }
 
     fread(tot,sizeof(int),5,Nicode);
-
     
     double DoubCon[tot[0]];
     fread(DoubCon,sizeof(double),tot[0],Nicode);
-
+    Consts_Double = DoubCon;
+    total_Double_Consts = tot[0];
    
     int IntCon[tot[1]];
     fread(IntCon,sizeof(int),tot[1],Nicode);
-
+    Consts_Integer = IntCon;
+    total_Integer_Consts = tot[1];
 
     char* StrCon[tot[2]];
     fread(StrCon,sizeof(char*),tot[2],Nicode);
-    
+    Consts_String = StrCon;
+    total_String_Consts = tot[2];
+
     userfunc FuncCon[tot[3]];
     fread(FuncCon,sizeof(userfunc),tot[3],Nicode);
-    
+    Consts_Func = FuncCon;
+    total_Func_Consts = tot[3];
 
     instruction* buffer = malloc(sizeof(instruction)*tot[4]);
-
     fread(buffer,sizeof(instruction),tot[4],Nicode);
+    instr = buffer;
+    total_instr = tot[4];
    	
 	fclose(Nicode);
-
 	return 0;
+}
 
+void run_avm(){
+	avm_initialize();
+	top = AVM_STACKSIZE - (findMaxOffset() + 500);
+	topsp = top;
+	while (executionFinished != 1){
+		execute_cycle();
+	}
 }

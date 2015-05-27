@@ -3,7 +3,9 @@
 
 #include "target_code.h"
 
-#define AVM_ENDING_PC codeSize
+extern unsigned	total_instr;
+
+#define AVM_ENDING_PC 			total_instr
 #define AVM_MAX_INSTRUCTIONS	(unsigned) nop_v
 
 #define execute_add	execute_arithmetic
