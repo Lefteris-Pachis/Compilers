@@ -152,30 +152,6 @@ incomplete_jump *add_incomplete_jump(incomplete_jump *head,unsigned instrNo, uns
 		ij_total++;
 		return head;
 	}
-
-
-
-	/*incomplete_jump* tmp = ij_head;
-	printf("JUMP_LIST%d:::%d\n", instrNo,iaddress);
-	if(ij_head == NULL){
-		ij_head = malloc(sizeof(incomplete_jump));
-		ij_head->instrNo = instrNo;
-		ij_head->iaddress = iaddress;
-		ij_head->next = NULL;
-		ij_total++;
-	}
-	else if(ij_head!=NULL){
-
-		while(tmp!=NULL){
-
-			tmp = tmp->next;
-		}
-		tmp = malloc(sizeof(incomplete_jump));
-		tmp->instrNo = instrNo;
-		tmp->iaddress = iaddress;
-		tmp->next = NULL;
-		ij_total++;
-	}*/
 }
 
 void Print_Instructions(FILE * fp){
@@ -219,6 +195,59 @@ void Print_Instructions(FILE * fp){
 	}
 }
 
+void Print_Bin(){
+
+	
+	char* magicNo = "giwrgadakhs";
+	
+
+	char *table_op[25] = {"ASSIGN","ADD","SUB","MUL","DIV","MOD","UMINUS","AND","OR","NOT","JEQ","JNOTEQ",
+      "JLESSEQ","JGREATEREQ","JLESS","JGREATER","JUMP","CALL","PUSHARG","ENTERFUNC","EXITFUNC","NEWTABLE","TABLEGETELEM","TABLESETELEM","NOP"};
+
+	FILE *icode = fopen("tcode.bin","wb");
+	
+	int i = 0;
+
+	int totals[] = {total_double_Consts,total_int_Consts,total_string_Consts,total_userFuncs,currInstr};	
+
+
+	fwrite(magicNo, strlen(magicNo)+1,1,icode);
+
+
+	fwrite(totals,sizeof(int),5,icode);
+	//fwrite((int*)total_double_Consts, sizeof(int),1,icode);
+	
+	fwrite(doubleConsts, sizeof(double),total_double_Consts,icode);
+
+	//fwrite((int*)total_int_Consts, sizeof(int),1,icode);
+	
+	fwrite(intConsts, sizeof(int),total_int_Consts,icode);
+
+	//fwrite((int*)total_string_Consts, sizeof(int),1,icode);
+
+	fwrite(stringConsts, sizeof(char*),total_string_Consts,icode);
+
+	/*while(i<total_string_Consts){
+
+		//fwrite((int*)strlen(stringConsts[i])+1, sizeof(int),1,icode);
+		fwrite(stringConsts[i], strlen(stringConsts[i]+1),1,icode);
+		i++;
+	}*/
+	
+	//fwrite((int*)total_userFuncs,sizeof(int),1,icode);	
+
+	fwrite(userFuncs,sizeof(userfunc),total_userFuncs,icode);
+
+	//fwrite((int*)currInstr,sizeof(int),1,icode);	
+    
+    fwrite(instructions,sizeof(instruction),currInstr,icode);
+
+    //fseek(icode,SEEK_SET,0);
+    fclose(icode);
+}
+
+
+
 void print_incomplete_j(){
 	incomplete_jump* tmp = ij_head;
 	while(tmp!=NULL){
@@ -234,7 +263,7 @@ void patch_incomplete_jumps(){
 
 	while(tmp!=NULL){
 		if(tmp->iaddress == currQuad){
-			instructions[tmp->instrNo].result.val = currInstr;	
+			instructions[tmp->instrNo].result.val = currInstr-1;	
 			//printf("currInstr    %d\n", currInstr);
 		}
 		else{
@@ -278,6 +307,7 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 	}
 
 	quad->taddress = nextinstructionlabel();
+	t.srcLine = quad->line;
 	t_emit(&t);
 
 }
@@ -432,5 +462,6 @@ void printConsts(){
 	fprintf( fp, "\n\n\n");
 	Print_Instructions(fp);
 	fclose(fp);
+	Print_Bin();
 }
 

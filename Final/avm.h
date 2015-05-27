@@ -119,4 +119,6 @@ unsigned char 	undef_tobool(avm_memcell* m);
 
 void 			avm_initialize(void);
 
+int Read_Bin();
+
 #endif

@@ -364,3 +364,49 @@ void avm_initialize(){
 	avm_registerlibfunc("print", libfunc_print);
 	avm_registerlibfunc("typeof", libfunc_typeof);
 }
+
+
+int Read_Bin(){
+
+    FILE* Nicode = fopen("tcode.bin","rb");
+    int x=0;
+
+    int tot[5];
+   
+    char magic[12];
+    
+    fread(magic,12,1,Nicode);
+
+    
+    
+    if(strcmp(magic,"giwrgadakhs")!=0){
+    	return -1;
+    }
+
+    fread(tot,sizeof(int),5,Nicode);
+
+    
+    double DoubCon[tot[0]];
+    fread(DoubCon,sizeof(double),tot[0],Nicode);
+
+   
+    int IntCon[tot[1]];
+    fread(IntCon,sizeof(int),tot[1],Nicode);
+
+
+    char* StrCon[tot[2]];
+    fread(StrCon,sizeof(char*),tot[2],Nicode);
+    
+    userfunc FuncCon[tot[3]];
+    fread(FuncCon,sizeof(userfunc),tot[3],Nicode);
+    
+
+    instruction* buffer = malloc(sizeof(instruction)*tot[4]);
+
+    fread(buffer,sizeof(instruction),tot[4],Nicode);
+   	
+	fclose(Nicode);
+
+	return 0;
+
+}

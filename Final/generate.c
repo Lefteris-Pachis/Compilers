@@ -112,7 +112,7 @@ void generate_JUMP(quad* quad){
 	//make_operand(quad->result,&i.result);
 	
 	//i->srcLine = quad->line;
-	//t_emit(i);
+	//t_emit(&i);
 	generate_relational_instruction(jump_v,quad);
 }
 
@@ -282,7 +282,16 @@ return_list * appendRL(return_list *head,int label){
 
 void generate_UMINUS(quad* quad){
 	printf("***GENERATE_UMINUS***\n");
-	generate_instruction(uminus_v, quad);
+	instruction i;
+	i.opcode = mul_v;
+	if(quad->arg1!=NULL)
+		make_operand(quad->arg1,&i.arg1);
+	i.arg2.type = integer_a;
+	i.arg2.val = -1;
+	make_operand(quad->result,&i.result);
+	quad->taddress = nextinstructionlabel();
+	i.srcLine = quad->line;
+	t_emit(&i);
 }
 
 void generate_OR(quad* quad){
