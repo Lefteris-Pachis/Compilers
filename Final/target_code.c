@@ -279,8 +279,10 @@ void generate_instruction(vmopcode op, quad* quad){
 	i.opcode = op;
 	if(quad->arg1!=NULL)
 		make_operand(quad->arg1,&i.arg1);
-	if(quad->arg2!=NULL)
+	if(quad->arg2!=NULL){
 		make_operand(quad->arg2,&i.arg2);
+	}
+
 	make_operand(quad->result,&i.result);
 	quad->taddress = nextinstructionlabel();
 	i.srcLine = quad->line;

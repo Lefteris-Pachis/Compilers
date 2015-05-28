@@ -38,7 +38,7 @@ typedef enum vmarg_t{
 
 typedef struct vmarg{
 	vmarg_t 	type;
-	unsigned 	val;
+	unsigned int val;
 }vmarg;
 
 typedef struct instruction{

@@ -14,7 +14,7 @@ execute_func_t executeFuncs[] = {
 	execute_mul,
 	execute_div,
 	execute_mod,
-	execute_uminus,
+	0,
 	0,
 	0,
 	0,

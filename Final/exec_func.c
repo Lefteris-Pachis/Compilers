@@ -22,6 +22,7 @@ char* typeStrings[] = {
 };
 
 void execute_call(instruction* instr){
+	printf("exec_call\n");
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
 	avm_callsaveenviroment();
@@ -57,25 +58,31 @@ void execute_call(instruction* instr){
 }
 
 void execute_pusharg(instruction* instr){
+	printf("exec_pusharg\n");
 	avm_memcell* arg = avm_translate_operand(&instr->result, &ax);
 	assert(arg);	
+	printf("xxxx %d\n", &stack[top].type);
 	avm_assign(&stack[top], arg);
 	++totalActuals;
 	avm_dec_top();
 }
 
 void execute_funcenter(instruction* instr){
+	printf("exec_funcenter\n");
 	userfunc* funcInfo;
-	avm_memcell* func = avm_translate_operand(&instr->arg1, &ax);
+	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
 	assert(pc == func->data.funcVal);
 	totalActuals = 0;
 	funcInfo = avm_getfuncinfo(pc);
+	printf("%d\n",topsp );
 	topsp = top;
+	printf("%d\n",topsp );
 	top = top - funcInfo->localSize;
 }
 
 void execute_funcexit(instruction* unused){
+	printf("exec_funcexit\n");
 	unsigned int oldTop = top;
 	top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
 	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
@@ -93,7 +100,7 @@ void libfunc_print(void){
 	for(i = 0; i < n; ++i){
 		s = (char*)avm_tostring(avm_getactual(i));
 		puts(s);
-		free(s);
+		//free(s);												//provlhma me boolean
 	}
 }
 

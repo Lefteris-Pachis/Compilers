@@ -41,7 +41,8 @@ arithmetic_func_t arithmeticFuncs[] = {
 };
 
 void execute_arithmetic(instruction* instr){
-	avm_memcell* lv = avm_translate_operand(&instr->result, (avm_memcell*) 0);
+	printf("exec_arithm\n");
+	avm_memcell* lv = avm_translate_operand(&instr->result, &retval);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
 
@@ -58,8 +59,4 @@ void execute_arithmetic(instruction* instr){
 		lv->type = number_m;
 		lv->data.numVal = (*op)(rv1->data.numVal, rv2->data.numVal);
 	}
-}
-
-void execute_uminus(instruction* instr){
-	
 }

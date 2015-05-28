@@ -78,7 +78,7 @@ void 			avm_memclear(avm_memcell* m);
 void 			avm_initstack(void);
 avm_memcell* 	avm_translate_operand(vmarg* arg, avm_memcell* reg);
 
-int 			consts_getint(unsigned index);
+double 			consts_getint(unsigned index);
 double 			consts_getdouble(unsigned index);
 char* 			consts_getstring(unsigned index);
 char* 			libfuncs_getused(unsigned index);

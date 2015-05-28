@@ -3,7 +3,7 @@
 avm_memcell 			stack[AVM_STACKSIZE];
 avm_memcell 			ax, bx, cx;
 avm_memcell 			retval;
-unsigned 				top, topsp;
+unsigned int 			top, topsp;
 unsigned 				totalActuals = 0;
 extern unsigned 		pc;
 extern userfunc* 		userFuncs;
@@ -15,7 +15,7 @@ instruction* 			instr;
 unsigned 				total_instr;
 double* 				Consts_Double;
 unsigned 				total_Double_Consts;
-int*					Consts_Integer;
+double*					Consts_Integer;
 unsigned 				total_Integer_Consts;
 char** 					Consts_String;
 unsigned 				total_String_Consts;
@@ -126,10 +126,10 @@ avm_memcell* avm_tablegetelem(avm_table* table,avm_memcell* index){
 }
 
 void avm_tablesetelem(avm_table* table,avm_memcell* index, avm_memcell* content){
-
+	
 }
 
-int consts_getint(unsigned index){
+double consts_getint(unsigned index){
 	return Consts_Integer[index];
 }
 
@@ -150,7 +150,7 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 	switch(arg->type){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
-		case local_a: 	return &stack[topsp - arg->val];
+		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
 		case formal_a: 	return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];
 
 		case retval_a: 	return &retval;
@@ -187,6 +187,7 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 		case userfunc_a:{
 			reg->type = userfunc_m;
 			reg->data.funcVal = arg->val;
+
 			return reg;
 		}
 
@@ -289,7 +290,8 @@ void avm_callsaveenviroment(void){
 
 unsigned avm_get_envvalue(unsigned i){
 	unsigned val;
-	assert(stack[i].type == number_m);
+	printf("xxxxxxxxxxxx %f\n", stack[i].data.numVal);
+	//assert(stack[i].type == number_m);
 	val = (unsigned) stack[i].data.numVal;
 	assert(stack[i].data.numVal == ((double) val));
 	return val;
@@ -305,7 +307,7 @@ avm_memcell* avm_getactual(unsigned i){
 }
 
 userfunc* avm_getfuncinfo(unsigned address){
-	return (userFuncs + address);
+	return (Consts_Func + address);
 }
 
 void avm_calllibfunc(char* id){	
@@ -448,7 +450,7 @@ int Read_Bin(){
 
     FILE* Nicode = fopen("tcode.bin","rb");
     int x=0;
-
+	int i;
     int tot[5];
    
     char magic[12];
@@ -465,18 +467,29 @@ int Read_Bin(){
     
     double DoubCon[tot[0]];
     fread(DoubCon,sizeof(double),tot[0],Nicode);
-    Consts_Double = DoubCon;
+
     total_Double_Consts = tot[0];
+    Consts_Double = malloc(sizeof(double)*total_Double_Consts);
+    for ( i = 0; i < total_Double_Consts; ++i)
+    	Consts_Double[i] = DoubCon[i];
    
     int IntCon[tot[1]];
+    double temp;
     fread(IntCon,sizeof(int),tot[1],Nicode);
-    Consts_Integer = IntCon;
     total_Integer_Consts = tot[1];
+    Consts_Integer = malloc(sizeof(double)*total_Integer_Consts);
+    for ( i = 0; i < total_Integer_Consts; ++i){
+    	temp = (double)IntCon[i];
+    	Consts_Integer[i] = temp;
+    }
+    
 
     char* StrCon[tot[2]];
     fread(StrCon,sizeof(char*),tot[2],Nicode);
-    Consts_String = StrCon;
     total_String_Consts = tot[2];
+    Consts_String = malloc(sizeof(char*)*total_String_Consts);
+    for ( i = 0; i < total_String_Consts; ++i)
+    	Consts_String[i] = strdup(StrCon[i]);
 
     userfunc FuncCon[tot[3]];
     fread(FuncCon,sizeof(userfunc),tot[3],Nicode);
@@ -485,8 +498,11 @@ int Read_Bin(){
 
     instruction* buffer = malloc(sizeof(instruction)*tot[4]);
     fread(buffer,sizeof(instruction),tot[4],Nicode);
-    instr = buffer;
+    //instr = buffer;
     total_instr = tot[4];
+    instr = malloc(sizeof(instruction)*total_instr);
+    for ( i = 0; i < total_instr; ++i)
+    	instr[i] = buffer[i];
    	
 	fclose(Nicode);
 	return 0;
