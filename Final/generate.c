@@ -175,6 +175,7 @@ void generate_CALL(quad* quad){
 	if(flag == 0){
 		for(index = 0; index<total_userFuncs; index++){
 			if(strcmp(quad->result->sym->name,userFuncs[index].id)==0){
+				t.result.type = userfunc_a;
 				break;
 			}
 		}

@@ -310,12 +310,11 @@ avm_memcell* avm_getactual(unsigned i){
 }
 
 userfunc* avm_getfuncinfo(unsigned address){
-	int i=0;
-	printf("%d\n", address);
+	/*int i=0;
 	for (i = 0; i < total_Func_Consts; ++i)
 	{
 		printf("Consts_Func %s\n", Consts_Func[i].id);
-	}
+	}*/
 	return (Consts_Func + address);
 }
 
