@@ -511,6 +511,7 @@ int Read_Bin(){
 void run_avm(){
 	avm_initialize();
 	top = AVM_STACKSIZE - (findMaxOffset() + 500);
+	printf("%d\n",top );
 	topsp = top;
 	while (executionFinished != 1){
 		execute_cycle();

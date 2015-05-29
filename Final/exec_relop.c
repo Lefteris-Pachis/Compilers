@@ -20,6 +20,7 @@ cmp_func cmpFunctions[] = {
 };
 
 void execute_relop(instruction* instr){
+	printf("exec_relop\n");
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
 	cmp_func op;
@@ -41,6 +42,7 @@ void execute_relop(instruction* instr){
 }
 
 void execute_jeq(instruction* instr){
+	printf("exec_jeq\n");
 	assert(instr->result.type == label_a);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
@@ -74,6 +76,7 @@ void execute_jeq(instruction* instr){
 }
 
 void execute_jne(instruction* instr){
+	printf("exec_jne\n");
 	assert(instr->result.type == label_a);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
@@ -107,6 +110,7 @@ void execute_jne(instruction* instr){
 }
 
 void execute_jump(instruction* instr){
+	printf("exec_jump\n");
 	assert(instr->result.type == label_a);
 	pc = instr->result.val;
 }
