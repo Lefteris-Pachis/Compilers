@@ -65,9 +65,7 @@ void execute_pusharg(instruction* instr){
 	avm_memcell* arg = avm_translate_operand(&instr->result, &ax);
 	assert(arg);
 	printf("%d\n", top);	
-	printf("xxxx %d %d\n", &stack[top].type,arg->type);
-	printf("%f\n", arg->data.numVal);
-	//*(stack+top) = *(arg);
+	printf("xxxx %d\n", &stack[top].type);
 	avm_assign(&stack[top], arg);
 	++totalActuals;
 	avm_dec_top();
@@ -107,7 +105,7 @@ void libfunc_print(void){
 	char* s;
 	for(i = 0; i < n; ++i){
 		s = (char*)avm_tostring(avm_getactual(i));
-		printf("PRINT CALLED :::::::::::::::: ");
+		printf("PRINT CALLED ::::::::::::::::::::::: ");
 		puts(s);
 		//free(s);												//provlhma me boolean
 	}

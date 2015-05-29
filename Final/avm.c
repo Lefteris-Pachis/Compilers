@@ -147,12 +147,11 @@ char* libfuncs_getused(unsigned index){
 }
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
-	int i;
 	switch(arg->type){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
 		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
-		case formal_a: 	/*return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];*/ return &stack[AVM_STACKSIZE - arg->val];
+		case formal_a: 	printf("formal_a\n"); /*return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];*/return &stack[AVM_STACKSIZE - arg->val];
 
 		case retval_a: 	printf("retval_a\n");return &retval;
 
@@ -261,11 +260,13 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 	memcpy(lv, rv, sizeof(avm_memcell));
 
 	/* Now take care of copied valus or reference counting */
-	if(lv->type == string_m)
+	if(lv->type == string_m){
+
 		lv->data.strVal = strdup(rv->data.strVal);
-	else if(lv->type == table_m){
+	}else if(lv->type == table_m){
 		avm_tableincrefcounter(lv->data.tableVal);
 	}
+
 }
 
 void avm_dec_top(void){
@@ -522,7 +523,7 @@ int Read_Bin(){
 
 void run_avm(){
 	avm_initialize();
-	top = AVM_STACKSIZE - (findMaxOffset());
+	top = AVM_STACKSIZE - (findMaxOffset() + 500); // an thelw functions 0 anti gia 500
 	printf("%d\n",top );
 	topsp = top;
 	while (executionFinished != 1){
