@@ -1,4 +1,4 @@
-/*function f(x){
+function f(x){
 
 	
 	print(x);
@@ -6,12 +6,12 @@
 }
 
 f(3);
-print("EEEEEEE");*/
+print("EEEEEEE");
 x = 1;
 y=2;
 z=3;
 e=4;
-f= x<y and x>y;
-b= true and false;
-print(f);
-print(b);
+//f= x<y and x>y;
+//b= true and false;
+//print(f);
+print(x);

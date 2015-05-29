@@ -151,7 +151,7 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
 		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
-		case formal_a: 	printf("formal_a\n"); /*return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];*/return &stack[AVM_STACKSIZE - arg->val];
+		case formal_a: 	printf("formal_a\n"); return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];/*return &stack[AVM_STACKSIZE - arg->val];*/
 
 		case retval_a: 	printf("retval_a\n");return &retval;
 
