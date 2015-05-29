@@ -147,17 +147,19 @@ char* libfuncs_getused(unsigned index){
 }
 
 avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
+	int i;
 	switch(arg->type){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
 		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
-		case formal_a: 	return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];
+		case formal_a: 	/*return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];*/ return &stack[AVM_STACKSIZE - arg->val];
 
-		case retval_a: 	printf("giwrgadakhs\n");return &retval;
+		case retval_a: 	printf("retval_a\n");return &retval;
 
 		case integer_a:  {
 			reg->type = number_m;
 			reg->data.numVal = consts_getint(arg->val);
+			printf("zzzzzz %f\n", reg->data.numVal);
 			return reg;
 		}
 
@@ -225,7 +227,7 @@ void avm_memcellclear(avm_memcell* m){
 }
 
 void memclear_string (avm_memcell* m){
-	assert(m->data.strVal);
+	//assert(m->data.strVal);
 	free(m->data.strVal);
 }
 
@@ -509,8 +511,10 @@ int Read_Bin(){
     //instr = buffer;
     total_instr = tot[4];
     instr = malloc(sizeof(instruction)*total_instr);
-    for ( i = 0; i < total_instr; ++i)
+    for ( i = 0; i < total_instr; ++i){
     	instr[i] = buffer[i];
+    	printf("instr[i] %d\n",instr[i].opcode );
+    }
    	
 	fclose(Nicode);
 	return 0;
@@ -518,7 +522,7 @@ int Read_Bin(){
 
 void run_avm(){
 	avm_initialize();
-	top = AVM_STACKSIZE - (findMaxOffset() + 500);
+	top = AVM_STACKSIZE - (findMaxOffset());
 	printf("%d\n",top );
 	topsp = top;
 	while (executionFinished != 1){

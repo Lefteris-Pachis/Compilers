@@ -65,7 +65,9 @@ void execute_pusharg(instruction* instr){
 	avm_memcell* arg = avm_translate_operand(&instr->result, &ax);
 	assert(arg);
 	printf("%d\n", top);	
-	printf("xxxx %d\n", &stack[top].type);
+	printf("xxxx %d %d\n", &stack[top].type,arg->type);
+	printf("%f\n", arg->data.numVal);
+	//*(stack+top) = *(arg);
 	avm_assign(&stack[top], arg);
 	++totalActuals;
 	avm_dec_top();
@@ -90,7 +92,8 @@ void execute_funcexit(instruction* unused){
 	printf("exec_funcexit\n");
 	unsigned int oldTop = top;
 	top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
-	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
+	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET)+1;
+	printf("PC     %d\n", pc);
 	topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
 	while (oldTop++ <= top){
 		avm_memcellclear(&stack[oldTop]);
@@ -104,6 +107,7 @@ void libfunc_print(void){
 	char* s;
 	for(i = 0; i < n; ++i){
 		s = (char*)avm_tostring(avm_getactual(i));
+		printf("PRINT CALLED :::::::::::::::: ");
 		puts(s);
 		//free(s);												//provlhma me boolean
 	}

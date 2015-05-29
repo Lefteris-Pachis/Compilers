@@ -113,4 +113,5 @@ void execute_jump(instruction* instr){
 	printf("exec_jump\n");
 	assert(instr->result.type == label_a);
 	pc = instr->result.val;
+	printf("PC = %d\n",pc );
 }
