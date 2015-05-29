@@ -63,7 +63,8 @@ void execute_call(instruction* instr){
 void execute_pusharg(instruction* instr){
 	printf("exec_pusharg\n");
 	avm_memcell* arg = avm_translate_operand(&instr->result, &ax);
-	assert(arg);	
+	assert(arg);
+	printf("%d\n", top);	
 	printf("xxxx %d\n", &stack[top].type);
 	avm_assign(&stack[top], arg);
 	++totalActuals;
@@ -77,11 +78,12 @@ void execute_funcenter(instruction* instr){
 	assert(func);
 	assert(pc = func->data.funcVal+1);
 	totalActuals = 0;
-	funcInfo = avm_getfuncinfo(pc);
+	funcInfo = avm_getfuncinfo(pc-1);
 	printf("%d\n",topsp );
 	topsp = top;
 	printf("%d\n",topsp );
 	top = top - funcInfo->localSize;
+	printf("%d\n",top );
 }
 
 void execute_funcexit(instruction* unused){

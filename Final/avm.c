@@ -153,7 +153,7 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
 		case formal_a: 	return &stack[topsp + AVM_STACKSIZE + 1 + arg->val];
 
-		case retval_a: 	return &retval;
+		case retval_a: 	printf("giwrgadakhs\n");return &retval;
 
 		case integer_a:  {
 			reg->type = number_m;
@@ -307,6 +307,12 @@ avm_memcell* avm_getactual(unsigned i){
 }
 
 userfunc* avm_getfuncinfo(unsigned address){
+	int i=0;
+	printf("%d\n", address);
+	for (i = 0; i < total_Func_Consts; ++i)
+	{
+		printf("Consts_Func %s\n", Consts_Func[i].id);
+	}
 	return (Consts_Func + address);
 }
 
@@ -493,8 +499,10 @@ int Read_Bin(){
 
     userfunc FuncCon[tot[3]];
     fread(FuncCon,sizeof(userfunc),tot[3],Nicode);
-    Consts_Func = FuncCon;
     total_Func_Consts = tot[3];
+    Consts_Func = malloc(sizeof(userfunc)*total_Func_Consts);
+    for ( i = 0; i < total_Func_Consts; ++i)
+    	Consts_Func[i] = FuncCon[i];
 
     instruction* buffer = malloc(sizeof(instruction)*tot[4]);
     fread(buffer,sizeof(instruction),tot[4],Nicode);

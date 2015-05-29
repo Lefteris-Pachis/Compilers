@@ -2,6 +2,7 @@ function f(x){
 
 	
 	print("lol");
+	return x;
 }
 
 f(1);

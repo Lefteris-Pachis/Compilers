@@ -181,7 +181,11 @@ void Print_Instructions(FILE * fp){
 				fprintf(icode,"%d(%s),%d\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type],instructions[i].arg1.val);
 			else
 				fprintf(icode,"%d(%s)\t", instructions[i].arg1.type,vmarg_t[instructions[i].arg1.type]);
-			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+			if(instructions[i].result.type != 11)
+				fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
+			else
+				fprintf(icode,"%d(%s)\t", instructions[i].result.type,vmarg_t[instructions[i].result.type]);
+
       	}else if((op==call_v) || (op==pusharg_v) || (op==funcenter_v) ||  (op==funcexit_v) || (op==newtable_v)){	
 			fprintf(icode,"%d(%s),%d\t", instructions[i].result.type,vmarg_t[instructions[i].result.type],instructions[i].result.val);
       	}else{
