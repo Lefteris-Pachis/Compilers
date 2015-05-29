@@ -1,14 +1,7 @@
-/*lol = "eeis giwrgadakh";
-print(lol);
+function f(x){
 
-fidia = "prosexe fidi me gata";
-print(fidia);*/
-//function f(){print("GG");}
-//i=10;
-//while(i!=0){print("print",i);i--;}
-//t=[1];
-t = false;
-x=3;
-if(true){
-	print(t);
-	}
+	
+	print("lol");
+}
+
+f(1);

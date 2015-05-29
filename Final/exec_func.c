@@ -4,7 +4,7 @@ extern avm_memcell		stack[AVM_STACKSIZE];
 extern avm_memcell		ax;
 extern avm_memcell		retval;
 extern unsigned 		pc;
-extern instruction*		code;
+extern instruction*		instr;
 extern unsigned char	executionFinished;
 extern unsigned			top, topsp;
 extern unsigned 		totalActuals;
@@ -26,14 +26,17 @@ void execute_call(instruction* instr){
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
 	avm_callsaveenviroment();
+
 	
 	switch (func->type){
 		
 		case userfunc_m: {
 			
-			pc = func->data.funcVal;
+			pc = func->data.funcVal+1;
+			//printf("%d\n", func->data.funcVal);
+			//printf("%d\n", pc);
 			assert(pc < AVM_ENDING_PC);
-			assert(code[pc].opcode = funcenter_v);
+			assert(instr[pc].opcode = funcenter_v);
 			break;
 		}
 		
@@ -72,7 +75,7 @@ void execute_funcenter(instruction* instr){
 	userfunc* funcInfo;
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
-	assert(pc == func->data.funcVal);
+	assert(pc = func->data.funcVal+1);
 	totalActuals = 0;
 	funcInfo = avm_getfuncinfo(pc);
 	printf("%d\n",topsp );

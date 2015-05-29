@@ -3,7 +3,7 @@
 extern avm_memcell	stack[AVM_STACKSIZE];
 extern avm_memcell 	ax;
 extern avm_memcell	retval;
-extern unsigned		top;
+extern unsigned	int	top;
 
 void execute_assign (instruction* instr){
 	printf("exec_assign\n");

@@ -4,7 +4,7 @@ unsigned char	executionFinished = 0;
 unsigned 		pc = 0;
 unsigned		currLine = 0;
 unsigned		codeSize = 0;
-instruction*	code = (instruction *) 0;
+//instruction*	code = (instruction*)0;
 extern instruction* instr;
 
 execute_func_t executeFuncs[] = {

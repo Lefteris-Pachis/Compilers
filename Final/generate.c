@@ -8,7 +8,9 @@ extern unsigned currQuad;
 extern unsigned int currInstr;
 extern int total_userFuncs;
 extern char* namedLibfuncs[12];
+extern userfunc*	userFuncs;
 unsigned i;
+int func_jmp = -1;
 
 generator_func_t generators[] = {
  	generate_ASSIGN ,
@@ -158,14 +160,24 @@ void generate_PARAM(quad* quad){
 
 void generate_CALL(quad* quad){
 	printf("***GENERATE_CALL***\n");
+	int flag = 0;
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = call_v;
 	make_operand(quad->result, &t.result);
 	int index;
 	for(index=0; index<12; index++){
-		if(strcmp(quad->result->sym->name,namedLibfuncs[index]) == 0)
+		if(strcmp(quad->result->sym->name,namedLibfuncs[index]) == 0){
+			flag = 1;
 			break;
+		}
+	}
+	if(flag == 0){
+		for(index = 0; index<total_userFuncs; index++){
+			if(strcmp(quad->result->sym->name,userFuncs[index].id)==0){
+				break;
+			}
+		}
 	}
 	t.result.val = index;
 	t_emit(&t);
@@ -182,6 +194,15 @@ void generate_GETRETVAL(quad* quad){
 }
 
 void generate_FUNCSTART(quad* quad){
+	if(quad->result->sym->scope == 0){
+		instruction j;
+		j.opcode = jump_v;
+		j.result.type = label_a;
+		j.result.val = 0;
+		j.srcLine = quad->line;
+		t_emit(&j);
+		func_jmp = nextinstructionlabel()-1;
+	}
 	printf("***GENERATE_FUNCSTART***\n");
 	int index;
 	func_stack* function= malloc(sizeof(func_stack));
@@ -257,8 +278,8 @@ void generate_FUNCEND(quad* quad){
 	t.result.val = total_userFuncs-1;
 	t_emit(&t);
 
-
-
+	if(func_jmp!=-1)
+		instructions[func_jmp].result.val = nextinstructionlabel();
 
 }
 
