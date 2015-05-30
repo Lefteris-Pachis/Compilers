@@ -187,8 +187,10 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 
 		case userfunc_a:{
 			reg->type = userfunc_m;
-			reg->data.funcVal = arg->val;
-
+			//reg->data.funcVal = arg->val;
+			printf("reg->data.funcVal %d\n", reg->data.funcVal);
+			reg->data.funcVal = Consts_Func[arg->val].address;
+			printf("Consts_Func[arg->val].address %d\n", Consts_Func[arg->val].address);
 			return reg;
 		}
 

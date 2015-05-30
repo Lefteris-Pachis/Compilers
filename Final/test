@@ -1,19 +1,17 @@
-function T(){
-		print("SSSSSS");
-}
+s=10;
 
 function f(x){
-
-	//print(x);
-	T();
 	
-	//return x;
+	print(x);
+	
+	return x;
 }
 
 
-
+//a=10;
+//print(a);
 f(3);
-print("EEEEEEE");
+/*print("EEEEEEE");
 x = 1;
 y=2;
 z=3;
@@ -21,4 +19,4 @@ e=4;
 m= x<y and x>y;
 b= true and false;
 print(m);
-print(x);
+print(x);*/

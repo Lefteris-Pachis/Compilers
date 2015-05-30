@@ -32,7 +32,7 @@ void execute_call(instruction* instr){
 		
 		case userfunc_m: {
 			
-			pc = func->data.funcVal+1;
+			pc = func->data.funcVal;
 			//printf("%d\n", func->data.funcVal);
 			//printf("%d\n", pc);
 			assert(pc < AVM_ENDING_PC);
@@ -66,6 +66,11 @@ void execute_pusharg(instruction* instr){
 	assert(arg);
 	printf("%d\n", top);	
 	printf("xxxx %d\n", &stack[top].type);
+	int i;
+	//for (i = 0; i < AVM_STACKSIZE; ++i)
+	//{
+		//printf("stack type %f\n", stack[i].data.numVal);
+	//}
 	avm_assign(&stack[top], arg);
 	++totalActuals;
 	avm_dec_top();
@@ -76,7 +81,7 @@ void execute_funcenter(instruction* instr){
 	userfunc* funcInfo;
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
-	assert(pc = func->data.funcVal+1);
+	assert(pc = func->data.funcVal);
 	totalActuals = 0;
 	funcInfo = avm_getfuncinfo(pc-1);
 	printf("%d\n",topsp );
@@ -90,7 +95,7 @@ void execute_funcexit(instruction* unused){
 	printf("exec_funcexit\n");
 	unsigned int oldTop = top;
 	top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
-	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET)+1;
+	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
 	printf("PC     %d\n", pc);
 	topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
 	while (oldTop++ <= top){
