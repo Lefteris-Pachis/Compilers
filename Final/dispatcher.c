@@ -46,7 +46,7 @@ void execute_cycle(void){
 		else{
 			assert(pc < AVM_ENDING_PC);
 			instruction* i = instr + pc;
-			printf("OP %d PC %d\n",i->opcode,pc );
+			printf("PC %d instr[%d].op = %d\n",pc,pc,(instr+pc)->opcode );
 			assert(i->opcode >= 0 && i->opcode <= AVM_MAX_INSTRUCTIONS);
 			if(i->srcLine)
 				currLine = i->srcLine;

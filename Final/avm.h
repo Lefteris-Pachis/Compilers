@@ -129,5 +129,6 @@ void 			avm_initialize(void);
 
 int 			Read_Bin();
 void 			run_avm();
+void 			validate_instr();
 
 #endif

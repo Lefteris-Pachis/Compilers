@@ -12,6 +12,7 @@ char**					VMlibs = (char**) 0;
 unsigned 				countlibs = 0;
 unsigned 				totalVMlibs = 0;
 instruction* 			instr;
+instruction* 			instr_save;
 unsigned 				total_instr;
 double* 				Consts_Double;
 unsigned 				total_Double_Consts;
@@ -151,14 +152,13 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
 		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
-		case formal_a: 	printf("formal_a\n"); return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];/*return &stack[AVM_STACKSIZE - arg->val];*/
+		case formal_a: 	printf("formal_a\n"); return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
 
 		case retval_a: 	printf("retval_a\n");return &retval;
 
 		case integer_a:  {
 			reg->type = number_m;
 			reg->data.numVal = consts_getint(arg->val);
-			printf("zzzzzz %f\n", reg->data.numVal);
 			return reg;
 		}
 
@@ -187,10 +187,7 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 
 		case userfunc_a:{
 			reg->type = userfunc_m;
-			//reg->data.funcVal = arg->val;
-			printf("reg->data.funcVal %d\n", reg->data.funcVal);
 			reg->data.funcVal = Consts_Func[arg->val].address;
-			printf("Consts_Func[arg->val].address %d\n", Consts_Func[arg->val].address);
 			return reg;
 		}
 
@@ -295,8 +292,8 @@ void avm_callsaveenviroment(void){
 
 unsigned avm_get_envvalue(unsigned i){
 	unsigned val;
-	printf("xxxxxxxxxxxx %f\n", stack[i].data.numVal);
-	//assert(stack[i].type == number_m);
+	//printf("xxxxxxxxxxxx %f\n", stack[i].data.numVal);
+	assert(stack[i].type == number_m);
 	val = (unsigned) stack[i].data.numVal;
 	assert(stack[i].data.numVal == ((double) val));
 	return val;
@@ -312,11 +309,6 @@ avm_memcell* avm_getactual(unsigned i){
 }
 
 userfunc* avm_getfuncinfo(unsigned address){
-	/*int i=0;
-	for (i = 0; i < total_Func_Consts; ++i)
-	{
-		printf("Consts_Func %s\n", Consts_Func[i].id);
-	}*/
 	return (Consts_Func + address);
 }
 
@@ -508,15 +500,12 @@ int Read_Bin(){
     for ( i = 0; i < total_Func_Consts; ++i)
     	Consts_Func[i] = FuncCon[i];
 
-    instruction* buffer = malloc(sizeof(instruction)*tot[4]);
-    fread(buffer,sizeof(instruction),tot[4],Nicode);
-    //instr = buffer;
+    instr = malloc(sizeof(instruction)*tot[4]);
+    fread(instr,sizeof(instruction),tot[4],Nicode);
     total_instr = tot[4];
-    instr = malloc(sizeof(instruction)*total_instr);
-    for ( i = 0; i < total_instr; ++i){
-    	instr[i] = buffer[i];
-    	printf("instr[i] %d\n",instr[i].opcode );
-    }
+    instr_save = malloc(sizeof(instruction)*total_instr);
+    for ( i = 0; i < total_instr; ++i)
+    	instr_save[i] = instr[i];
    	
 	fclose(Nicode);
 	return 0;
@@ -524,10 +513,18 @@ int Read_Bin(){
 
 void run_avm(){
 	avm_initialize();
-	top = AVM_STACKSIZE - (findMaxOffset() + 500); // an thelw functions 0 anti gia 500
-	printf("%d\n",top );
+	top = AVM_STACKSIZE - (findMaxOffset() + 500); 
+	printf("top initial = %d\n",top );
 	topsp = top;
 	while (executionFinished != 1){
+		validate_instr();
 		execute_cycle();
 	}
+}
+
+void validate_instr(){
+	int i;
+	for (i = 0; i < total_instr; ++i)
+		if (instr[i].opcode != instr_save[i].opcode)
+			instr[i].opcode = instr_save[i].opcode;
 }

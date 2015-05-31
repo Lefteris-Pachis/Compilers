@@ -8,10 +8,11 @@ function f(x){
 }
 
 
-//a=10;
-//print(a);
-f(3);
-/*print("EEEEEEE");
+a=10;
+print(a);
+i = f(3);
+print(i);
+print("EEEEEEE");
 x = 1;
 y=2;
 z=3;
@@ -19,4 +20,4 @@ e=4;
 m= x<y and x>y;
 b= true and false;
 print(m);
-print(x);*/
+print(x);
