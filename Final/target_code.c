@@ -18,6 +18,8 @@ extern int 		yylineno;
 extern quad* 	quads;
 extern int 		currQuad;
 extern unsigned	i;
+extern int 		funcstart_count;
+extern int 		return_count;
 
 instruction*	instructions = (instruction*) 0;
 unsigned		totalIn = 0;
@@ -266,13 +268,14 @@ void patch_incomplete_jumps(){
 	incomplete_jump* tmp = ij_head;
 
 	while(tmp!=NULL){
+		printf("aaa %d\n", tmp->instrNo);
 		if(tmp->iaddress == currQuad){
 			instructions[tmp->instrNo].result.val = currInstr-1;	
-			//printf("currInstr    %d\n", currInstr);
+			printf("currInstr    %d\n", currInstr);
 		}
 		else{
-			instructions[tmp->instrNo].result.val = tmp->iaddress-1;	
-			//printf("tmp->iaddress    %d\n", tmp->iaddress-1);
+			instructions[tmp->instrNo].result.val = tmp->iaddress-1+funcstart_count+return_count;	// an exei function den thelei -1
+			printf("tmp->iaddress    %d\n", tmp->iaddress-1);
 		}
 		tmp = tmp->next;
 	}

@@ -1,18 +1,20 @@
-s=10;
-
+//s=10;
+function C(){}
 function f(x){
-	
-	print(x);
+	function v(){}
+	//print(x);
 	
 	return x;
 }
 
 
 a=10;
-print(a);
+for(i=0; i<10; i++)
+	{print(i);}
 i = f(3);
 print(i);
-print("EEEEEEE");
+C();
+/*print("EEEEEEE");
 x = 1;
 y=2;
 z=3;
@@ -20,4 +22,4 @@ e=4;
 m= x<y and x>y;
 b= true and false;
 print(m);
-print(x);
+print(x);*/

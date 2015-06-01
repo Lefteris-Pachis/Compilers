@@ -11,6 +11,8 @@ extern char* namedLibfuncs[12];
 extern userfunc*	userFuncs;
 unsigned i;
 int func_jmp = -1;
+int funcstart_count = 0;
+int return_count = 0;
 
 generator_func_t generators[] = {
  	generate_ASSIGN ,
@@ -196,6 +198,7 @@ void generate_GETRETVAL(quad* quad){
 
 void generate_FUNCSTART(quad* quad){
 	if(quad->result->sym->scope == 0){
+		funcstart_count++;
 		instruction j;
 		j.opcode = jump_v;
 		j.result.type = label_a;
@@ -229,6 +232,7 @@ void generate_FUNCSTART(quad* quad){
 }
 
 void generate_RETURN(quad* quad){
+	return_count++;
 	func_stack *f;
 	printf("***GENERATE_RETURN***\n");
 	quad->taddress = nextinstructionlabel();
