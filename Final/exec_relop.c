@@ -20,7 +20,7 @@ cmp_func cmpFunctions[] = {
 };
 
 void execute_relop(instruction* instr){
-	printf("exec_relop\n");
+	//printf("exec_relop\n");
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
 	cmp_func op;
@@ -30,7 +30,7 @@ void execute_relop(instruction* instr){
 	assert(rv1 && rv2 );
 	
 	if (rv1->type != number_m || rv2->type != number_m) {
-		avm_error("not a number in arithmetic!", "");
+		avm_error("not a number in arithmetic!");
 		executionFinished = 1;
 	}
 	else{
@@ -42,14 +42,14 @@ void execute_relop(instruction* instr){
 }
 
 void execute_jeq(instruction* instr){
-	printf("exec_jeq\n");
+	//printf("exec_jeq\n");
 	assert(instr->result.type == label_a);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
 	unsigned char result = 0;
 		
 	if (rv1->type == undef_m || rv2->type == undef_m)
-		avm_error("'undef' involved in equality!", "");
+		avm_error("'undef' involved in equality!");
 		else
 			if(rv1->type == nil_m || rv2->type == nil_m)
 				result = rv1->type == nil_m && rv2->type == nil_m;
@@ -58,7 +58,7 @@ void execute_jeq(instruction* instr){
 						result = (avm_tobool(rv1) == avm_tobool(rv2));
 					else
 						if(rv1->type != rv2->type)
-							avm_error("illegal! equality!", "" );		/////////////////////////////////////////////////////////////////////////////////
+							avm_error("illegal! equality!");
 						else{
 							if(rv1->type == number_m)
 								result = rv1->data.numVal == rv2->data.numVal;
@@ -76,14 +76,14 @@ void execute_jeq(instruction* instr){
 }
 
 void execute_jne(instruction* instr){
-	printf("exec_jne\n");
+	//printf("exec_jne\n");
 	assert(instr->result.type == label_a);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
 	unsigned char result = 0;
 	
 	if (rv1->type == undef_m || rv2->type == undef_m)
-		avm_error("'undef' involved in inequality!","");
+		avm_error("'undef' involved in inequality!");
 		else
 			if(rv1->type == nil_m || rv2->type == nil_m)
 				result = !(rv1->type == nil_m && rv2->type == nil_m);
@@ -92,7 +92,7 @@ void execute_jne(instruction* instr){
 					result = (avm_tobool(rv1) != avm_tobool(rv2));
 				else
 					if(rv1->type != rv2->type)
-						avm_error("illegal inequality!",	""); 		///////////////////////////////////////////////////////////////////////////////////
+						avm_error("illegal inequality!");
 					else{
 						if(rv1->type == number_m)
 							result = rv1->data.numVal != rv2->data.numVal;
@@ -110,8 +110,8 @@ void execute_jne(instruction* instr){
 }
 
 void execute_jump(instruction* instr){
-	printf("exec_jump\n");
+	//printf("exec_jump\n");
 	assert(instr->result.type == label_a);
 	pc = instr->result.val;
-	printf("PC = %d\n",pc );
+	//printf("PC = %d\n",pc );
 }

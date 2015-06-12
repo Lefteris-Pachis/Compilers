@@ -22,19 +22,14 @@ char* typeStrings[] = {
 };
 
 void execute_call(instruction* instr){
-	printf("exec_call\n");
+	//printf("exec_call\n");
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
 	avm_callsaveenviroment();
 
-	
-	switch (func->type){
-		
+	switch (func->type){		
 		case userfunc_m: {
-			
 			pc = func->data.funcVal;
-			//printf("%d\n", func->data.funcVal);
-			//printf("%d\n", pc);
 			assert(pc < AVM_ENDING_PC);
 			assert(instr[pc].opcode = funcenter_v);
 			break;
@@ -53,7 +48,7 @@ void execute_call(instruction* instr){
 		default: {
 			char *s = (char*) malloc(sizeof(char));
 			s = avm_tostring(func);
-			avm_error("call: cannot bind '%s' to function!", s);
+			avm_error("call: cannot bind '%s' to function!");
 			free(s);
 			executionFinished = 1;
 		}
@@ -61,33 +56,28 @@ void execute_call(instruction* instr){
 }
 
 void execute_pusharg(instruction* instr){
-	printf("exec_pusharg\n");
+	//printf("exec_pusharg\n");
 	avm_memcell* arg = avm_translate_operand(&instr->result, &ax);
 	assert(arg);
-	//printf("%d\n", top);	
-	//printf("xxxx %d\n", &stack[top].type);
 	avm_assign(&stack[top], arg);
 	++totalActuals;
 	avm_dec_top();
 }
 
 void execute_funcenter(instruction* instr){
-	printf("exec_funcenter\n");
+	//printf("exec_funcenter\n");
 	userfunc* funcInfo;
 	avm_memcell* func = avm_translate_operand(&instr->result, &ax);
 	assert(func);
 	assert(pc = func->data.funcVal);
 	totalActuals = 0;
 	funcInfo = avm_getfuncinfo(pc-1);
-	//printf("%d\n",topsp );
 	topsp = top;
-	//printf("%d\n",topsp );
 	top = top - funcInfo->localSize;
-	//printf("%d\n",top );
 }
 
 void execute_funcexit(instruction* unused){
-	printf("exec_funcexit\n");
+	//printf("exec_funcexit\n");
 	unsigned int oldTop = top;
 	top = avm_get_envvalue(topsp + AVM_SAVEDTOP_OFFSET);
 	pc = avm_get_envvalue(topsp + AVM_SAVEDPC_OFFSET);
@@ -104,7 +94,6 @@ void libfunc_print(void){
 	char* s;
 	for(i = 0; i < n; ++i){
 		s = (char*)avm_tostring(avm_getactual(i));
-		printf("PRINT CALLED ::::::::::::::::::::::: ");
 		puts(s);
 		//free(s);												//provlhma me boolean
 	}
@@ -113,7 +102,7 @@ void libfunc_print(void){
 void libfunc_typeof(void){
 	unsigned n = avm_totalactuals();
 	if(n != 1)
-		avm_error("one argument expected in 'typeof'!","");
+		avm_error("one argument expected in 'typeof'!");
 	else{
 		avm_memcellclear(&retval);
 		retval.type = string_m;
@@ -125,7 +114,7 @@ void libfunc_totalarguments(void){
 	unsigned p_topsp = avm_get_envvalue(topsp + AVM_SAVEDTOPSP_OFFSET);
 	avm_memcellclear(&retval);
 	if(!p_topsp){
-		avm_error("'totalarguments' called outside a function!","");
+		avm_error("'totalarguments' called outside a function!");
 		retval.type = nil_m;
 	}
 	else{

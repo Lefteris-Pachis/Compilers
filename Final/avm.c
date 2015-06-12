@@ -98,8 +98,8 @@ void avm_tablebucketsdestroy(avm_table_bucket** p){
 		for(b = *p; b;){
 			del = b;
 			b = b->next;
-			//avm_memclear(&del->key);
-			//avm_memclear(&del->value);
+			/*avm_memclear(&del->key);
+			avm_memclear(&del->value);*/
 			free(del);
 		}
 		p[i] = (avm_table_bucket*) 0;
@@ -151,10 +151,10 @@ avm_memcell* avm_translate_operand(vmarg* arg, avm_memcell* reg){
 	switch(arg->type){
 		/*Variables*/
 		case global_a:	return &stack[AVM_STACKSIZE - 1 - arg->val];
-		case local_a: 	printf("aaaaaaaa %d\n", arg->val); return &stack[topsp - arg->val];
-		case formal_a: 	printf("formal_a\n"); return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
+		case local_a: 	return &stack[topsp - arg->val];
+		case formal_a: 	return &stack[topsp + AVM_STACKENV_SIZE + 1 + arg->val];
 
-		case retval_a: 	printf("retval_a\n");return &retval;
+		case retval_a: 	return &retval;
 
 		case integer_a:  {
 			reg->type = number_m;
@@ -225,7 +225,6 @@ void avm_memcellclear(avm_memcell* m){
 }
 
 void memclear_string (avm_memcell* m){
-	//assert(m->data.strVal);
 	free(m->data.strVal);
 }
 
@@ -238,8 +237,8 @@ void avm_warning(char* format){
 	printf("Warning! %s\n", format);
 }
 
-void avm_error(char* format, char* s){
-	printf("Runtime error! %s\n", format, s);		/* message may need to include %s */
+void avm_error(char* format){
+	printf("Runtime error! %s\n", format);		/* message may need to include %s */
 	executionFinished = 1;
 }
 
@@ -270,7 +269,7 @@ void avm_assign(avm_memcell* lv, avm_memcell* rv){
 
 void avm_dec_top(void){
 	if(!top){
-		avm_error("stack overflow","");
+		avm_error("stack overflow");
 		executionFinished = 1;
 	}
 	else
@@ -292,7 +291,6 @@ void avm_callsaveenviroment(void){
 
 unsigned avm_get_envvalue(unsigned i){
 	unsigned val;
-	//printf("xxxxxxxxxxxx %f\n", stack[i].data.numVal);
 	assert(stack[i].type == number_m);
 	val = (unsigned) stack[i].data.numVal;
 	assert(stack[i].data.numVal == ((double) val));
@@ -315,7 +313,7 @@ userfunc* avm_getfuncinfo(unsigned address){
 void avm_calllibfunc(char* id){	
 	library_func_t f = avm_getlibraryfunc(id);
 	if(!f){
-		avm_error("Unsupported lib func '%s' called!", id);
+		avm_error("Unsupported lib func '%s' called!");
 		executionFinished = 1;
 	}
 	else{
@@ -514,7 +512,7 @@ int Read_Bin(){
 void run_avm(){
 	avm_initialize();
 	top = AVM_STACKSIZE - (findMaxOffset() + 500); 
-	printf("top initial = %d\n",top );
+	//printf("top initial = %d\n",top );
 	topsp = top;
 	while (executionFinished != 1){
 		validate_instr();

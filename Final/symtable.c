@@ -108,28 +108,7 @@ SymTable_T SymTable_new(void)
 
 void SymTable_free(SymTable_T oSymTable)
 {
-	/*int i = 0;
-	symbol makefree;
-	symbol parse;
 
-	assert(oSymTable!=NULL);
-
-	while(i<BUCKETS)
-	{
-		parse = oSymTable->hashtable[i];
-
-		while(parse!=NULL)
-		{
-			makefree = parse->next;
-			free(parse->var_name);
-			free(parse);
-			parse = makefree;
-		}
-		i++;
-	}
-	
-	free(parse);
-	free(oSymTable);*/
 }
 
 int findMaxOffset(){

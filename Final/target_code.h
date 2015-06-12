@@ -21,7 +21,6 @@ typedef enum vmopcode{
 }vmopcode;
 
 typedef enum vmarg_t{
-
 	label_a 	= 0,
 	global_a 	= 1,
 	formal_a 	= 2,
@@ -110,7 +109,6 @@ void t_emit(instruction* instruction);
 unsigned int  nextinstructionlabel();
 void Print_Instructions(FILE *fp );
 int add_userfunction(symbol f);
-
 
 void printConsts();
 #endif

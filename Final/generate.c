@@ -52,106 +52,76 @@ void generate(void){
 }
 
 void generate_ADD(quad* quad){
-	printf("***GENERATE_ADD***\n");
 	generate_instruction(add_v, quad);
 }
 
 void generate_SUB(quad* quad){
-	printf("***GENERATE_SUB***\n");
 	generate_instruction(sub_v, quad);
 }
 
 void generate_MUL(quad* quad){
-	printf("***GENERATE_MUL***\n");
 	generate_instruction(mul_v, quad);
 }
 
 void generate_DIV(quad* quad){
-	printf("***GENERATE_DIV***\n");
 	generate_instruction(div_v, quad);
 }
 
 void generate_MOD(quad* quad){
-	printf("***GENERATE_MOD***\n");
 	generate_instruction(mod_v, quad);
 }
 
 void generate_NEWTABLE(quad* quad){
-	printf("***GENERATE_NEWTABLE***\n");
 	generate_instruction(newtable_v, quad);
 }
 
 void generate_TABLEGETELEM(quad* quad){
-	printf("***GENERATE_TABLEGETELEM***\n");
 	generate_instruction(tablegetelem_v, quad);
 }
 
 void generate_TABLESETELEM(quad* quad){
-	printf("***GENERATE_TABLESETELEM***\n");
 	generate_instruction(tablesetelem_v, quad);
 }
 
 void generate_ASSIGN(quad* quad){
-	printf("***GENERATE_ASSIGN***\n");
 	generate_instruction(assign_v, quad);
 }
 
 void generate_NOP(){
 	instruction i;
-	printf("***GENERATE_NOP***\n");
 	i.opcode = nop_v;
 	t_emit(&i);
 }
 
 void generate_JUMP(quad* quad){
-	printf("***GENERATE_JUMP***\n");
-	//generate_instruction(jump_v, quad);
-	//instruction *i = malloc(sizeof(instruction));
-	//i->opcode = jump_v;
-	//i->result.type = label_a;
-	//i->result.val = quad->label;
-	//quad->taddress = nextinstructionlabel();
-	//if(quad->result)
-	//	printf("%d\n", quad->result);
-	//make_operand(quad->result,&i.result);
-	
-	//i->srcLine = quad->line;
-	//t_emit(&i);
 	generate_relational_instruction(jump_v,quad);
 }
 
 void generate_IF_EQ(quad* quad){
-	printf("***GENERATE_IF_EQ***\n");
 	generate_relational_instruction(jeq_v, quad);
 }
 
 void generate_IF_NOTEQ(quad* quad){
-	printf("***GENERATE_IF_NOTEQ***\n");
 	generate_relational_instruction(jne_v, quad);
 }
 
 void generate_IF_GREATER(quad* quad){
-	printf("***GENERATE_IF_GREATER***\n");
 	generate_relational_instruction(jgt_v, quad);
 }
 
 void generate_IF_GREATERQ(quad* quad){
-	printf("***GENERATE_IF_GREATERQ***\n");
 	generate_relational_instruction(jge_v, quad);
 }
 
 void generate_IF_LESS(quad* quad){
-	printf("***GENERATE_IF_LESS***\n");
 	generate_relational_instruction(jlt_v, quad);
 }
 
 void generate_IF_LESSEQ(quad* quad){
-	printf("***GENERATE_IF_LESSEQ***\n");
 	generate_relational_instruction(jle_v, quad);
 }
 
 void generate_PARAM(quad* quad){
-	printf("***GENERATE_PARAM***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = pusharg_v;
@@ -161,7 +131,6 @@ void generate_PARAM(quad* quad){
 }
 
 void generate_CALL(quad* quad){
-	printf("***GENERATE_CALL***\n");
 	int flag = 0;
 	quad->taddress = nextinstructionlabel();
 	instruction t;
@@ -187,7 +156,6 @@ void generate_CALL(quad* quad){
 }
 
 void generate_GETRETVAL(quad* quad){
-	printf("***GENERATE_GETRETVAL***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = assign_v;
@@ -207,7 +175,6 @@ void generate_FUNCSTART(quad* quad){
 		t_emit(&j);
 		func_jmp = nextinstructionlabel()-1;
 	}
-	printf("***GENERATE_FUNCSTART***\n");
 	int index;
 	func_stack* function= malloc(sizeof(func_stack));
 
@@ -215,7 +182,6 @@ void generate_FUNCSTART(quad* quad){
 	function->func=f;
 	function->node=NULL;
 	f->taddress = nextinstructionlabel();
-	printf("%d\n", f->taddress);
 	quad->taddress = nextinstructionlabel();
 
 	index = add_userfunction(f);
@@ -234,7 +200,6 @@ void generate_FUNCSTART(quad* quad){
 void generate_RETURN(quad* quad){
 	return_count++;
 	func_stack *f;
-	printf("***GENERATE_RETURN***\n");
 	quad->taddress = nextinstructionlabel();
 	instruction t;
 	t.opcode = assign_v;
@@ -249,12 +214,7 @@ void generate_RETURN(quad* quad){
 	reset_operand(&t.arg2);
 	t.result.type=label_a;
 	t_emit(&t);
-
-
-	
 }
-
-
 
 vmarg * reset_operand(){
 	 return( (vmarg *) NULL);
@@ -262,18 +222,13 @@ vmarg * reset_operand(){
 
 void generate_FUNCEND(quad* quad){
 	return_list *tmp;
-	printf("***GENERATE_FUNCEND***\n");
 	func_stack *f;
 	f=pop_func();
 	tmp=f->node;
 	if(tmp!=NULL){
 		while(tmp){
-			printf("while\n");
 			instructions[tmp->return_label].result.val=nextinstructionlabel();
-
-
 			tmp=tmp->next;
-
 		}
 	}
 	quad->taddress = nextinstructionlabel();
@@ -288,10 +243,7 @@ void generate_FUNCEND(quad* quad){
 
 }
 
-
-
 return_list * appendRL(return_list *head,int label){
-
 	return_list *tmp = malloc( sizeof( struct return_List ) );
 	tmp->return_label = label;
 
@@ -307,7 +259,6 @@ return_list * appendRL(return_list *head,int label){
 }
 
 void generate_UMINUS(quad* quad){
-	printf("***GENERATE_UMINUS***\n");
 	instruction i;
 	i.opcode = mul_v;
 	if(quad->arg1!=NULL)

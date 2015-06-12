@@ -17,7 +17,7 @@ double mul_impl (double x, double y){
 }
 double div_impl (double x, double y){ 
 	if(y == 0){
-		avm_error("error: division by 0", ""); 
+		avm_error("error: division by 0"); 
 		executionFinished = 1; 
 		return -1.0;
 	}
@@ -25,7 +25,7 @@ double div_impl (double x, double y){
 }
 double mod_impl (double x, double y){ 
 	if(y == 0){
-		avm_error("error: division by 0", ""); 
+		avm_error("error: division by 0"); 
 		executionFinished = 1;  
 		return -1.0;
 	} 
@@ -41,7 +41,7 @@ arithmetic_func_t arithmeticFuncs[] = {
 };
 
 void execute_arithmetic(instruction* instr){
-	printf("exec_arithm\n");
+	//printf("exec_arithm\n");
 	avm_memcell* lv = avm_translate_operand(&instr->result, &retval);
 	avm_memcell* rv1 = avm_translate_operand(&instr->arg1, &ax);
 	avm_memcell* rv2 = avm_translate_operand(&instr->arg2, &bx);
@@ -50,7 +50,7 @@ void execute_arithmetic(instruction* instr){
 	assert(rv1 && rv2 );
 	
 	if (rv1->type != number_m || rv2->type != number_m) {
-		avm_error("not a number in arithmetic!", "");
+		avm_error("not a number in arithmetic!");
 		executionFinished = 1;
 	}
 	else{

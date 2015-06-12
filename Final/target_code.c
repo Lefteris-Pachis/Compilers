@@ -48,7 +48,7 @@ void make_operand(expr* e, vmarg* arg){
 		case constbool_e:
 			if(e->boolConst == 48)
 				arg->val = 0;
-			else if(e->boolConst == 49)						/////////////////////////////////////
+			else if(e->boolConst == 49)						
 				arg->val = 1;
 			arg->type = bool_a;
 			break;
@@ -57,14 +57,8 @@ void make_operand(expr* e, vmarg* arg){
 			arg->type = string_a;
 			break;
 		case constint_e:
-			//if(e->sym == NULL){
-				arg->val = consts_newint(e->intConst);
-				arg->type = integer_a;
-			//}
-			//else{
-			//	arg->val = e->sym->offset;
-			//	arg->type = global_a;
-			//}
+			arg->val = consts_newint(e->intConst);
+			arg->type = integer_a;
 			break;
 		case constdouble_e:
 			arg->val = consts_newdouble(e->doubleConst);
@@ -81,22 +75,18 @@ void make_operand(expr* e, vmarg* arg){
 			/*userfuncs_newfunc(e->sym);*/
 			break;
 		case libraryfunc_e:
-			printf("LIBRARY FUNC OPERAND\n");
 			arg->type = libfunc_a;
-			//arg->val = libfuncs_newused(e->sym->value.funcVal->name);
 			break;
 		default: assert(0);
 	}
 }
 
 void push_func(func_stack* function){
-
 	function->next = f_top;
 	f_top = function;
 }
 
 func_stack* pop_func(){
-
 	func_stack* tmp;
 
 	if(f_top == NULL)
@@ -116,9 +106,6 @@ func_stack* top_func(){
 	return tmp;
 }
 
-
-
-
 void make_int_operand(vmarg* arg, int val){
 	arg->val = consts_newint(val);
 	arg->type = integer_a;
@@ -133,6 +120,7 @@ void make_bool_operand(vmarg* arg, unsigned val){
 	arg->val = val;
 	arg->type = bool_a;
 }
+
 void make_retval_operand(vmarg* arg){
 	arg->type = retval_a;
 }
@@ -157,8 +145,6 @@ incomplete_jump *add_incomplete_jump(incomplete_jump *head,unsigned instrNo, uns
 }
 
 void Print_Instructions(FILE * fp){
-
-
 	vmopcode op;
 	int i = 0;
 	char *table_op[25] = {"ASSIGN","ADD","SUB","MUL","DIV","MOD","UMINUS","AND","OR","NOT","JEQ","JNOTEQ",
@@ -202,57 +188,22 @@ void Print_Instructions(FILE * fp){
 }
 
 void Print_Bin(){
-
-	
 	char* magicNo = "giwrgadakhs";
-	
-
 	char *table_op[25] = {"ASSIGN","ADD","SUB","MUL","DIV","MOD","UMINUS","AND","OR","NOT","JEQ","JNOTEQ",
       "JLESSEQ","JGREATEREQ","JLESS","JGREATER","JUMP","CALL","PUSHARG","ENTERFUNC","EXITFUNC","NEWTABLE","TABLEGETELEM","TABLESETELEM","NOP"};
 
 	FILE *icode = fopen("tcode.bin","wb");
-	
 	int i = 0;
-
-	int totals[] = {total_double_Consts,total_int_Consts,total_string_Consts,total_userFuncs,currInstr};	
-
-
+	int totals[] = {total_double_Consts,total_int_Consts,total_string_Consts,total_userFuncs,currInstr};
 	fwrite(magicNo, strlen(magicNo)+1,1,icode);
-
-
-	fwrite(totals,sizeof(int),5,icode);
-	//fwrite((int*)total_double_Consts, sizeof(int),1,icode);
-	
-	fwrite(doubleConsts, sizeof(double),total_double_Consts,icode);
-
-	//fwrite((int*)total_int_Consts, sizeof(int),1,icode);
-	
+	fwrite(totals,sizeof(int),5,icode);	
+	fwrite(doubleConsts, sizeof(double),total_double_Consts,icode);	
 	fwrite(intConsts, sizeof(int),total_int_Consts,icode);
-
-	//fwrite((int*)total_string_Consts, sizeof(int),1,icode);
-
 	fwrite(stringConsts, sizeof(char*),total_string_Consts,icode);
-
-	/*while(i<total_string_Consts){
-
-		//fwrite((int*)strlen(stringConsts[i])+1, sizeof(int),1,icode);
-		fwrite(stringConsts[i], strlen(stringConsts[i]+1),1,icode);
-		i++;
-	}*/
-	
-	//fwrite((int*)total_userFuncs,sizeof(int),1,icode);	
-
-	fwrite(userFuncs,sizeof(userfunc),total_userFuncs,icode);
-
-	//fwrite((int*)currInstr,sizeof(int),1,icode);	
-    
+	fwrite(userFuncs,sizeof(userfunc),total_userFuncs,icode);    
     fwrite(instructions,sizeof(instruction),currInstr,icode);
-
-    //fseek(icode,SEEK_SET,0);
     fclose(icode);
 }
-
-
 
 void print_incomplete_j(){
 	incomplete_jump* tmp = ij_head;
@@ -266,16 +217,12 @@ void print_incomplete_j(){
 void patch_incomplete_jumps(){
 	//print_incomplete_j();
 	incomplete_jump* tmp = ij_head;
-
 	while(tmp!=NULL){
-		printf("aaa %d\n", tmp->instrNo);
 		if(tmp->iaddress == currQuad){
 			instructions[tmp->instrNo].result.val = currInstr-1;	
-			printf("currInstr    %d\n", currInstr);
 		}
 		else{
-			instructions[tmp->instrNo].result.val = tmp->iaddress-1+funcstart_count+return_count;	// an exei function den thelei -1
-			printf("tmp->iaddress    %d\n", tmp->iaddress-1);
+			instructions[tmp->instrNo].result.val = tmp->iaddress-1+funcstart_count+return_count;
 		}
 		tmp = tmp->next;
 	}
@@ -289,7 +236,6 @@ void generate_instruction(vmopcode op, quad* quad){
 	if(quad->arg2!=NULL){
 		make_operand(quad->arg2,&i.arg2);
 	}
-
 	make_operand(quad->result,&i.result);
 	quad->taddress = nextinstructionlabel();
 	i.srcLine = quad->line;
@@ -297,9 +243,7 @@ void generate_instruction(vmopcode op, quad* quad){
 }
 
 void generate_relational_instruction(vmopcode op, quad* quad){
-
 	instruction t;
-
 	t.opcode = op;
 	if(quad->arg1)
 		make_operand(quad->arg1,&t.arg1);
@@ -321,15 +265,8 @@ void generate_relational_instruction(vmopcode op, quad* quad){
 
 }
 
-
-
-
-
-
 int consts_newdouble(double d){
-
 	total_double_Consts++;
-
 	double* newdoubleConsts = malloc(sizeof(double)*total_double_Consts);
 
 	memcpy(newdoubleConsts,doubleConsts,8*(total_double_Consts-1));
@@ -341,10 +278,8 @@ int consts_newdouble(double d){
 	return total_double_Consts-1;
 }
 
-
 int consts_newint(int d){
 	total_int_Consts++;
-
 	int* newintConsts = malloc(sizeof(int)*total_int_Consts);
 
 	memcpy(newintConsts,intConsts,4*(total_int_Consts-1));
@@ -354,13 +289,10 @@ int consts_newint(int d){
 
 	intConsts[total_int_Consts-1] = d;
 
-	
 	return total_int_Consts-1;
 }
 
-
 int consts_newstring(char* s){
-
 	total_string_Consts++;
 
 	char** newstringConsts = malloc(sizeof(char*)*total_string_Consts);
@@ -381,18 +313,12 @@ int add_userfunction(symbol f){
 
 	free(userFuncs);
 	userFuncs=newuserFuncs;
-	//printf("Function :: %s\n", f->name);
 	userFuncs[total_userFuncs-1].id=strdup(f->name);
-	//printf("Function :: %s\n", tmp->id);
 	userFuncs[total_userFuncs-1].address=f->taddress;
 
 	userFuncs[total_userFuncs-1].localSize=f->totallocals;
 
-	printf("address  %d\n",userFuncs[total_userFuncs-1].address );
-
 	return total_userFuncs-1;
-
-
 }
 
 void t_expand(){
@@ -408,7 +334,6 @@ void t_expand(){
 
 void t_emit(instruction* instruction){
 	struct instruction* i;
-	printf("currInstr%d\n", currInstr);
 	if(currInstr == totalIn)
 		t_expand();
 	i = instructions + currInstr++;
@@ -424,19 +349,16 @@ unsigned int  nextinstructionlabel(){
 	return currInstr;
 }
 void printUserFunction(FILE *fp){
-
 	int i;
    for(i=0; i<total_userFuncs; i++){ 
       fprintf( fp, "\n%d: %s %d %d ", i, userFuncs[ i].id, userFuncs[ i ].address, userFuncs[ i ].localSize);
    }
    fprintf(fp,"\n\n\n");
    return;
-
 }
 
 void printConsts(){
 	int i = 0;
-	
 
 	FILE* fp = fopen("const.txt","w");
 	fprintf(fp, "namedLibfuncs : ");
@@ -473,4 +395,3 @@ void printConsts(){
 	fclose(fp);
 	Print_Bin();
 }
-

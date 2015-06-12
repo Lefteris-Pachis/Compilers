@@ -86,7 +86,7 @@ char* 			libfuncs_getused(unsigned index);
 void 			avm_memcellclear(avm_memcell* m);
 
 void 			avm_warning(char* format);
-void 			avm_error(char* format, char* s);
+void 			avm_error(char* format);
 
 void 			avm_assign(avm_memcell* lv, avm_memcell* rv);
 

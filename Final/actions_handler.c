@@ -9,30 +9,39 @@ extern label_list* cont_list;
 void Handle_stmt_expr_semicolon(int lineNo){
 	printf("Line: %d \tstmt: expr;\n", lineNo);
 }
+
 void Handle_stmt_ifstmt(int lineNo){
 	printf("Line: %d \tstmt: ifstmt\n", lineNo);
 }
+
 void Handle_stmt_whilestmt(int lineNo){
 	printf("Line: %d \tstmt: whilestmt\n", lineNo);
 }
+
 void Handle_stmt_forstmt(int lineNo){
 	printf("Line: %d \tstmt: forstmt\n", lineNo);
 }
+
 void Handle_stmt_returnstmt(int lineNo){
 	printf("Line: %d \tstmt: returnstmt\n", lineNo);
 }
+
 void Handle_stmt_break_semicolon(int lineNo){
 	printf("Line: %d \tstmt: break;\n", lineNo);
 }
+
 void Handle_stmt_continue_semicolon(int lineNo){
 	printf("Line: %d \tstmt: continue;\n", lineNo);
 }
+
 void Handle_stmt_block(int lineNo){
 	printf("Line: %d \tstmt: block\n", lineNo);
 }
+
 void Handle_stmt_funcdef(int lineNo){
 	printf("Line: %d \tstmt: funcdef\n", lineNo);
 }
+
 void Handle_stmt_semicolon(int lineNo){
 	printf("Line: %d \tstmt: ;\n", lineNo);
 }
@@ -40,6 +49,7 @@ void Handle_stmt_semicolon(int lineNo){
 void Handle_expr_assignexpr(int lineNo){
 	printf("Line: %d \texpr: assignexpr\n", lineNo);
 }
+
 expr* Handle_expr_expr_plus_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr + expr \n", lineNo);
 	expr* e = NULL;
@@ -66,6 +76,7 @@ expr* Handle_expr_expr_plus_expr(expr* arg1,expr* arg2,int lineNo){
 	}
 	return e;
 }
+
 expr* Handle_expr_expr_minus_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr - expr \n", lineNo);
 	expr* e = NULL;
@@ -92,6 +103,7 @@ expr* Handle_expr_expr_minus_expr(expr* arg1,expr* arg2,int lineNo){
 	}
 	return e;
 }
+
 expr* Handle_expr_expr_mul_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr * expr \n", lineNo);
 	expr* e = NULL;
@@ -118,6 +130,7 @@ expr* Handle_expr_expr_mul_expr(expr* arg1,expr* arg2,int lineNo){
 	}
 	return e;
 }
+
 expr* Handle_expr_expr_div_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr / expr \n", lineNo);
 	expr* e = NULL;
@@ -144,6 +157,7 @@ expr* Handle_expr_expr_div_expr(expr* arg1,expr* arg2,int lineNo){
 	}
 	return e;
 }
+
 expr* Handle_expr_expr_mod_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr %% expr \n", lineNo);
 	expr* e = NULL;
@@ -170,78 +184,73 @@ expr* Handle_expr_expr_mod_expr(expr* arg1,expr* arg2,int lineNo){
 	}
 	return e;
 }
+
 expr* Handle_expr_expr_greater_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr > expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_greater,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_greater,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_less_than_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr < expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_less,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_less,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_greater_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr >= expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_greatereq,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_greatereq,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_less_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr <= expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_lesseq,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_lesseq,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr == expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_eq,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_eq,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_not_eq_expr(expr* arg1,expr* arg2,int lineNo){
 	printf("Line: %d \texpr: expr != expr \n", lineNo);
 	expr* e = NULL;
-	//if(((arg1->type == var_e) && (arg2->type == var_e)) || ((arg1->type == var_e) && (arg2->type == arithexpr_e)) || ((arg1->type == tableitem_e) && (arg2->type == tableitem_e)) || ((arg1->type == arithexpr_e) && (arg2->type == arithexpr_e)) || ((arg1->type == boolexpr_e) && (arg2->type == boolexpr_e)) || ((arg1->type == constdouble_e) && (arg2->type == constdouble_e)) || ((arg1->type == constint_e) && (arg2->type == constint_e)) || ((arg1->type == var_e) && (arg2->type == constdouble_e)) || ((arg1->type == var_e) && (arg2->type == constint_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constdouble_e)) || ((arg1->type == arithexpr_e) && (arg2->type == constint_e))){
-		e = newexpr(boolexpr_e);
-		e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
-		e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
-		emit_jump(if_noteq,arg1, arg2, (expr*)0, 0);
-		emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
-	//}
+	e = newexpr(boolexpr_e);
+	e->true_list = label_list_insert(e->true_list,next_quad_label(),0);
+	e->false_list = label_list_insert(e->false_list,next_quad_label()+1,0);
+	emit_jump(if_noteq,arg1, arg2, (expr*)0, 0);
+	emit_jump(jump, (expr*)0, (expr*)0, (expr*)0, 0);
 	return e;
 }
+
 expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr and expr \n", lineNo);
 	if(arg2->type == var_e){
@@ -260,6 +269,7 @@ expr* Handle_expr_expr_and_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo
 	e->false_list = merge(arg1->false_list,arg2->false_list);
 	return e;
 }
+
 expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo){
 	printf("Line: %d \texpr: expr or expr \n", lineNo);
 	if(arg2->type == var_e){
@@ -276,8 +286,8 @@ expr* Handle_expr_expr_or_expr(expr* arg1,expr* arg2,unsigned M_quad,int lineNo)
 	e->true_list = merge(arg1->true_list,arg2->true_list);
 	e->false_list = arg2->false_list;
 	return e;
-
 }
+
 void Handle_expr_term(int lineNo){
 	printf("Line: %d \texpr: term\n", lineNo);
 }
@@ -285,9 +295,11 @@ void Handle_expr_term(int lineNo){
 void Handle_term_l_parenthesis_expr_r_parenthesis(int lineNo){
 	printf("Line: %d \tterm: (expr)\n", lineNo);
 }
+
 void Handle_term_uminus_expr(int lineNo){
 	printf("Line: %d \tterm: -expr\n", lineNo);
 }
+
 expr* Handle_term_not_expr(expr* expr,int lineNo){
 	printf("Line: %d \tterm: not expr\n", lineNo);
 	struct expr *e = NULL;
@@ -302,6 +314,7 @@ expr* Handle_term_not_expr(expr* expr,int lineNo){
 	e->false_list = expr->true_list;
 	return e;
 }
+
 int Handle_term_plus_plus_lvalue(int lineNo, char* id_val){
 	printf("Line: %d \tterm: ++lvalue\n", lineNo);
 	if(id_val != NULL)
@@ -316,6 +329,7 @@ int Handle_term_plus_plus_lvalue(int lineNo, char* id_val){
 	}
 	return 0;
 }
+
 int Handle_term_lvalue_plus_plus(int lineNo, char* id_val){
 	printf("Line: %d \tterm: lvalue++\n", lineNo);
 	if(id_val != NULL)
@@ -330,6 +344,7 @@ int Handle_term_lvalue_plus_plus(int lineNo, char* id_val){
 	}
 	return 0;
 }
+
 int Handle_term_minus_minus_lvalue(int lineNo, char* id_val){
 	printf("Line: %d \tterm: --lvalue\n", lineNo);
 	if(id_val != NULL)
@@ -344,6 +359,7 @@ int Handle_term_minus_minus_lvalue(int lineNo, char* id_val){
 	}
 	return 0;
 }
+
 int Handle_term_lvalue_minus_minus(int lineNo, char* id_val){
 	printf("Line: %d \tterm: lvalue--\n", lineNo);
 	if(id_val != NULL)
@@ -358,6 +374,7 @@ int Handle_term_lvalue_minus_minus(int lineNo, char* id_val){
 	}
 	return 0;
 }
+
 void Handle_term_primary(int lineNo){
 	printf("Line: %d \tterm: primary\n", lineNo);
 }
@@ -377,15 +394,19 @@ int Handle_assignexpr_lvalue_assign_expr(int lineNo, int state){
 void Handle_primary_lvalue(int lineNo){
 	printf("Line: %d \tprimary: lvalue\n", lineNo);
 }
+
 void Handle_primary_call(int lineNo){
 	printf("Line: %d \tprimary: call\n", lineNo);
 }
+
 void Handle_primary_objectdef(int lineNo){
 	printf("Line: %d \tprimary: objectdef\n", lineNo);
 }
+
 void Handle_primary_l_parenthesis_funcdef_r_parenthesis(int lineNo){
 	printf("Line: %d \tprimary: (funcdef)\n", lineNo);
 }
+
 void Handle_primary_const(int lineNo){
 	printf("Line: %d \tprimary: const\n", lineNo);
 }
@@ -417,7 +438,6 @@ int Handle_lvalue_id(char* name, int scope, int lineNo, int function_counter){
 	}
 
 	while(i>=1){
-
 		parse = Lookup(mytable,name,i);
 		if(parse!=NULL){
 			if(parse->scope == scope)
@@ -478,6 +498,7 @@ int Handle_lvalue_d_colon_id(char* name, int lineNo){
 	}
 	return 0;
 }
+
 void Handle_lvalue_member(int lineNo){
 	printf("Line: %d \tlvalue: member\n", lineNo);
 }
@@ -485,12 +506,15 @@ void Handle_lvalue_member(int lineNo){
 void Handle_member_lvalue_dot_id(int lineNo){
 	printf("Line: %d \tmember: lvalue.id\n", lineNo);
 }
+
 void Handle_member_lvalue_l_bracket_expr_r_bracket(int lineNo){
 	printf("Line: %d \tmember: lvalue[expr]\n", lineNo);
 }
+
 void Handle_member_call_dot_id(int lineNo){
 	printf("Line: %d \tmember: call.id\n", lineNo);
 }
+
 void Handle_member_call_l_bracket_expr_r_bracket(int lineNo){
 	printf("Line: %d \tmember: call[expr]\n", lineNo);
 }
@@ -498,9 +522,11 @@ void Handle_member_call_l_bracket_expr_r_bracket(int lineNo){
 void Handle_call_call_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tcall: call(elist)\n", lineNo);
 }
+
 void Handle_call_lvalue_callsuffix(int lineNo){
 	printf("Line: %d \tcall: lvalue callsuffix\n", lineNo);
 }
+
 void Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tcall: (funcdef)(elist)\n", lineNo);
 }
@@ -508,6 +534,7 @@ void Handle_call_l_parenthesis_funcdef_r_parenthesis_l_parenthesis_elist_r_paren
 void Handle_callsuffix_normcall(int lineNo){
 	printf("Line: %d \tcallsuffix: normcall\n", lineNo);
 }
+
 void Handle_callsuffix_methodcall(int lineNo){
 	printf("Line: %d \tcallsuffix: methodcall\n", lineNo);
 }
@@ -515,6 +542,7 @@ void Handle_callsuffix_methodcall(int lineNo){
 void Handle_normcall_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tnormcall: (elist)\n", lineNo);
 }
+
 void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo){
 	printf("Line: %d \tmethodcall: ..id(elist)\n", lineNo);
 }
@@ -522,6 +550,7 @@ void Handle_methodcall_d_dot_id_l_parenthesis_elist_r_parenthesis(int lineNo){
 void Handle_elist_expr(int lineNo){
 	printf("Line: %d \telist: expr\n", lineNo);
 }
+
 void Handle_elist_elist_comma_expr(int lineNo){
 	printf("Line: %d \telist: elist , expr\n", lineNo);
 }
@@ -529,6 +558,7 @@ void Handle_elist_elist_comma_expr(int lineNo){
 void Handle_objectdef_l_bracket_elist_r_bracket(int lineNo){
 	printf("Line: %d \tobjectdef: [elist]\n", lineNo);
 }
+
 void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo){
 	printf("Line: %d \tobjectdef: [indexed]\n", lineNo);
 }
@@ -536,9 +566,11 @@ void Handle_objectdef_l_bracket_indexed_r_bracket(int lineNo){
 void Handle_indexed_indexedelem(int lineNo){
 	printf("Line: %d \tindexed: indexedelem\n", lineNo);
 }
+
 void Handle_indexed_indexed_comma_indexedelem(int lineNo){
 	printf("Line: %d \tindexed: indexed , indexedelem\n", lineNo);
 }
+
 void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 	printf("Line: %d \tindexedelem: {expr: expr}\n", lineNo);
 }
@@ -546,13 +578,13 @@ void Handle_indexedelem_l_brace_expr_colon_expr_r_brace(int lineNo){
 void Handle_block_l_brace_block_1_r_brace(int lineNo){
 	printf("Line: %d \tblock: {block_1}\n", lineNo);
 }
+
 void Handle_block_1_stmt_block_1(int lineNo){
 	printf("Line: %d \tblock_1: stmt block_1\n", lineNo);
 }
 
 int Handle_funcdef_function_id_l_parenthesis_idlist_r_parenthesis_block(char* name, int scope, int lineNo){
 	printf("Line: %d \tfuncdef: function id(idlist) block\n", lineNo);
-	
 	symbol tmp = Lookup(mytable,name,scope);
 	if(tmp != NULL){
 		if(tmp->type == programfunc_s){
@@ -581,18 +613,23 @@ int Handle_funcdef_function_l_parenthesis_idlist_r_parenthesis_block(char* name,
 void Handle_const_integer(int lineNo){
 	printf("Line: %d \tconst: integer\n", lineNo);
 }
+
 void Handle_const_double(int lineNo){
 	printf("Line: %d \tconst: double\n", lineNo);
 }
+
 void Handle_const_string(int lineNo){
 	printf("Line: %d \tconst: string\n", lineNo);
 }
+
 void Handle_const_nil(int lineNo){
 	printf("Line: %d \tconst: nil\n", lineNo);
 }
+
 void Handle_const_true(int lineNo){
 	printf("Line: %d \tconst: true\n", lineNo);
 }
+
 void Handle_const_false(int lineNo){
 	printf("Line: %d \tconst: false\n", lineNo);
 }
@@ -617,6 +654,7 @@ int Handle_idlist_id_idlist_1(char* name, char* functionName, int scope, int lin
 		Insert_to_Hash(mytable, name, var_s, scope, lineNo);
 	return 0;
 }
+
 void Handle_idlist_1_comma_idlist(int lineNo){
 	printf("Line: %d \tidlist_1: ,idlist\n", lineNo);
 }
@@ -625,11 +663,13 @@ void Handle_ifstmt_ifprefix_stmt(unsigned quadnum,int lineNo){
 	printf("Line: %d \tifstmt: ifprefix stmt\n", lineNo);
 	patchlabel(quadnum,next_quad_label());
 }
+
 void Handle_ifstmt_ifprefix_stmt_elseprefix_stmt(unsigned quadnum1,unsigned quadnum2,int lineNo){
 	printf("Line: %d \tifstmt: ifprefix stmt elseprefix stmt\n", lineNo);
 	patchlabel(quadnum1,quadnum2+1);
 	patchlabel(quadnum2,next_quad_label());
 }
+
 unsigned Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo){
 	printf("Line: %d \tifprefix: if (expr)\n", lineNo);
 	emit_jump(if_eq, newexpr_constbool('1'), expr, 0, next_quad_label()+2);
@@ -637,6 +677,7 @@ unsigned Handle_ifprefix_if_l_parenthesis_expr_r_parenthesis(expr* expr,int line
 	emit_jump(jump, 0, 0, 0, 0);
 	return ret;
 }
+
 unsigned Handle_elseprefix_else(int lineNo){
 	printf("Line: %d \telseprefix: else\n", lineNo);
 	unsigned ret = next_quad_label();
@@ -644,13 +685,11 @@ unsigned Handle_elseprefix_else(int lineNo){
 	return ret;
 }
 
-/*void Handle_whilestmt_while_l_parenthesis_expr_r_parenthesis_stmt(int lineNo){
-	printf("Line: %d \twhilestmt: while (expr) stmt\n", lineNo);
-}*/
 unsigned Handle_whilestart_while(int lineNo){
 	printf("Line: %d \twhilestart: while\n", lineNo);
 	return next_quad_label();
 }
+
 unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo){
 	printf("Line: %d \twhilecond: (expr)\n", lineNo);
 	emit_jump(if_eq,newexpr_constbool('1'),expr,0,next_quad_label()+2);
@@ -658,6 +697,7 @@ unsigned Handle_whilecond_l_parenthesis_expr_r_parenthesis(expr* expr,int lineNo
 	emit_jump(jump, 0, 0, 0, 0);
 	return ret;
 }
+
 void Handle_whilestmt_whilestart_whilecond_stmt(unsigned quadnum1,unsigned quadnum2,struct statement *stmt,unsigned index,int lineNo){
 	printf("Line: %d \twhilestmt: whilestart whilecond stmt\n", lineNo);
 	emit_jump(jump, 0, 0, 0, quadnum1);
@@ -706,6 +746,7 @@ int Handle_returnstmt_return_expr_semicolon(expr* expr,int function_counter,int 
 		return 1;
 	}
 }
+
 int Handle_returnstmt_return_semicolon(int function_counter,int lineNo){
 	if(function_counter > 0){
 		printf("Line: %d \treturnstmt: return;\n", lineNo);
