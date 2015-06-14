@@ -1,4 +1,3 @@
-# Compiler and Virtual Machine for Alpha Language. www.csd.uoc.gr/~hy340
 
       Lefteris Pachis           pachis@csd.uoc.gr   2526
       Manos Xatzidakhs          hatzidak@csd.uoc.gr 2571
