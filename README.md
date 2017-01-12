@@ -1,7 +1,7 @@
 
-      Lefteris Pachis           pachis@csd.uoc.gr   2526
-      Manos Xatzidakhs          hatzidak@csd.uoc.gr 2571
-      Panagiwths Androvitsaneas androvit@csd.uoc.gr 2607
+      Lefteris Pachis           pachis@csd.uoc.gr   
+      Manos Xatzidakhs          hatzidak@csd.uoc.gr 
+      Panagiwths Androvitsaneas androvit@csd.uoc.gr 
 
       51  text files.
       48  unique files.
